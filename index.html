@@ -1709,10 +1709,13 @@
 
           fetch('/api/user', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              'x-telegram-init-data': initData
+            },
             body: JSON.stringify({ initData, startParam })
           })
-          .then(res => res.json())
+          .then(res => res.json().catch(() => ({})))
           .then(data => {
             if (data.success && data.user) {
               const u = data.user;
@@ -1756,41 +1759,58 @@
           showToast('Preparing sponsor ad...');
 
           try {
-            // Step 1: Request temporary session token from backend
+            // Step 1: Request temporary session token from backend (with x-telegram-init-data header)
             const startRes = await fetch('/api/ad-start', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: {
+                'Content-Type': 'application/json',
+                'x-telegram-init-data': initData
+              },
               body: JSON.stringify({ initData })
             });
-            const startData = await startRes.json();
-            if (!startData.success) throw new Error(startData.message || 'Ad session failed to start');
+            const startData = await startRes.json().catch(() => ({}));
+            if (!startRes.ok || !startData.success) {
+              throw new Error(startData.error || startData.message || 'Ad session failed to start');
+            }
 
-            const sessionToken = startData.sessionToken;
+            const sessionToken = startData.sessionId || startData.sessionToken;
 
             // Step 2: Show Monetag Ad (show_11923110)
             if (typeof window.show_11923110 === 'function') {
               await window.show_11923110();
             } else {
-              // Wait fallback simulation if ad blocker is active
+              // Fallback wait if ad blocker is active or function is delayed
               await new Promise(r => setTimeout(r, 2000));
             }
 
-            // Step 3: Claim Reward on backend
+            // Step 3: Claim Reward on backend (with both sessionId & sessionToken)
             showToast('Verifying points reward...');
             const rewardRes = await fetch('/api/reward', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ initData, sessionToken })
+              headers: {
+                'Content-Type': 'application/json',
+                'x-telegram-init-data': initData
+              },
+              body: JSON.stringify({
+                initData,
+                sessionId: sessionToken,
+                sessionToken: sessionToken
+              })
             });
-            const rewardData = await rewardRes.json();
+            const rewardData = await rewardRes.json().catch(() => ({}));
 
-            if (rewardData.success) {
-              updateBalance(rewardData.points);
+            if (rewardRes.ok && rewardData.success) {
+              const earnedReward = rewardData.reward || 100;
+              const newPoints = rewardData.balance !== undefined
+                ? rewardData.balance
+                : (rewardData.points !== undefined ? rewardData.points : stats.starBalance + earnedReward);
+
+              updateBalance(newPoints);
               setStats(p => ({ ...p, adsWatchedToday: p.adsWatchedToday + 1 }));
-              showToast('🎉 +100 PTS successfully credited!');
+              showToast(`🎉 +${earnedReward} PTS successfully credited!`);
               try { confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } }); } catch (e) {}
             } else {
-              showToast(rewardData.message || 'Reward verification failed');
+              showToast(rewardData.error || rewardData.message || 'Reward verification failed');
             }
           } catch (err) {
             console.error('Ad Error:', err);
@@ -1808,28 +1828,38 @@
           try {
             const res = await fetch('/api/daily-checkin', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: {
+                'Content-Type': 'application/json',
+                'x-telegram-init-data': initData
+              },
               body: JSON.stringify({ initData })
             });
-            const data = await res.json();
+            const data = await res.json().catch(() => ({}));
 
-            if (data.success) {
-              updateBalance(data.points);
+            if (res.ok && data.success) {
+              const rewardAmount = data.reward || 100;
+              const newBalance = data.balance !== undefined
+                ? data.balance
+                : (data.points !== undefined ? data.points : stats.starBalance + rewardAmount);
+
+              updateBalance(newBalance);
               setStats(p => ({
                 ...p,
                 hasCheckedInToday: true,
-                streakDays: data.streak,
+                streakDays: data.streak || p.streakDays + 1,
               }));
               setIsCheckInModalOpen(false);
-              showToast(data.message || '🎉 +100 PTS daily bonus claimed!');
+              showToast(data.message || `🎉 +${rewardAmount} PTS daily bonus claimed!`);
               try { confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 } }); } catch (e) {}
-            } else {
+            } else if (data.alreadyCheckedIn) {
+              setStats(p => ({ ...p, hasCheckedInToday: true }));
+              setIsCheckInModalOpen(false);
               showToast(data.message || 'Already claimed today!');
-              if (data.points !== undefined) {
-                setStats(p => ({ ...p, hasCheckedInToday: true }));
-              }
+            } else {
+              showToast(data.error || data.message || 'Check-in failed');
             }
           } catch (err) {
+            console.error('Daily Check-in Error:', err);
             showToast('Server error on check-in');
           }
         };
