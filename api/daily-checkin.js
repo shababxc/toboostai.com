@@ -1,88 +1,97 @@
 // api/daily-checkin.js
-const { db, admin } = require('./_firebase');
-const { verifyTelegramWebAppData } = require('./_telegram');
+const firebaseModule = require('./_firebase');
+const db = firebaseModule.db || firebaseModule;
+const admin = firebaseModule.admin || require('firebase-admin');
+
+const telegramHelper = require('./_telegram');
+const verifyInitData = typeof telegramHelper === 'function'
+  ? telegramHelper
+  : (telegramHelper.verifyInitData || telegramHelper.verifyTelegram || telegramHelper.verifyTelegramWebAppData || telegramHelper.validateInitData);
 
 module.exports = async (req, res) => {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  // CORS Headers
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, x-telegram-init-data');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
 
   try {
-    // হেডার অথবা বডি—দুটো থেকেই ডাটা রিসিভ করার নিরাপদ ব্যবস্থা
-    const initData = req.headers['x-telegram-init-data'] || (req.body && req.body.initData);
-    if (!initData) return res.status(401).json({ error: 'Missing Telegram authentication' });
+    // 1. Extract Telegram initData (from Header or Body)
+    const initData = req.headers['x-telegram-init-data'] || 
+                     req.headers['telegram-init-data'] || 
+                     (req.body && req.body.initData);
 
-    const auth = verifyTelegramWebAppData(initData);
-    if (!auth || !auth.user) return res.status(401).json({ error: 'Unauthorized user' });
+    if (!initData) {
+      return res.status(401).json({ success: false, error: 'Missing Telegram authentication data' });
+    }
 
-    const userId = String(auth.user.id);
+    // 2. Cryptographic Telegram Verification
+    const user = await verifyInitData(initData);
+    if (!user || !user.id) {
+      return res.status(401).json({ success: false, error: 'Unauthorized: Invalid Telegram initData' });
+    }
+
+    const userId = String(user.id);
     const userRef = db.collection('users').doc(userId);
+    const userDoc = await userRef.get();
+    const userData = userDoc.exists ? userDoc.data() : {};
 
-    const DAILY_BONUS_POINTS = 100;
+    // 3. Date & Streak Calculation (UTC based)
     const now = new Date();
-    const todayStr = now.toISOString().split('T')[0];
+    const todayStr = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
 
-    const result = await db.runTransaction(async (transaction) => {
-      const userDoc = await transaction.get(userRef);
-      if (!userDoc.exists) {
-        throw new Error('User not found. Please reload app.');
-      }
+    const yesterday = new Date(now);
+    yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
 
-      const userData = userDoc.data();
-      const lastCheckInDate = userData.lastCheckInDate || null;
-
-      // ইউজার কি আজ ইতিমধ্যে ক্লেইম করেছেন?
-      if (lastCheckInDate === todayStr) {
-        return {
-          alreadyClaimed: true,
-          points: userData.points || 0,
-          streak: userData.checkInStreak || 1
-        };
-      }
-
-      const yesterday = new Date(now);
-      yesterday.setUTCDate(yesterday.getUTCDate() - 1);
-      const yesterdayStr = yesterday.toISOString().split('T')[0];
-
-      let streak = userData.checkInStreak || 0;
-      if (lastCheckInDate === yesterdayStr) {
-        streak += 1;
-      } else {
-        streak = 1;
-      }
-
-      const newPoints = (userData.points || 0) + DAILY_BONUS_POINTS;
-
-      transaction.update(userRef, {
-        points: newPoints,
-        lastCheckInDate: todayStr,
-        lastCheckInAt: admin.firestore.FieldValue.serverTimestamp(),
-        checkInStreak: streak
-      });
-
-      return {
-        alreadyClaimed: false,
-        addedPoints: DAILY_BONUS_POINTS,
-        totalPoints: newPoints,
-        streak
-      };
-    });
-
-    if (result.alreadyClaimed) {
-      return res.status(400).json({
+    // Already checked in today?
+    if (userData.lastCheckInDate === todayStr) {
+      return res.status(200).json({
         success: false,
-        message: 'Already claimed today! Come back tomorrow.',
-        points: result.points,
-        streak: result.streak
+        alreadyCheckedIn: true,
+        message: 'You have already checked in today! Come back tomorrow.'
       });
     }
 
+    // Determine streak
+    let newStreak = 1;
+    if (userData.lastCheckInDate === yesterdayStr) {
+      newStreak = (userData.checkInStreak || 0) + 1;
+    }
+
+    const REWARD_AMOUNT = 100;
+
+    // 4. Update Firestore
+    await userRef.set({
+      id: userId,
+      balance: admin.firestore.FieldValue.increment(REWARD_AMOUNT),
+      totalEarned: admin.firestore.FieldValue.increment(REWARD_AMOUNT),
+      lastCheckInDate: todayStr,
+      lastCheckInTime: admin.firestore.FieldValue.serverTimestamp(),
+      checkInStreak: newStreak,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    const currentBalance = (userData.balance || 0) + REWARD_AMOUNT;
+
     return res.status(200).json({
       success: true,
-      message: `🎉 +${result.addedPoints} PTS claimed! (Streak: ${result.streak} Days)`,
-      points: result.totalPoints,
-      streak: result.streak
+      reward: REWARD_AMOUNT,
+      streak: newStreak,
+      balance: currentBalance,
+      message: `Daily check-in successful! +${REWARD_AMOUNT} coins awarded.`
     });
-  } catch (err) {
-    console.error('Daily checkin error:', err);
-    return res.status(500).json({ error: err.message || 'Failed to process daily checkin' });
+
+  } catch (error) {
+    console.error('daily-checkin error:', error);
+    return res.status(500).json({ success: false, error: error.message || 'Internal server error' });
   }
 };
