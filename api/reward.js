@@ -1,90 +1,70 @@
-// api/reward.js
-const firebaseModule = require('./_firebase');
-const db = firebaseModule.db || firebaseModule;
-const admin = firebaseModule.admin || require('firebase-admin');
-
-const telegramHelper = require('./_telegram');
-const verifyInitData = typeof telegramHelper === 'function'
-  ? telegramHelper
-  : (telegramHelper.verifyInitData || telegramHelper.verifyTelegram || telegramHelper.verifyTelegramWebAppData || telegramHelper.validateInitData);
+const { db, admin } = require('./_firebase');
+const { verifyTelegramWebAppData } = require('./_telegram');
 
 module.exports = async (req, res) => {
-  // CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, x-telegram-init-data');
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'Method not allowed' });
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
-    // 1. Safe read initData from headers or body
-    const initData = req.headers['x-telegram-init-data'] || 
-                     req.headers['telegram-init-data'] || 
-                     (req.body && req.body.initData);
-
+    const initData = req.headers['x-telegram-init-data'] || (req.body && req.body.initData);
     if (!initData) {
-      return res.status(401).json({ success: false, error: 'Missing Telegram authentication data' });
+      return res.status(401).json({ success: false, error: 'Telegram authentication missing' });
     }
 
-    // 2. Verify Telegram user
-    const user = await verifyInitData(initData);
-    if (!user || !user.id) {
-      return res.status(401).json({ success: false, error: 'Unauthorized: Invalid Telegram initData' });
+    const auth = verifyTelegramWebAppData(initData);
+    if (!auth || !auth.user) {
+      return res.status(401).json({ success: false, error: 'Unauthorized Telegram session' });
     }
 
-    const userId = String(user.id);
-
-    // 3. Read sessionId or sessionToken from request body
+    const userId = String(auth.user.id);
     const sessionId = req.body && (req.body.sessionId || req.body.sessionToken);
+
     if (!sessionId) {
-      return res.status(400).json({ success: false, error: 'Missing sessionId or sessionToken' });
+      return res.status(400).json({ success: false, error: 'Missing session token' });
     }
 
     const sessionRef = db.collection('ad_sessions').doc(sessionId);
     const userRef = db.collection('users').doc(userId);
-    const REWARD_AMOUNT = 100;
+    const REWARD_POINTS = 100;
 
-    // 4. Atomic verification and balance increment via Firestore Transaction
+    let updatedPoints = 0;
+
     await db.runTransaction(async (transaction) => {
       const sessionDoc = await transaction.get(sessionRef);
-
       if (!sessionDoc.exists) {
         throw new Error('Invalid ad session');
       }
 
       const sessionData = sessionDoc.data();
-
       if (sessionData.userId !== userId) {
-        throw new Error('Session does not belong to this user');
+        throw new Error('User mismatch for this ad session');
       }
 
       if (sessionData.status === 'completed') {
-        throw new Error('Reward has already been claimed for this ad session');
+        throw new Error('Reward already claimed');
       }
 
       if (sessionData.expiresAt && Date.now() > sessionData.expiresAt) {
-        throw new Error('Ad session expired. Please watch the ad again.');
+        throw new Error('Ad session expired');
       }
 
-      // Mark session completed
+      const userDoc = await transaction.get(userRef);
+      const currentPoints = userDoc.exists ? (userDoc.data().points || 0) : 0;
+      updatedPoints = currentPoints + REWARD_POINTS;
+
       transaction.update(sessionRef, {
         status: 'completed',
-        rewardAmount: REWARD_AMOUNT,
+        rewardAmount: REWARD_POINTS,
         completedAt: admin.firestore.FieldValue.serverTimestamp()
       });
 
-      // Credit 100 coins to user
       transaction.set(userRef, {
-        id: userId,
-        balance: admin.firestore.FieldValue.increment(REWARD_AMOUNT),
-        totalEarned: admin.firestore.FieldValue.increment(REWARD_AMOUNT),
+        userId,
+        points: admin.firestore.FieldValue.increment(REWARD_POINTS),
         adsWatched: admin.firestore.FieldValue.increment(1),
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
       }, { merge: true });
@@ -92,10 +72,11 @@ module.exports = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      reward: REWARD_AMOUNT,
-      message: `Reward credited successfully! +${REWARD_AMOUNT} coins.`
+      reward: REWARD_POINTS,
+      points: updatedPoints,
+      balance: updatedPoints,
+      message: `Reward credited! +${REWARD_POINTS} PTS`
     });
-
   } catch (error) {
     console.error('reward error:', error);
     return res.status(400).json({ success: false, error: error.message || 'Failed to claim reward' });
