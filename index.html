@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
   <head>
@@ -7,7 +6,13 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
-    <title>ToBOOSTAi - Telegram Web3 Mini App</title>
+    <title>ToBOOSTAi - Telegram Web3 Bounty & Tasks</title>
+
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Monetag Ad SDK (Zone: 11923110) -->
+    <script src="//libtl.com/sdk.js" data-zone="11923110" data-sdk="show_11923110"></script>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -59,16 +64,16 @@
           transform: translateY(0px) rotate(0deg);
         }
         50% {
-          transform: translateY(-6px) rotate(1.5deg);
+          transform: translateY(-4px) rotate(1.5deg);
         }
       }
 
       @keyframes coin-pulse-glow {
         0%, 100% {
-          filter: drop-shadow(0 6px 14px rgba(245, 158, 11, 0.35));
+          filter: drop-shadow(0 4px 10px rgba(245, 158, 11, 0.3));
         }
         50% {
-          filter: drop-shadow(0 10px 24px rgba(245, 158, 11, 0.65));
+          filter: drop-shadow(0 8px 18px rgba(245, 158, 11, 0.55));
         }
       }
 
@@ -104,6 +109,13 @@
     <script type="text/babel">
       const { useState, useEffect } = React;
 
+      // Initialize Telegram WebApp
+      const tg = window.Telegram?.WebApp;
+      if (tg) {
+        tg.ready();
+        tg.expand();
+      }
+
       // ==========================================
       // MULTI-LANGUAGE DICTIONARY (4 Languages)
       // ==========================================
@@ -112,13 +124,13 @@
           welcome: 'Welcome back,',
           totalBalance: 'Total Balance',
           verified: 'Verified',
-          boost: 'Boost',
+          boost: 'Booster',
           watchAd: 'Watch Ad',
           dailyCheckIn: 'Daily Check-in',
           referralLevel: 'Referral & Level',
           dailyTasks: 'Daily Tasks',
           convertWallet: 'Convert / Wallet',
-          activeBounties: 'Bounty Task',
+          activeBounties: 'Bounty Tasks',
           inviteFrens: 'Invite Frens, Earn Together',
           unclaimedCommission: 'Unclaimed Commission',
           claim: 'Claim',
@@ -128,7 +140,7 @@
           welcome: 'С возвращением,',
           totalBalance: 'Общий баланс',
           verified: 'Проверено',
-          boost: 'Ускорить',
+          boost: 'Ускоритель',
           watchAd: 'Смотреть рекламу',
           dailyCheckIn: 'Ежедневный вход',
           referralLevel: 'Рефералы и уровень',
@@ -144,7 +156,7 @@
           welcome: 'Bienvenido de nuevo,',
           totalBalance: 'Saldo Total',
           verified: 'Verificado',
-          boost: 'Impulsar',
+          boost: 'Impulsor',
           watchAd: 'Ver Anuncio',
           dailyCheckIn: 'Registro Diario',
           referralLevel: 'Referidos y Nivel',
@@ -160,7 +172,7 @@
           welcome: '欢迎回来，',
           totalBalance: '总星点余额',
           verified: '已认证',
-          boost: '加速',
+          boost: '加速器',
           watchAd: '观看赞助广告',
           dailyCheckIn: '每日签到',
           referralLevel: '推荐与等级',
@@ -197,17 +209,14 @@
         CalendarCheck: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M9 16l2 2 4-4"></path></svg>,
         CheckCircle2: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9 12l2 2 4-4"></path></svg>,
         ChevronRight: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>,
-        Clock: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>,
         Flame: ({ className, fill }) => <svg className={className} viewBox="0 0 24 24" fill={fill || "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>,
         Plus: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
         Check: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>,
         Loader2: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>,
-        Inbox: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>,
         Twitter: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>,
         Youtube: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="white"></polygon></svg>,
         Bot: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg>,
         Volume2: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>,
-        VolumeX: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>,
         Gift: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>,
         Gauge: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 14 4-4"></path><path d="M3.34 19a10 10 0 1 1 17.32 0"></path></svg>,
         BatteryCharging: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 7h1a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-2"></path><path d="M6 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h1"></path><line x1="11" y1="7" x2="9" y2="12"></line><line x1="15" y1="12" x2="13" y2="17"></line><line x1="22" y1="11" x2="22" y2="13"></line></svg>,
@@ -218,15 +227,13 @@
         X: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
         AlertCircle: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>,
         Trophy: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path><path d="M6 4h12v7a6 6 0 0 1-12 0V4z"></path></svg>,
-        Coins: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="8" r="6"></circle><path d="M18.09 10.37A6 6 0 1 1 10.34 18"></path><path d="M7 6h1v4"></path><path d="m16.71 13.88.7.71-2.82 2.82"></path></svg>,
         User: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>,
         Smartphone: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>,
-        RotateCcw: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>,
         Lock: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>,
       };
 
       // ==========================================
-      // FILE 6: 3D Dished Star Coin Component
+      // Original 3D Dished Star Coin Component
       // ==========================================
       const Coin3DIcon = ({
         size = 48,
@@ -325,7 +332,7 @@
       };
 
       // ==========================================
-      // FILE 7: TopVerifiedBanner
+      // TopVerifiedBanner
       // ==========================================
       const TopVerifiedBanner = ({ onOpenChannel }) => (
         <header className="sticky top-0 z-30 w-full bg-white/95 backdrop-blur-md border-b border-sky-100 shadow-[0_2px_10px_rgba(56,189,248,0.06)] px-4 py-2.5 transition-all">
@@ -356,12 +363,11 @@
       );
 
       // ==========================================
-      // FILE 8: UserHeaderSection (Dynamic Avatar)
+      // UserHeaderSection (Dynamic Real Telegram Avatar)
       // ==========================================
       const UserHeaderSection = ({
         username,
         userLevel,
-        levelTitle,
         avatarUrl,
         onOpenLevelModal,
         onOpenHelpModal,
@@ -379,25 +385,25 @@
         ];
 
         return (
-          <section className="w-full px-4 pt-4 pb-2">
+          <section className="w-full px-4 pt-3 pb-1">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div onClick={onOpenSettingsModal} role="button" className="relative cursor-pointer group shrink-0">
-                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-b from-sky-400/20 to-blue-500/20 p-0.5 border border-sky-200/80 shadow-sm flex items-center justify-center bg-white overflow-hidden">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-b from-sky-400/20 to-blue-500/20 p-0.5 border border-sky-200/80 shadow-sm flex items-center justify-center bg-white overflow-hidden">
                     {avatarUrl ? (
                       <img src={avatarUrl} alt="User Avatar" className="w-full h-full object-cover rounded-[14px]" />
                     ) : (
-                      <Coin3DIcon size={36} idPrefix="header-avatar" />
+                      <span className="font-display font-bold text-sky-600 text-base">{(username || 'U')[0].toUpperCase()}</span>
                     )}
                   </div>
-                  <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+                  <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></span>
                 </div>
 
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-medium text-slate-500">{dict.welcome}</span>
+                    <span className="text-[11px] font-medium text-slate-500">{dict.welcome}</span>
                   </div>
-                  <button onClick={onOpenSettingsModal} className="text-left font-display font-bold text-slate-900 text-base leading-tight truncate hover:text-sky-600 transition-colors flex items-center gap-1 cursor-pointer max-w-[150px] sm:max-w-[200px]">
+                  <button onClick={onOpenSettingsModal} className="text-left font-display font-bold text-slate-900 text-sm leading-tight truncate hover:text-sky-600 transition-colors flex items-center gap-1 cursor-pointer max-w-[140px] sm:max-w-[200px]">
                     <span className="truncate">{username}</span>
                   </button>
                 </div>
@@ -412,20 +418,20 @@
                   <span className="tabular-nums">LV.{userLevel}</span>
                 </button>
 
-                <button onClick={onOpenHelpModal} className="w-8 h-8 rounded-full bg-white/90 border border-slate-200/80 text-slate-600 hover:text-sky-600 flex items-center justify-center transition-all shadow-xs active:scale-95 cursor-pointer">
-                  <Icons.HelpCircle className="w-4 h-4" />
+                <button onClick={onOpenHelpModal} className="w-7 h-7 rounded-full bg-white/90 border border-slate-200/80 text-slate-600 hover:text-sky-600 flex items-center justify-center transition-all shadow-xs active:scale-95 cursor-pointer">
+                  <Icons.HelpCircle className="w-3.5 h-3.5" />
                 </button>
 
-                <button onClick={onOpenSettingsModal} className="w-8 h-8 rounded-full bg-white/90 border border-slate-200/80 text-slate-600 hover:text-sky-600 flex items-center justify-center transition-all shadow-xs active:scale-95 cursor-pointer">
-                  <Icons.Settings className="w-4 h-4" />
+                <button onClick={onOpenSettingsModal} className="w-7 h-7 rounded-full bg-white/90 border border-slate-200/80 text-slate-600 hover:text-sky-600 flex items-center justify-center transition-all shadow-xs active:scale-95 cursor-pointer">
+                  <Icons.Settings className="w-3.5 h-3.5" />
                 </button>
 
                 <div className="relative">
                   <button
                     onClick={() => setLangMenuOpen(!langMenuOpen)}
-                    className="h-8 px-2 rounded-full bg-white/90 border border-slate-200/80 text-slate-700 hover:text-sky-600 flex items-center gap-1 text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer"
+                    className="h-7 px-2 rounded-full bg-white/90 border border-slate-200/80 text-slate-700 hover:text-sky-600 flex items-center gap-1 text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer"
                   >
-                    <Icons.Globe className="w-3.5 h-3.5 text-slate-500" />
+                    <Icons.Globe className="w-3 h-3 text-slate-500" />
                     <span>{currentLanguage}</span>
                     <Icons.ChevronDown className="w-3 h-3 text-slate-400" />
                   </button>
@@ -460,7 +466,7 @@
       };
 
       // ==========================================
-      // FILE 9: DynamicBalanceCard Component
+      // Compact DynamicBalanceCard (Slim, Fast & Clean)
       // ==========================================
       const DynamicBalanceCard = ({ starBalance, tokenBalance, tonEquivalent, onBoostClick, onSwapClick, dict }) => {
         const [conversionCurrency, setConversionCurrency] = useState('GRAM');
@@ -471,43 +477,38 @@
         const currencySymbol = conversionCurrency === 'GRAM' ? '$GRAM' : '$TON';
 
         return (
-          <div className="w-full px-4 pt-2 pb-3">
-            <div className="relative overflow-hidden rounded-[20px] bg-gradient-to-br from-white via-white to-sky-50/70 border border-white/90 shadow-[0_4px_20px_rgba(56,189,248,0.12)] p-4 sm:p-5">
-              <div className="absolute -top-12 -right-12 w-36 h-36 bg-sky-200/35 rounded-full blur-2xl pointer-events-none" />
-              <div className="absolute -bottom-8 -left-8 w-28 h-28 bg-amber-200/25 rounded-full blur-xl pointer-events-none" />
-
-              <div className="relative z-10 flex items-center justify-between gap-4">
+          <div className="w-full px-4 pt-2 pb-2">
+            <div className="relative overflow-hidden rounded-[20px] bg-gradient-to-br from-white via-white to-sky-50/80 border border-white/90 shadow-[0_4px_16px_rgba(56,189,248,0.1)] p-4">
+              <div className="relative z-10 flex items-center justify-between gap-3">
                 <div className="flex flex-col items-center shrink-0">
-                  <div className="relative flex items-center justify-center p-1">
-                    <div className="absolute inset-0 bg-amber-400/20 rounded-full blur-md animate-pulse" />
-                    <Coin3DIcon size={76} idPrefix="balance-main" floating={true} glow={true} className="transform transition-transform duration-300 hover:scale-105" />
+                  <div className="relative flex items-center justify-center p-0.5">
+                    <Coin3DIcon size={54} idPrefix="balance-main" floating={true} glow={true} />
                   </div>
-                  <span className="text-[10px] font-bold text-amber-700/80 tracking-wide mt-1 uppercase flex items-center gap-0.5">
-                    <Icons.Sparkles className="w-2.5 h-2.5 text-amber-500" />
-                    ToBOOST Star
+                  <span className="text-[9px] font-bold text-amber-700/90 uppercase mt-0.5">
+                    ⭐ Star PTS
                   </span>
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2 mb-1">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">{dict.totalBalance}</span>
-                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{dict.totalBalance}</span>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
                       <Icons.ShieldCheck className="w-3 h-3" />
                       {dict.verified}
                     </span>
                   </div>
 
-                  <div className="flex items-baseline gap-1.5 flex-wrap">
+                  <div className="flex items-baseline gap-1.5 mt-0.5">
                     <span className="font-display font-extrabold text-2xl sm:text-3xl text-slate-900 tracking-tight tabular-nums">
                       {formattedStars}
                     </span>
-                    <span className="text-xs font-extrabold text-amber-600 tracking-wide">PTS</span>
+                    <span className="text-xs font-extrabold text-amber-600">PTS</span>
                   </div>
 
-                  <div className="mt-2 flex items-center gap-2 flex-wrap">
+                  <div className="mt-1.5 flex items-center gap-2 flex-wrap">
                     <button
                       onClick={toggleCurrency}
-                      className="group inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-sky-100/70 hover:bg-sky-100 border border-sky-200 text-sky-800 text-xs font-bold transition-all active:scale-95 cursor-pointer"
+                      className="group inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-sky-100/70 hover:bg-sky-100 border border-sky-200 text-sky-800 text-[11px] font-bold transition-all active:scale-95 cursor-pointer"
                     >
                       <span>≈ {displayTokenAmount} {currencySymbol}</span>
                       <Icons.Repeat className="w-3 h-3 text-sky-600 group-hover:rotate-180 transition-transform duration-300" />
@@ -515,27 +516,19 @@
 
                     <button
                       onClick={onBoostClick}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-bold shadow-xs active:scale-95 transition-all cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[11px] font-bold shadow-xs active:scale-95 transition-all cursor-pointer"
                     >
                       <Icons.Zap className="w-3 h-3" fill="#ffffff" />
                       <span>{dict.boost}</span>
                     </button>
                   </div>
-
-                  <div className="mt-2 text-[11px] font-medium text-slate-400 flex items-center gap-1.5 truncate">
-                    <span>Rate:</span>
-                    <span className="font-semibold text-slate-600 tabular-nums">10,000 ⭐ = 1 $GRAM</span>
-                  </div>
                 </div>
               </div>
 
-              <div className="mt-3.5 pt-3 border-t border-slate-100/90 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-1.5 text-slate-500 font-medium">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping inline-block" />
-                  <span>Auto-mining: <strong className="text-slate-700">Active</strong></span>
-                </div>
+              <div className="mt-3 pt-2.5 border-t border-slate-100/90 flex items-center justify-between text-xs">
+                <span className="text-[11px] text-slate-400 font-medium">Rate: 10,000 ⭐ = 1 $GRAM</span>
 
-                <button onClick={onSwapClick} className="flex items-center gap-1 text-sky-600 font-bold hover:text-sky-700 transition-colors cursor-pointer">
+                <button onClick={onSwapClick} className="flex items-center gap-1 text-sky-600 font-bold hover:text-sky-700 transition-colors cursor-pointer text-xs">
                   <span>{dict.convertWallet}</span>
                   <Icons.ArrowUpRight className="w-3.5 h-3.5" />
                 </button>
@@ -546,12 +539,12 @@
       };
 
       // ==========================================
-      // FILE 10: BottomNavBar Component
+      // BottomNavBar Component
       // ==========================================
       const BottomNavBar = ({ activeTab, onSelectTab, unclaimedCheckIn = false }) => {
         const tabs = [
           { id: 'home', label: 'Home', icon: Icons.Home },
-          { id: 'boost', label: 'Boost', icon: Icons.Zap },
+          { id: 'boost', label: 'Booster', icon: Icons.Zap },
           { id: 'checkin', label: 'Check-in', icon: Icons.Calendar, badge: unclaimedCheckIn },
           { id: 'frens', label: 'Frens', icon: Icons.Users },
           { id: 'wallet', label: 'Wallet', icon: Icons.Wallet },
@@ -595,7 +588,7 @@
       };
 
       // ==========================================
-      // FILE 11: QuickActionsGrid Component
+      // QuickActionsGrid (4 Connected Functional Action Buttons)
       // ==========================================
       const QuickActionsGrid = ({
         adReward,
@@ -620,7 +613,8 @@
         return (
           <div className="w-full px-4 py-2">
             <div className="grid grid-cols-2 gap-3">
-              <div onClick={onWatchAdClick} role="button" className="group relative flex flex-col justify-between p-3.5 sm:p-4 rounded-[18px] bg-white border border-sky-100 shadow-[0_2px_12px_rgba(56,189,248,0.08)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden">
+              {/* BUTTON 1: Monetag Ad */}
+              <div onClick={onWatchAdClick} role="button" className="group relative flex flex-col justify-between p-3.5 rounded-[18px] bg-white border border-sky-100 shadow-[0_2px_12px_rgba(56,189,248,0.08)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden">
                 <div className="flex items-start justify-between">
                   <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-400 to-blue-500 flex items-center justify-center text-white shadow-xs">
                     <Icons.PlayCircle className="w-5 h-5 stroke-white" />
@@ -641,7 +635,8 @@
                 </div>
               </div>
 
-              <div onClick={onCheckInClick} role="button" className="group relative flex flex-col justify-between p-3.5 sm:p-4 rounded-[18px] bg-white border border-sky-100 shadow-[0_2px_12px_rgba(56,189,248,0.08)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden">
+              {/* BUTTON 2: Daily Check-in */}
+              <div onClick={onCheckInClick} role="button" className="group relative flex flex-col justify-between p-3.5 rounded-[18px] bg-white border border-sky-100 shadow-[0_2px_12px_rgba(56,189,248,0.08)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden">
                 <div className="flex items-start justify-between">
                   <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center text-white shadow-xs">
                     <Icons.CalendarCheck className="w-5 h-5" />
@@ -664,7 +659,8 @@
                 </div>
               </div>
 
-              <div onClick={onInviteClick} role="button" className="group relative flex flex-col justify-between p-3.5 sm:p-4 rounded-[18px] bg-white border border-sky-100 shadow-[0_2px_12px_rgba(56,189,248,0.08)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden">
+              {/* BUTTON 3: Referral & Level */}
+              <div onClick={onInviteClick} role="button" className="group relative flex flex-col justify-between p-3.5 rounded-[18px] bg-white border border-sky-100 shadow-[0_2px_12px_rgba(56,189,248,0.08)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden">
                 <div className="flex items-start justify-between">
                   <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-xs">
                     <Icons.Users className="w-5 h-5" />
@@ -690,7 +686,8 @@
                 </div>
               </div>
 
-              <div onClick={onTasksClick} role="button" className="group relative flex flex-col justify-between p-3.5 sm:p-4 rounded-[18px] bg-white border border-sky-100 shadow-[0_2px_12px_rgba(56,189,248,0.08)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden">
+              {/* BUTTON 4: Daily Tasks */}
+              <div onClick={onTasksClick} role="button" className="group relative flex flex-col justify-between p-3.5 rounded-[18px] bg-white border border-sky-100 shadow-[0_2px_12px_rgba(56,189,248,0.08)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden">
                 <div className="flex items-start justify-between">
                   <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-400 to-teal-600 flex items-center justify-center text-white shadow-xs">
                     <Icons.CheckCircle2 className="w-5 h-5" />
@@ -721,7 +718,7 @@
       };
 
       // ==========================================
-      // FILE 12: BountyTasksSection Component
+      // BountyTasksSection Component
       // ==========================================
       const BountyTasksSection = ({ tasks, onStartTask, onPostBountyClick, dict }) => {
         const [selectedCategory, setSelectedCategory] = useState('All');
@@ -744,7 +741,7 @@
         };
 
         return (
-          <section className="w-full px-4 pt-3 pb-24">
+          <section id="bounty-section" className="w-full px-4 pt-3 pb-24">
             <div className="flex items-center justify-between gap-2 mb-3">
               <div className="flex items-center gap-2">
                 <h2 className="font-display font-extrabold text-slate-900 text-lg tracking-tight">{dict.activeBounties}</h2>
@@ -803,7 +800,7 @@
                   <div className="shrink-0">
                     {task.status === 'active' && (
                       <button
-                        onClick={() => onStartTask(task.id)}
+                        onClick={() => onStartTask(task.id, task.actionUrl)}
                         className="flex items-center gap-1 px-3.5 py-1.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 text-white rounded-full text-xs font-bold transition-all shadow-xs active:scale-95 whitespace-nowrap cursor-pointer"
                       >
                         <span>{task.actionText || 'Start'}</span>
@@ -831,13 +828,12 @@
       };
 
       // ==========================================
-      // FILE 19: PostBountyModal (Slider & Discounts)
+      // PostBountyModal (For Task Publishers)
       // ==========================================
       const PostBountyModal = ({ isOpen, onClose, onSubmitBounty }) => {
         const [title, setTitle] = useState('');
         const [category, setCategory] = useState('Social');
         const [iconType, setIconType] = useState('telegram');
-        const [partnerName, setPartnerName] = useState('');
         const [actionText, setActionText] = useState('Join Channel');
         const [actionUrl, setActionUrl] = useState('https://t.me/');
         const [currency, setCurrency] = useState('GRAM');
@@ -845,10 +841,6 @@
 
         if (!isOpen) return null;
 
-        // Pricing calculation with volume discount as instructed:
-        // 100 imp = 1 GRAM, 200 imp = 1.75 GRAM, 10,000 imp = 20 GRAM (Massive discount)
-        // 100 imp = 300 stars, 10,000 imp = 6,000 stars (Discounted from 30k)
-        // 100 imp = 10,000 PTS, 10,000 imp = 200,000 PTS (Discounted from 1M)
         const calcPrice = () => {
           const ratio = (impressions - 100) / (10000 - 100);
           if (currency === 'GRAM') {
@@ -875,7 +867,6 @@
             actionText: actionText.trim() || 'Start Mission',
             actionUrl: actionUrl.trim() || 'https://t.me/ToBOOST_Ai',
             iconType,
-            partnerName: partnerName.trim() || undefined,
           });
           onClose();
         };
@@ -888,7 +879,7 @@
                   <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-black text-sm">+</div>
                   <div>
                     <h3 className="font-display font-bold text-slate-900 text-base">Post Bounty Task</h3>
-                    <p className="text-[11px] text-slate-400">Launch mission with dynamic impressions</p>
+                    <p className="text-[11px] text-slate-400">Launch mission for real community members</p>
                   </div>
                 </div>
                 <button onClick={onClose} className="p-1 rounded-full text-slate-400 hover:text-slate-600">
@@ -931,7 +922,6 @@
                   </div>
                 </div>
 
-                {/* Impression Slider & Pricing Engine */}
                 <div className="p-3 rounded-2xl bg-sky-50/60 border border-sky-100">
                   <div className="flex justify-between items-center text-xs font-bold mb-1">
                     <span className="text-slate-700">Target Impressions</span>
@@ -954,7 +944,7 @@
 
                   <div className="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] text-slate-500 block">Payment Method:</span>
+                      <span className="text-[10px] text-slate-500 block">Currency:</span>
                       <div className="flex gap-1 mt-0.5">
                         {['GRAM', 'STARS', 'PTS'].map((c) => (
                           <button
@@ -971,7 +961,7 @@
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="text-[10px] text-emerald-600 font-bold block">Discounted Price</span>
+                      <span className="text-[10px] text-emerald-600 font-bold block">Cost</span>
                       <span className="font-display font-black text-sm text-slate-900">{calcPrice()}</span>
                     </div>
                   </div>
@@ -984,6 +974,7 @@
                     value={actionUrl}
                     onChange={(e) => setActionUrl(e.target.value)}
                     className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 text-slate-900"
+                    required
                   />
                 </div>
 
@@ -1001,15 +992,15 @@
       };
 
       // ==========================================
-      // FILE 20: LevelPerksModal Component
+      // LevelPerksModal Component
       // ==========================================
-      const LevelPerksModal = ({ isOpen, onClose, userLevel, levelTitle, currentInvites, requiredInvites, multiplier }) => {
+      const LevelPerksModal = ({ isOpen, onClose, userLevel, currentInvites, requiredInvites, multiplier }) => {
         if (!isOpen) return null;
 
         const levels = [
-          { lvl: 1, title: 'Star Novice', perks: 'Base 5 daily tasks, 1.0x mining multiplier' },
-          { lvl: 2, title: 'Boost Explorer', perks: '10 daily tasks (5 referrals required), 1.2x boost' },
-          { lvl: 3, title: 'Cosmic Miner', perks: '15 daily tasks (10 referrals required), 1.4x boost' },
+          { lvl: 1, title: 'Star Hunter', perks: 'Base 5 daily tasks, 1.0x booster multiplier' },
+          { lvl: 2, title: 'Bounty Explorer', perks: '10 daily tasks (5 referrals required), 1.2x boost' },
+          { lvl: 3, title: 'Cosmic Collector', perks: '15 daily tasks (10 referrals required), 1.4x boost' },
           { lvl: 4, title: 'Galaxy Pioneer', perks: '20 daily tasks (15 referrals required), 1.6x multiplier' },
           { lvl: 5, title: 'ToBOOST Master', perks: 'Maximum 20 tasks, 2.0x multiplier, priority airdrop' },
         ];
@@ -1023,7 +1014,7 @@
                     <Icons.Trophy className="w-5 h-5 text-amber-600" />
                   </div>
                   <div>
-                    <h3 className="font-display font-black text-slate-900 text-base">Level {userLevel} · {levelTitle}</h3>
+                    <h3 className="font-display font-black text-slate-900 text-base">Level {userLevel} Perks</h3>
                     <p className="text-[11px] text-slate-400">Current Multiplier: <strong className="text-amber-600">{multiplier}x</strong></p>
                   </div>
                 </div>
@@ -1041,7 +1032,7 @@
                   <div className="bg-gradient-to-r from-amber-500 to-orange-500 h-full rounded-full" style={{ width: `${Math.min(100, (currentInvites / requiredInvites) * 100)}%` }} />
                 </div>
                 <p className="text-[11px] text-amber-800/80 mt-2 font-medium">
-                  Invite {Math.max(0, requiredInvites - currentInvites)} more friends to unlock higher daily tasks & boost!
+                  Invite {Math.max(0, requiredInvites - currentInvites)} more friends to unlock higher daily tasks!
                 </p>
               </div>
 
@@ -1071,14 +1062,14 @@
       };
 
       // ==========================================
-      // FILE 21: HelpModal Component
+      // HelpModal Component
       // ==========================================
       const HelpModal = ({ isOpen, onClose }) => {
         if (!isOpen) return null;
         const faqs = [
-          { q: 'What is ToBOOSTAi?', a: 'ToBOOSTAi is a Telegram Web3 Mini App where users complete bounties, watch ads, and convert earned Star PTS to $GRAM tokens.' },
-          { q: 'What are the Daily Task limits?', a: 'You start with 5 daily tasks (200 PTS each). By inviting friends (5, 10, 15+), you unlock 10, 15, up to 20 tasks daily.' },
-          { q: 'What are Withdrawal Rules?', a: 'To withdraw, you must: 1) Reach 10,000 PTS (1 $GRAM), 2) Complete 7 consecutive daily check-ins, 3) Watch at least 10 sponsor ads today.' },
+          { q: 'What is ToBOOSTAi?', a: 'ToBOOSTAi is a Web3 Mini App where users complete social bounties, watch sponsor ads, and convert earned Star PTS to $GRAM tokens.' },
+          { q: 'How to increase Daily Task limits?', a: 'You start with 5 daily tasks. By inviting 5, 10, 15+ friends, you unlock 10, 15, up to 20 high-reward tasks every day.' },
+          { q: 'What are Withdrawal Rules?', a: 'To withdraw: 1) Reach 10,000 PTS (1 $GRAM), 2) Complete 7 consecutive daily check-ins, 3) Watch at least 10 sponsor ads today.' },
         ];
 
         return (
@@ -1115,9 +1106,9 @@
       };
 
       // ==========================================
-      // FILE 22: SettingsModal Component
+      // SettingsModal (Cleaned - No Demo Reset)
       // ==========================================
-      const SettingsModal = ({ isOpen, onClose, username, onUpdateUsername, onResetData }) => {
+      const SettingsModal = ({ isOpen, onClose, username, onUpdateUsername }) => {
         const [editingName, setEditingName] = useState(username);
         const [soundEnabled, setSoundEnabled] = useState(true);
         const [hapticsEnabled, setHapticsEnabled] = useState(true);
@@ -1146,7 +1137,7 @@
                 <form onSubmit={handleSave} className="space-y-2">
                   <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                     <Icons.User className="w-3.5 h-3.5 text-sky-600" />
-                    <span>Telegram Profile Name</span>
+                    <span>Display Name</span>
                   </label>
                   <div className="flex gap-2">
                     <input
@@ -1176,27 +1167,12 @@
                   <div className="flex items-center justify-between py-1">
                     <div className="flex items-center gap-2">
                       <Icons.Smartphone className="w-4 h-4 text-slate-500" />
-                      <span className="text-xs font-semibold text-slate-700">Haptic Vibration</span>
+                      <span className="text-xs font-semibold text-slate-700">Haptic Feedback</span>
                     </div>
                     <button onClick={() => setHapticsEnabled(!hapticsEnabled)} className={`w-10 h-6 flex items-center rounded-full p-1 cursor-pointer ${hapticsEnabled ? 'bg-sky-500 justify-end' : 'bg-slate-200 justify-start'}`}>
                       <div className="w-4 h-4 rounded-full bg-white shadow-xs" />
                     </button>
                   </div>
-                </div>
-
-                <div className="pt-3 border-t border-slate-100">
-                  <button
-                    onClick={() => {
-                      if (confirm('Reset demo stats back to default?')) {
-                        onResetData();
-                        onClose();
-                      }
-                    }}
-                    className="w-full py-2 px-3 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                  >
-                    <Icons.RotateCcw className="w-3.5 h-3.5" />
-                    <span>Reset Demo State</span>
-                  </button>
                 </div>
               </div>
             </div>
@@ -1205,7 +1181,7 @@
       };
 
       // ==========================================
-      // SPECIAL NOTIFICATION MODALS (English Rules)
+      // Notification & Rule Modals
       // ==========================================
       const TaskLimitModal = ({ isOpen, onClose, dailyLimit, invites, onGoToFrens }) => {
         if (!isOpen) return null;
@@ -1219,9 +1195,9 @@
                 Daily Task Limit Reached!
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed mb-4">
-                You have completed all <strong className="text-slate-800">{dailyLimit} daily tasks</strong> allowed for your current referral level ({invites} frens).
+                You have completed all <strong className="text-slate-800">{dailyLimit} daily tasks</strong> allowed for your level ({invites} frens).
                 <br /><br />
-                <span className="text-sky-600 font-bold">Invite friends to unlock up to 20 daily tasks!</span>
+                <span className="text-sky-600 font-bold">Invite frens to unlock up to 20 daily tasks!</span>
               </p>
               <div className="flex gap-2">
                 <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600">
@@ -1231,7 +1207,7 @@
                   onClick={() => { onClose(); onGoToFrens(); }}
                   className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 text-white text-xs font-bold shadow-md cursor-pointer"
                 >
-                  Invite Friends
+                  Invite Frens
                 </button>
               </div>
             </div>
@@ -1251,7 +1227,7 @@
                 Withdrawal Locked!
               </h3>
               <p className="text-xs text-slate-500 mb-3">
-                Please fulfill all mandatory Web3 verification requirements:
+                Please fulfill all mandatory Web3 withdrawal criteria:
               </p>
               <div className="text-left space-y-2 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200 mb-4">
                 <div className={`flex items-center gap-2 ${conditions.hasMinBalance ? 'text-emerald-600 font-bold' : 'text-red-600 font-medium'}`}>
@@ -1276,60 +1252,7 @@
       };
 
       // ==========================================
-      // FILE 13: WatchAdModal (100 PTS Reward)
-      // ==========================================
-      const WatchAdModal = ({ isOpen, onClose, onClaimReward }) => {
-        const [seconds, setSeconds] = useState(5);
-        const [done, setDone] = useState(false);
-
-        useEffect(() => {
-          if (!isOpen) { setSeconds(5); setDone(false); return; }
-          const timer = setInterval(() => {
-            setSeconds((s) => {
-              if (s <= 1) {
-                clearInterval(timer);
-                setDone(true);
-                try { confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } }); } catch (e) {}
-                return 0;
-              }
-              return s - 1;
-            });
-          }, 1000);
-          return () => clearInterval(timer);
-        }, [isOpen]);
-
-        if (!isOpen) return null;
-
-        return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
-            <div className="relative w-full max-w-sm rounded-[24px] bg-white border border-sky-100 shadow-2xl overflow-hidden p-5 text-center">
-              <div className="aspect-video bg-gradient-to-br from-slate-900 via-sky-950 to-blue-900 rounded-2xl p-4 flex flex-col items-center justify-center text-white mb-4">
-                <Coin3DIcon size={56} idPrefix="ad-play-coin" floating={true} glow={true} />
-                <h4 className="font-display font-extrabold text-base mt-2">Sponsor Boost Stream</h4>
-                <span className="text-[10px] text-sky-200 font-mono mt-1">
-                  {done ? 'Reward Unlocked!' : `Watching: ${seconds}s remaining`}
-                </span>
-              </div>
-              {done ? (
-                <div>
-                  <div className="font-black text-xl text-slate-900 mb-3 flex items-center justify-center gap-1.5">
-                    <Coin3DIcon size={24} idPrefix="ad-claimed-coin" />
-                    <span>+100 PTS</span>
-                  </div>
-                  <button onClick={() => { onClaimReward(100); onClose(); }} className="w-full py-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold text-xs rounded-xl shadow-md cursor-pointer">
-                    Claim +100 PTS
-                  </button>
-                </div>
-              ) : (
-                <div className="text-xs text-slate-400 font-medium">Please watch until the end to claim your reward</div>
-              )}
-            </div>
-          </div>
-        );
-      };
-
-      // ==========================================
-      // FILE 14: DailyCheckInModal (100 PTS, 250 on Day 7)
+      // DailyCheckInModal
       // ==========================================
       const DailyCheckInModal = ({ isOpen, onClose, currentStreak, hasCheckedInToday, onClaimToday }) => {
         if (!isOpen) return null;
@@ -1356,7 +1279,7 @@
                     <span>Streak: Day {currentStreak}</span>
                   </div>
                   <h3 className="font-display font-black text-slate-900 text-xl tracking-tight">Daily Check-in</h3>
-                  <p className="text-xs text-slate-500">100 PTS daily. 250 PTS on Day 7! Don't miss a day or it resets.</p>
+                  <p className="text-xs text-slate-500">100 PTS daily. 250 PTS on Day 7! Don't miss a day.</p>
                 </div>
                 <button onClick={onClose} className="p-1 rounded-full text-slate-400 hover:text-slate-600">
                   <Icons.X className="w-5 h-5" />
@@ -1395,14 +1318,11 @@
               {hasCheckedInToday ? (
                 <div className="w-full py-3 bg-slate-100 rounded-xl text-center text-xs font-bold text-slate-500 flex items-center justify-center gap-1.5">
                   <Icons.Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
-                  <span>Checked in today! Unlocks tomorrow at 00:00 UTC</span>
+                  <span>Claimed today! Unlocks tomorrow at 00:00 UTC</span>
                 </div>
               ) : (
                 <button
-                  onClick={() => {
-                    onClaimToday(todayReward);
-                    try { confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 } }); } catch (e) {}
-                  }}
+                  onClick={() => onClaimToday(todayReward)}
                   className="w-full py-3 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white font-black text-sm rounded-xl shadow-md active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   <Icons.Sparkles className="w-4 h-4" />
@@ -1415,21 +1335,21 @@
       };
 
       // ==========================================
-      // FILE 15: BoostView Component
+      // BoostView Component (Power Booster)
       // ==========================================
-      const BoostView = ({ starBalance, energy, maxEnergy, multiplier, onUpgradeBoost, onTapToMine }) => {
+      const BoostView = ({ starBalance, energy, maxEnergy, multiplier, onUpgradeBoost, onTapToBoost }) => {
         const [tapEffect, setTapEffect] = useState(false);
         const [floatingPoints, setFloatingPoints] = useState([]);
 
         const boosts = [
-          { id: 'turbo', name: 'Turbo Miner Multiplier', desc: 'Increases yield by +0.2x per level', cost: 5000, effect: `+${(multiplier + 0.2).toFixed(1)}x`, icon: Icons.Gauge, color: 'from-amber-400 to-orange-500' },
-          { id: 'autobot', name: 'AI Auto-Tapper Bot', desc: 'Passive star collection while away', cost: 12000, effect: '+150 ⭐ / hour', icon: Icons.Bot, color: 'from-sky-400 to-blue-600' },
-          { id: 'battery', name: 'Energy Tank', desc: 'Extends energy limit by +500 units', cost: 3000, effect: `+500 (${maxEnergy + 500} Max)`, icon: Icons.BatteryCharging, color: 'from-emerald-400 to-teal-600' },
+          { id: 'turbo', name: 'Turbo Booster Multiplier', desc: 'Increases yield by +0.2x per level', cost: 5000, effect: `+${(multiplier + 0.2).toFixed(1)}x`, icon: Icons.Gauge, color: 'from-amber-400 to-orange-500' },
+          { id: 'autobot', name: 'Bounty Collector Bot', desc: 'Auto task perks while you are away', cost: 12000, effect: '+150 ⭐ / hour', icon: Icons.Bot, color: 'from-sky-400 to-blue-600' },
+          { id: 'battery', name: 'Energy Reservoir', desc: 'Extends energy limit by +500 units', cost: 3000, effect: `+500 (${maxEnergy + 500} Max)`, icon: Icons.BatteryCharging, color: 'from-emerald-400 to-teal-600' },
         ];
 
         const handleTap = (e) => {
           if (energy <= 0) return;
-          onTapToMine();
+          onTapToBoost();
           setTapEffect(true);
           setTimeout(() => setTapEffect(false), 150);
 
@@ -1462,7 +1382,7 @@
 
               <div onClick={handleTap} className="relative my-4 inline-flex items-center justify-center cursor-pointer select-none">
                 <div className={`transition-transform duration-100 ${tapEffect ? 'scale-90 rotate-3' : 'hover:scale-105 active:scale-95'}`}>
-                  <Coin3DIcon size={120} idPrefix="boost-tap-coin" floating={!tapEffect} glow={true} />
+                  <Coin3DIcon size={110} idPrefix="boost-tap-coin" floating={!tapEffect} glow={true} />
                 </div>
                 {floatingPoints.map((pt) => (
                   <span key={pt.id} className="absolute text-sm font-black text-amber-500 pointer-events-none transition-all duration-700 -translate-y-8 opacity-0 font-display" style={{ left: pt.x, top: pt.y }}>
@@ -1482,7 +1402,7 @@
                 <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden p-0.5">
                   <div className="bg-gradient-to-r from-amber-400 via-orange-500 to-sky-500 h-full rounded-full transition-all duration-300" style={{ width: `${energyPercent}%` }} />
                 </div>
-                <p className="text-[11px] text-slate-400 font-medium">Tap the coin to mine instant ⭐ stars!</p>
+                <p className="text-[11px] text-slate-400 font-medium">Tap the star coin for instant bonus energy!</p>
               </div>
             </div>
 
@@ -1524,11 +1444,13 @@
       };
 
       // ==========================================
-      // FILE 16: FrensView (100 PTS per referral)
+      // FrensView (Invite Real Friends - No Demo Button)
       // ==========================================
-      const FrensView = ({ currentInvites, onAddReferral, dict }) => {
+      const FrensView = ({ currentInvites, dict }) => {
         const [copied, setCopied] = useState(false);
-        const inviteUrl = `https://t.me/ToBOOST_Ai_bot?start=ref_user9831`;
+        const botUsername = 'ToBOOST_Ai_bot';
+        const userId = tg?.initDataUnsafe?.user?.id || '';
+        const inviteUrl = `https://t.me/${botUsername}?start=ref_${userId}`;
 
         const handleCopy = () => {
           navigator.clipboard.writeText(inviteUrl);
@@ -1537,7 +1459,7 @@
         };
 
         const handleShare = () => {
-          const text = encodeURIComponent(`🚀 Join ToBOOSTAi! Mine stars, complete 200 PTS bounties, and convert to $GRAM tokens.\n\nPlay now: ${inviteUrl}`);
+          const text = encodeURIComponent(`🚀 Join ToBOOSTAi! Complete bounties, watch ads, and convert earned Star PTS to $GRAM tokens.\n\nPlay now: ${inviteUrl}`);
           window.open(`https://t.me/share/url?url=${inviteUrl}&text=${text}`, '_blank');
         };
 
@@ -1568,25 +1490,19 @@
 
             <div className="p-4 rounded-[18px] bg-white border border-sky-100 shadow-sm flex items-center justify-between gap-3">
               <div>
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Test Invite Fren</span>
-                <p className="text-xs text-slate-600 font-semibold mt-0.5">Simulate new user join (+100 PTS)</p>
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Your Referral Network</span>
+                <p className="text-base font-display font-bold text-slate-800 mt-0.5">{currentInvites} Active Frens</p>
               </div>
-              <button
-                onClick={() => {
-                  onAddReferral();
-                  try { confetti({ particleCount: 40, spread: 50, origin: { y: 0.6 } }); } catch (e) {}
-                }}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white active:scale-95 cursor-pointer"
-              >
-                + Invite Fren
-              </button>
+              <div className="px-3.5 py-1.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold">
+                +100 PTS / fren
+              </div>
             </div>
           </div>
         );
       };
 
       // ==========================================
-      // FILE 17: WalletView (Strict Withdrawal Rules)
+      // WalletView (Withdrawal Rules)
       // ==========================================
       const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, onConnectWallet, onDisconnectWallet, onConvertStars, onShowAlert }) => {
         const [swapAmount, setSwapAmount] = useState('10000');
@@ -1624,7 +1540,7 @@
                   </div>
                   <div>
                     <h3 className="font-display font-bold text-slate-900 text-sm">TON Blockchain Wallet</h3>
-                    <p className="text-[11px] text-slate-400">{walletAddress ? 'Connected to Telegram @wallet' : 'Connect for $GRAM token airdrop'}</p>
+                    <p className="text-[11px] text-slate-400">{walletAddress ? 'Connected to Telegram @wallet' : 'Connect for $GRAM token withdrawal'}</p>
                   </div>
                 </div>
                 {walletAddress ? (
@@ -1721,25 +1637,24 @@
 
       function App() {
         const [stats, setStats] = useState({
-          username: 'Alex_Telegram',
-          userLevel: 2,
-          levelTitle: 'Boost Explorer',
-          starBalance: 12500,
-          tokenBalance: 1.25,
-          tonEquivalent: 0.0043,
-          streakDays: 4, // Set to 4 to demonstrate 7-day rule check
+          username: tg?.initDataUnsafe?.user?.first_name || 'User',
+          userLevel: 1,
+          starBalance: 0,
+          tokenBalance: 0,
+          tonEquivalent: 0,
+          streakDays: 0,
           hasCheckedInToday: false,
           completedTasksToday: 3,
-          currentInvites: 7, // 7 invites gives 10 daily tasks
-          requiredInvites: 10,
-          adReward: 100, // Rule 8: 100 PTS per ad
-          checkInReward: 100, // Rule 4: 100 PTS daily
-          walletAddress: 'UQD4...9fA1',
-          multiplier: 1.2,
+          currentInvites: 0,
+          requiredInvites: 5,
+          adReward: 100,
+          checkInReward: 100,
+          walletAddress: null,
+          multiplier: 1.0,
           energy: 950,
           maxEnergy: 1000,
-          adsWatchedToday: 6, // Rule 8: Mandatory 10 ads daily
-          avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
+          adsWatchedToday: 0,
+          avatarUrl: tg?.initDataUnsafe?.user?.photo_url || null,
         });
 
         const [activeTab, setActiveTab] = useState('home');
@@ -1747,7 +1662,6 @@
         const dict = DICTIONARY[currentLanguage] || DICTIONARY.EN;
 
         // Modal visibility states
-        const [isAdModalOpen, setIsAdModalOpen] = useState(false);
         const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
         const [isPostBountyOpen, setIsPostBountyOpen] = useState(false);
         const [isLevelModalOpen, setIsLevelModalOpen] = useState(false);
@@ -1755,11 +1669,16 @@
         const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
         const [isTaskLimitModalOpen, setIsTaskLimitModalOpen] = useState(false);
         const [withdrawAlertData, setWithdrawAlertData] = useState(null);
+        const [isAdLoading, setIsAdLoading] = useState(false);
+        const [statusToast, setStatusToast] = useState('');
 
         const [tasks, setTasks] = useState(INITIAL_TASKS);
 
-        // Daily Task Limit Calculation based on invites
-        // 0-4 invites: 5 tasks | 5-9: 10 tasks | 10-14: 15 tasks | 15+: 20 tasks
+        const showToast = (msg) => {
+          setStatusToast(msg);
+          setTimeout(() => setStatusToast(''), 3500);
+        };
+
         const getDailyTaskLimit = (invites) => {
           if (invites >= 15) return 20;
           if (invites >= 10) return 15;
@@ -1781,6 +1700,41 @@
           }));
         };
 
+        // 1. Initial Load: Fetch Live User from Firestore & Pass start_param for referral
+        useEffect(() => {
+          const initData = tg?.initData || '';
+          const startParam = tg?.initDataUnsafe?.start_param || '';
+
+          if (!initData) return;
+
+          fetch('/api/user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ initData, startParam })
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success && data.user) {
+              const u = data.user;
+              const todayStr = new Date().toISOString().split('T')[0];
+              const checkedToday = u.lastCheckInDate === todayStr;
+
+              setStats(prev => ({
+                ...prev,
+                username: u.firstName || prev.username,
+                starBalance: u.points || 0,
+                tokenBalance: (u.points || 0) / 10000,
+                tonEquivalent: ((u.points || 0) / 10000) * 0.0035,
+                streakDays: u.checkInStreak || 0,
+                hasCheckedInToday: checkedToday,
+                userLevel: u.level || 1,
+                currentInvites: u.referralsCount || 0,
+              }));
+            }
+          })
+          .catch(err => console.error('Error loading user profile:', err));
+        }, []);
+
         // Passive Energy Regeneration
         useEffect(() => {
           const timer = setInterval(() => {
@@ -1794,12 +1748,100 @@
           return () => clearInterval(timer);
         }, []);
 
-        // Task Completion Handler with Limit Check
-        const handleStartTask = (taskId) => {
+        // 2. Monetag Ad Trigger: Zone 11923110 with Security Token Verification
+        const handleWatchAd = async () => {
+          if (isAdLoading) return;
+          const initData = tg?.initData || '';
+          setIsAdLoading(true);
+          showToast('Preparing sponsor ad...');
+
+          try {
+            // Step 1: Request temporary session token from backend
+            const startRes = await fetch('/api/ad-start', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ initData })
+            });
+            const startData = await startRes.json();
+            if (!startData.success) throw new Error(startData.message || 'Ad session failed to start');
+
+            const sessionToken = startData.sessionToken;
+
+            // Step 2: Show Monetag Ad (show_11923110)
+            if (typeof window.show_11923110 === 'function') {
+              await window.show_11923110();
+            } else {
+              // Wait fallback simulation if ad blocker is active
+              await new Promise(r => setTimeout(r, 2000));
+            }
+
+            // Step 3: Claim Reward on backend
+            showToast('Verifying points reward...');
+            const rewardRes = await fetch('/api/reward', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ initData, sessionToken })
+            });
+            const rewardData = await rewardRes.json();
+
+            if (rewardData.success) {
+              updateBalance(rewardData.points);
+              setStats(p => ({ ...p, adsWatchedToday: p.adsWatchedToday + 1 }));
+              showToast('🎉 +100 PTS successfully credited!');
+              try { confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } }); } catch (e) {}
+            } else {
+              showToast(rewardData.message || 'Reward verification failed');
+            }
+          } catch (err) {
+            console.error('Ad Error:', err);
+            showToast(err.message || 'Ad stream could not load');
+          } finally {
+            setIsAdLoading(false);
+          }
+        };
+
+        // 3. Daily Check-in Trigger: Connect to api/daily-checkin
+        const handleClaimCheckIn = async () => {
+          const initData = tg?.initData || '';
+          showToast('Processing daily bonus...');
+
+          try {
+            const res = await fetch('/api/daily-checkin', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ initData })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+              updateBalance(data.points);
+              setStats(p => ({
+                ...p,
+                hasCheckedInToday: true,
+                streakDays: data.streak,
+              }));
+              setIsCheckInModalOpen(false);
+              showToast(data.message || '🎉 +100 PTS daily bonus claimed!');
+              try { confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 } }); } catch (e) {}
+            } else {
+              showToast(data.message || 'Already claimed today!');
+              if (data.points !== undefined) {
+                setStats(p => ({ ...p, hasCheckedInToday: true }));
+              }
+            }
+          } catch (err) {
+            showToast('Server error on check-in');
+          }
+        };
+
+        // Task Completion Handler
+        const handleStartTask = (taskId, url) => {
           if (stats.completedTasksToday >= dailyTaskLimit) {
             setIsTaskLimitModalOpen(true);
             return;
           }
+
+          if (url && url !== '#') window.open(url, '_blank');
 
           setTasks((prev) =>
             prev.map((t) => (t.id === taskId ? { ...t, status: 'verifying' } : t))
@@ -1811,27 +1853,11 @@
             );
             updateBalance(stats.starBalance + 200);
             setStats((p) => ({ ...p, completedTasksToday: p.completedTasksToday + 1 }));
+            showToast('🎉 Task completed! +200 PTS');
             try { confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } }); } catch (e) {}
           }, 3000);
         };
 
-        // Claim Ad Reward (Rule 8: 100 PTS + increment watched ads)
-        const handleClaimAdReward = (amount) => {
-          updateBalance(stats.starBalance + amount);
-          setStats((p) => ({ ...p, adsWatchedToday: p.adsWatchedToday + 1 }));
-        };
-
-        // Daily Check-in Claim
-        const handleClaimCheckIn = (reward) => {
-          updateBalance(stats.starBalance + reward);
-          setStats((p) => ({
-            ...p,
-            hasCheckedInToday: true,
-            streakDays: p.streakDays + 1,
-          }));
-        };
-
-        // Post New Bounty
         const handleAddBounty = (newBounty) => {
           const taskObj = {
             ...newBounty,
@@ -1839,15 +1865,7 @@
             status: 'active',
           };
           setTasks((prev) => [taskObj, ...prev]);
-        };
-
-        // Invite simulation (+100 PTS)
-        const handleAddReferral = () => {
-          setStats((p) => ({
-            ...p,
-            currentInvites: p.currentInvites + 1,
-            starBalance: p.starBalance + 100,
-          }));
+          showToast('✅ Bounty task successfully published!');
         };
 
         return (
@@ -1858,7 +1876,6 @@
               <UserHeaderSection
                 username={stats.username}
                 userLevel={stats.userLevel}
-                levelTitle={stats.levelTitle}
                 avatarUrl={stats.avatarUrl}
                 onOpenLevelModal={() => setIsLevelModalOpen(true)}
                 onOpenHelpModal={() => setIsHelpModalOpen(true)}
@@ -1891,10 +1908,13 @@
                       completedTasksToday={stats.completedTasksToday}
                       dailyTaskLimit={dailyTaskLimit}
                       adsWatchedToday={stats.adsWatchedToday}
-                      onWatchAdClick={() => setIsAdModalOpen(true)}
+                      onWatchAdClick={handleWatchAd}
                       onCheckInClick={() => setIsCheckInModalOpen(true)}
                       onInviteClick={() => setActiveTab('frens')}
-                      onTasksClick={() => window.scrollTo({ top: 400, behavior: 'smooth' })}
+                      onTasksClick={() => {
+                        const el = document.getElementById('bounty-section');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }}
                       dict={dict}
                     />
 
@@ -1917,7 +1937,7 @@
                       updateBalance(stats.starBalance - cost);
                       if (id === 'turbo') setStats((p) => ({ ...p, multiplier: Number((p.multiplier + 0.2).toFixed(1)) }));
                     }}
-                    onTapToMine={() => {
+                    onTapToBoost={() => {
                       if (stats.energy >= 5) {
                         setStats((p) => ({ ...p, energy: p.energy - 5 }));
                         updateBalance(stats.starBalance + Math.round(10 * stats.multiplier));
@@ -1929,7 +1949,6 @@
                 {activeTab === 'frens' && (
                   <FrensView
                     currentInvites={stats.currentInvites}
-                    onAddReferral={handleAddReferral}
                     dict={dict}
                   />
                 )}
@@ -1942,7 +1961,10 @@
                     adsWatchedToday={stats.adsWatchedToday}
                     onConnectWallet={(addr) => setStats((p) => ({ ...p, walletAddress: addr }))}
                     onDisconnectWallet={() => setStats((p) => ({ ...p, walletAddress: null }))}
-                    onConvertStars={(amt) => updateBalance(stats.starBalance - amt)}
+                    onConvertStars={(amt) => {
+                      updateBalance(stats.starBalance - amt);
+                      showToast('✅ Withdrawal request submitted!');
+                    }}
                     onShowAlert={(conds) => setWithdrawAlertData(conds)}
                   />
                 )}
@@ -1957,13 +1979,14 @@
                 unclaimedCheckIn={!stats.hasCheckedInToday}
               />
 
-              {/* MODALS */}
-              <WatchAdModal
-                isOpen={isAdModalOpen}
-                onClose={() => setIsAdModalOpen(false)}
-                onClaimReward={handleClaimAdReward}
-              />
+              {/* Toast Notifications */}
+              {statusToast && (
+                <div className="fixed top-14 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 backdrop-blur-md text-white px-4 py-2 rounded-full text-xs font-semibold shadow-lg">
+                  {statusToast}
+                </div>
+              )}
 
+              {/* MODALS */}
               <DailyCheckInModal
                 isOpen={isCheckInModalOpen}
                 onClose={() => setIsCheckInModalOpen(false)}
@@ -1982,7 +2005,6 @@
                 isOpen={isLevelModalOpen}
                 onClose={() => setIsLevelModalOpen(false)}
                 userLevel={stats.userLevel}
-                levelTitle={stats.levelTitle}
                 currentInvites={stats.currentInvites}
                 requiredInvites={stats.requiredInvites}
                 multiplier={stats.multiplier}
@@ -1998,7 +2020,6 @@
                 onClose={() => setIsSettingsModalOpen(false)}
                 username={stats.username}
                 onUpdateUsername={(name) => setStats((p) => ({ ...p, username: name }))}
-                onResetData={() => window.location.reload()}
               />
 
               <TaskLimitModal
