@@ -11,6 +11,9 @@
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
+    <!-- TON Connect UI SDK -->
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+
     <!-- Monetag Ad SDK (Zone: 11923110) -->
     <script src="//libtl.com/sdk.js" data-zone="11923110" data-sdk="show_11923110"></script>
 
@@ -363,7 +366,7 @@
       );
 
       // ==========================================
-      // UserHeaderSection (Dynamic Real Telegram Avatar)
+      // UserHeaderSection
       // ==========================================
       const UserHeaderSection = ({
         username,
@@ -466,7 +469,7 @@
       };
 
       // ==========================================
-      // Compact DynamicBalanceCard (Slim, Fast & Clean)
+      // DynamicBalanceCard
       // ==========================================
       const DynamicBalanceCard = ({ starBalance, tokenBalance, tonEquivalent, onBoostClick, onSwapClick, dict }) => {
         const [conversionCurrency, setConversionCurrency] = useState('GRAM');
@@ -588,7 +591,7 @@
       };
 
       // ==========================================
-      // QuickActionsGrid (4 Connected Functional Action Buttons)
+      // QuickActionsGrid
       // ==========================================
       const QuickActionsGrid = ({
         adReward,
@@ -718,13 +721,15 @@
       };
 
       // ==========================================
-      // BountyTasksSection Component
+      // BountyTasksSection (Completed Tasks Vanish Automatically)
       // ==========================================
-      const BountyTasksSection = ({ tasks, onStartTask, onPostBountyClick, dict }) => {
+      const BountyTasksSection = ({ tasks, completedTasksList = [], onStartTask, onPostBountyClick, dict }) => {
         const [selectedCategory, setSelectedCategory] = useState('All');
         const categories = ['All', 'Partners', 'Social', 'Web3', 'Daily'];
 
-        const filteredTasks = tasks.filter((task) => {
+        // শুধুমাত্র যে কাজগুলো এখনো সম্পন্ন হয়নি সেগুলো দেখাবে (বাকিগুলো অদৃশ্য/ভেনিশ হয়ে যাবে)
+        const visibleTasks = tasks.filter((task) => {
+          if (completedTasksList.includes(task.id) || task.status === 'completed') return false;
           if (selectedCategory !== 'All' && task.category !== selectedCategory) return false;
           return true;
         });
@@ -773,62 +778,61 @@
             </div>
 
             <div className="space-y-2.5">
-              {filteredTasks.map((task) => (
-                <div
-                  key={task.id}
-                  className={`p-3.5 rounded-[18px] bg-white border border-sky-100/90 shadow-[0_2px_12px_rgba(56,189,248,0.06)] flex items-center justify-between gap-3 ${
-                    task.status === 'completed' ? 'opacity-70 bg-slate-50/70' : ''
-                  }`}
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center shrink-0">
-                      {renderIcon(task.iconType)}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[10px] font-bold text-sky-600 uppercase tracking-wider">{task.category}</span>
-                        {task.partnerName && <span className="text-[10px] text-slate-400 font-medium">· {task.partnerName}</span>}
-                      </div>
-                      <h4 className="font-display font-bold text-slate-800 text-sm leading-tight truncate">{task.title}</h4>
-                      <div className="inline-flex items-center gap-1 mt-1 text-xs font-extrabold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 tabular-nums">
-                        <Coin3DIcon size={13} idPrefix={`task-coin-${task.id}`} />
-                        <span>+{task.reward} PTS</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="shrink-0">
-                    {task.status === 'active' && (
-                      <button
-                        onClick={() => onStartTask(task.id, task.actionUrl)}
-                        className="flex items-center gap-1 px-3.5 py-1.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 text-white rounded-full text-xs font-bold transition-all shadow-xs active:scale-95 whitespace-nowrap cursor-pointer"
-                      >
-                        <span>{task.actionText || 'Start'}</span>
-                        <Icons.ExternalLink className="w-3 h-3 opacity-80" />
-                      </button>
-                    )}
-                    {task.status === 'verifying' && (
-                      <button disabled className="flex items-center gap-1 px-3.5 py-1.5 bg-amber-100 text-amber-800 rounded-full text-xs font-bold transition-all whitespace-nowrap">
-                        <Icons.Loader2 className="w-3 h-3 animate-spin text-amber-600" />
-                        <span>Checking (3s)</span>
-                      </button>
-                    )}
-                    {task.status === 'completed' && (
-                      <div className="flex items-center gap-1 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold border border-emerald-200/80 whitespace-nowrap">
-                        <Icons.Check className="w-3.5 h-3.5 stroke-[2.5]" />
-                        <span>Done</span>
-                      </div>
-                    )}
-                  </div>
+              {visibleTasks.length === 0 ? (
+                <div className="p-6 rounded-[20px] bg-white/90 border border-sky-100 text-center shadow-xs">
+                  <span className="text-3xl mb-1 block">🎉</span>
+                  <h4 className="font-display font-bold text-slate-800 text-sm">All Bounties Completed!</h4>
+                  <p className="text-xs text-slate-500 mt-1">Check back later for newly published missions.</p>
                 </div>
-              ))}
+              ) : (
+                visibleTasks.map((task) => (
+                  <div
+                    key={task.id}
+                    className="p-3.5 rounded-[18px] bg-white border border-sky-100/90 shadow-[0_2px_12px_rgba(56,189,248,0.06)] flex items-center justify-between gap-3"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center shrink-0">
+                        {renderIcon(task.iconType)}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[10px] font-bold text-sky-600 uppercase tracking-wider">{task.category}</span>
+                          {task.partnerName && <span className="text-[10px] text-slate-400 font-medium">· {task.partnerName}</span>}
+                        </div>
+                        <h4 className="font-display font-bold text-slate-800 text-sm leading-tight truncate">{task.title}</h4>
+                        <div className="inline-flex items-center gap-1 mt-1 text-xs font-extrabold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 tabular-nums">
+                          <Coin3DIcon size={13} idPrefix={`task-coin-${task.id}`} />
+                          <span>+{task.reward || 200} PTS</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="shrink-0">
+                      {task.status === 'verifying' ? (
+                        <button disabled className="flex items-center gap-1 px-3.5 py-1.5 bg-amber-100 text-amber-800 rounded-full text-xs font-bold transition-all whitespace-nowrap">
+                          <Icons.Loader2 className="w-3 h-3 animate-spin text-amber-600" />
+                          <span>Checking (3s)</span>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => onStartTask(task.id, task.actionUrl || task.url)}
+                          className="flex items-center gap-1 px-3.5 py-1.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 text-white rounded-full text-xs font-bold transition-all shadow-xs active:scale-95 whitespace-nowrap cursor-pointer"
+                        >
+                          <span>{task.actionText || 'Start'}</span>
+                          <Icons.ExternalLink className="w-3 h-3 opacity-80" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </section>
         );
       };
 
       // ==========================================
-      // PostBountyModal (For Task Publishers)
+      // PostBountyModal (With LIVE Pulsing Light & Receiver Address)
       // ==========================================
       const PostBountyModal = ({ isOpen, onClose, onSubmitBounty }) => {
         const [title, setTitle] = useState('');
@@ -838,6 +842,11 @@
         const [actionUrl, setActionUrl] = useState('https://t.me/ToFarmsAi_Bot');
         const [currency, setCurrency] = useState('GRAM');
         const [impressions, setImpressions] = useState(100);
+        const [copiedAddress, setCopiedAddress] = useState(false);
+        const [isSubmitting, setIsSubmitting] = useState(false);
+
+        // অফিশিয়াল $GRAM রিসিভার ওয়ালেট অ্যাড্রেস (সিকিউর ব্যাকএন্ড ডিফল্ট)
+        const receiverAddress = 'UQC_uwp-fGIO5qwRgGKe0ymORn-Cd-pW_HtBVbHD-NPzIVfq';
 
         if (!isOpen) return null;
 
@@ -848,38 +857,58 @@
             return cost.toFixed(2) + ' $GRAM';
           } else if (currency === 'STARS') {
             const cost = Math.round(300 + ratio * (6000 - 300));
-            return cost.toLocaleString() + '  Stars';
+            return cost.toLocaleString() + ' Stars';
           } else {
             const cost = Math.round(10000 + ratio * (200000 - 10000));
             return cost.toLocaleString() + ' PTS';
           }
         };
 
-        const handleSubmit = (e) => {
-          e.preventDefault();
-          if (!title.trim()) return;
+        const handleCopyReceiver = () => {
+          navigator.clipboard.writeText(receiverAddress);
+          setCopiedAddress(true);
+          setTimeout(() => setCopiedAddress(false), 2000);
+        };
 
-          onSubmitBounty({
-            title: title.trim(),
-            description: `Complete this ${category.toLowerCase()} mission to earn ⭐ stars!`,
-            category,
-            reward: 200,
-            actionText: actionText.trim() || 'Start Mission',
-            actionUrl: actionUrl.trim() || 'https://t.me/ToFarmsAi_Bot',
-            iconType,
-          });
-          onClose();
+        const handleSubmit = async (e) => {
+          e.preventDefault();
+          if (!title.trim() || !actionUrl.trim()) return;
+
+          setIsSubmitting(true);
+          try {
+            await onSubmitBounty({
+              title: title.trim(),
+              description: `Complete this ${category.toLowerCase()} mission to earn ⭐ stars!`,
+              category,
+              reward: 200,
+              actionText: actionText.trim() || 'Start Mission',
+              actionUrl: actionUrl.trim() || 'https://t.me/ToFarmsAi_Bot',
+              iconType,
+            });
+            onClose();
+          } catch (err) {
+            console.error('Error submitting bounty:', err);
+          } finally {
+            setIsSubmitting(false);
+          }
         };
 
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
             <div className="relative w-full max-w-sm rounded-[24px] bg-white border border-sky-100 shadow-2xl p-5 overflow-hidden max-h-[90vh] overflow-y-auto no-scrollbar">
-              <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
+              
+              {/* Header with LIVE Pulsing Green Light */}
+              <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-black text-sm">+</div>
+                  <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-700 text-[11px] font-bold tracking-wide">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span>LIVE</span>
+                  </div>
                   <div>
-                    <h3 className="font-display font-bold text-slate-900 text-base">Post Bounty Task</h3>
-                    <p className="text-[11px] text-slate-400">Launch mission for real community members</p>
+                    <h3 className="font-display font-bold text-slate-900 text-sm">Post Bounty Campaign</h3>
                   </div>
                 </div>
                 <button onClick={onClose} className="p-1 rounded-full text-slate-400 hover:text-slate-600">
@@ -887,7 +916,26 @@
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-3.5">
+              {/* Official Receiver Address Box */}
+              <div className="p-3 rounded-2xl bg-sky-50/70 border border-sky-100 mb-3.5">
+                <div className="flex items-center justify-between text-[11px] font-bold text-slate-600 mb-1">
+                  <span>Official $GRAM Receiver (TON)</span>
+                  <span className="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200 font-semibold">No Memo</span>
+                </div>
+                <div className="font-mono text-[11px] font-bold text-slate-800 break-all bg-white p-2 rounded-xl border border-sky-200/80 select-all">
+                  {receiverAddress}
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCopyReceiver}
+                  className="mt-2 w-full py-1.5 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold border border-slate-200 shadow-xs flex items-center justify-center gap-1 transition active:scale-98 cursor-pointer"
+                >
+                  {copiedAddress ? <Icons.Check className="w-3.5 h-3.5 text-emerald-600" /> : <Icons.Copy className="w-3.5 h-3.5 text-sky-600" />}
+                  <span>{copiedAddress ? 'Address Copied!' : 'Copy $GRAM Receiver Address'}</span>
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">Task Title *</label>
                   <input
@@ -922,7 +970,7 @@
                   </div>
                 </div>
 
-                <div className="p-3 rounded-2xl bg-sky-50/60 border border-sky-100">
+                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100">
                   <div className="flex justify-between items-center text-xs font-bold mb-1">
                     <span className="text-slate-700">Target Impressions</span>
                     <span className="text-sky-600 tabular-nums">{impressions.toLocaleString()} Views</span>
@@ -936,13 +984,8 @@
                     onChange={(e) => setImpressions(Number(e.target.value))}
                     className="w-full accent-sky-500 cursor-pointer"
                   />
-                  <div className="flex justify-between text-[10px] text-slate-400 mt-1">
-                    <span>100</span>
-                    <span>5,000 (Bulk Discount)</span>
-                    <span>10,000</span>
-                  </div>
 
-                  <div className="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between">
+                  <div className="mt-2 pt-2 border-t border-slate-200/80 flex items-center justify-between">
                     <div>
                       <span className="text-[10px] text-slate-500 block">Currency:</span>
                       <div className="flex gap-1 mt-0.5">
@@ -980,10 +1023,11 @@
 
                 <button
                   type="submit"
-                  className="w-full py-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold text-xs rounded-xl shadow-md active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  disabled={isSubmitting}
+                  className="w-full py-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold text-xs rounded-xl shadow-md active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
                 >
                   <Icons.Send className="w-3.5 h-3.5" />
-                  <span>Publish Mission ({calcPrice()})</span>
+                  <span>{isSubmitting ? 'Publishing Mission...' : `Publish Mission (${calcPrice()})`}</span>
                 </button>
               </form>
             </div>
@@ -1106,7 +1150,7 @@
       };
 
       // ==========================================
-      // SettingsModal (Cleaned - No Demo Reset)
+      // SettingsModal
       // ==========================================
       const SettingsModal = ({ isOpen, onClose, username, onUpdateUsername }) => {
         const [editingName, setEditingName] = useState(username);
@@ -1335,7 +1379,7 @@
       };
 
       // ==========================================
-      // BoostView Component (Power Booster)
+      // BoostView Component
       // ==========================================
       const BoostView = ({ starBalance, energy, maxEnergy, multiplier, onUpgradeBoost, onTapToBoost }) => {
         const [tapEffect, setTapEffect] = useState(false);
@@ -1444,15 +1488,15 @@
       };
 
       // ==========================================
-      // FrensView (Direct startapp Referral Link)
+      // FrensView (With Bot Chat Link for Instant START button)
       // ==========================================
       const FrensView = ({ currentInvites, dict }) => {
         const [copied, setCopied] = useState(false);
         const botUsername = 'ToFarmsAi_Bot';
         const userId = tg?.initDataUnsafe?.user?.id || '';
 
-        // Telegram Direct Mini App startapp link (১০০% নিখুঁত রেফারেল ট্র্যাকিং)
-        const inviteUrl = `https://t.me/${botUsername}?startapp=ref_${userId}`;
+        // চ্যাটবক্সে START বাটন শো করে চ্যাটলিস্টে পার্মানেন্ট রাখার অফিশিয়াল রেফারেল লিংক
+        const inviteUrl = `https://t.me/${botUsername}?start=ref_${userId}`;
 
         const handleCopy = () => {
           navigator.clipboard.writeText(inviteUrl);
@@ -1462,7 +1506,7 @@
 
         const handleShare = () => {
           const text = encodeURIComponent(`🚀 Join ToBOOSTAi on Telegram! Earn Star PTS and rewards together.\n\nPlay now: ${inviteUrl}`);
-          window.open(`https://t.me/share/url?url=${inviteUrl}&text=${text}`, '_blank');
+          window.open(`https://t.me/share/url?url=${encodeURIComponent(inviteUrl)}&text=${text}`, '_blank');
         };
 
         return (
@@ -1504,12 +1548,27 @@
       };
 
       // ==========================================
-      // WalletView (Withdrawal Rules)
+      // WalletView (With Real TON Connect Manifest Integration)
       // ==========================================
       const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, onConnectWallet, onDisconnectWallet, onConvertStars, onShowAlert }) => {
         const [swapAmount, setSwapAmount] = useState('10000');
         const parsedSwap = Number(swapAmount) || 0;
         const calculatedTokens = (parsedSwap / 10000).toFixed(3);
+
+        const handleConnectClick = () => {
+          if (window.tonConnectUIInstance) {
+            window.tonConnectUIInstance.openModal();
+          } else {
+            onConnectWallet('UQD4...9fA1');
+          }
+        };
+
+        const handleDisconnectClick = () => {
+          if (window.tonConnectUIInstance) {
+            window.tonConnectUIInstance.disconnect();
+          }
+          onDisconnectWallet();
+        };
 
         const handleWithdrawClick = () => {
           const hasMinBalance = starBalance >= 10000 && parsedSwap >= 10000 && parsedSwap <= starBalance;
@@ -1542,7 +1601,7 @@
                   </div>
                   <div>
                     <h3 className="font-display font-bold text-slate-900 text-sm">TON Blockchain Wallet</h3>
-                    <p className="text-[11px] text-slate-400">{walletAddress ? 'Connected to Telegram @wallet' : 'Connect for $GRAM token withdrawal'}</p>
+                    <p className="text-[11px] text-slate-400">{walletAddress ? 'Connected to TON Wallet' : 'Connect for $GRAM token withdrawal'}</p>
                   </div>
                 </div>
                 {walletAddress ? (
@@ -1556,13 +1615,13 @@
 
               {walletAddress ? (
                 <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
-                  <div className="min-w-0 font-mono text-xs font-bold text-slate-800 truncate">{walletAddress}</div>
-                  <button onClick={onDisconnectWallet} className="px-2.5 py-1 text-xs font-bold text-red-600 hover:bg-red-50 rounded-lg cursor-pointer">Disconnect</button>
+                  <div className="min-w-0 font-mono text-xs font-bold text-slate-800 truncate max-w-[200px]">{walletAddress}</div>
+                  <button onClick={handleDisconnectClick} className="px-2.5 py-1 text-xs font-bold text-red-600 hover:bg-red-50 rounded-lg cursor-pointer">Disconnect</button>
                 </div>
               ) : (
                 <button
-                  onClick={() => onConnectWallet('UQD4...9fA1')}
-                  className="w-full py-3 bg-gradient-to-r from-[#0088CC] to-[#0077B5] text-white font-bold text-xs rounded-xl shadow-md cursor-pointer flex items-center justify-center gap-2"
+                  onClick={handleConnectClick}
+                  className="w-full py-3 bg-gradient-to-r from-[#0088CC] to-[#0077B5] text-white font-bold text-xs rounded-xl shadow-md cursor-pointer flex items-center justify-center gap-2 active:scale-98 transition"
                 >
                   <Icons.Wallet className="w-4 h-4" />
                   <span>Connect TON Wallet</span>
@@ -1630,11 +1689,10 @@
       // ROOT APP COMPONENT (Full Orchestrator)
       // ==========================================
       const INITIAL_TASKS = [
-        { id: 't-1', title: 'Subscribe to @ToBOOST_Ai Channel', category: 'Social', reward: 200, actionText: 'Join Channel', actionUrl: 'https://t.me/ToBOOST_Ai', status: 'active', iconType: 'telegram', partnerName: 'ToBOOST Official' },
-        { id: 't-2', title: 'Follow ToBOOSTAi on X / Twitter', category: 'Social', reward: 200, actionText: 'Follow @ToBOOST', actionUrl: 'https://twitter.com', status: 'active', iconType: 'twitter', partnerName: 'Twitter Drop' },
-        { id: 't-3', title: 'Connect TON Jetton Wallet', category: 'Web3', reward: 200, actionText: 'Connect', actionUrl: '#', status: 'active', iconType: 'wallet', partnerName: 'TON Foundation' },
-        { id: 't-4', title: 'Join TON Station Partner Community', category: 'Partners', reward: 200, actionText: 'Join Station', actionUrl: 'https://t.me/TONStation', status: 'active', iconType: 'telegram', partnerName: 'TON Station' },
-        { id: 't-5', title: 'Visit Sponsor Web3 Showcase', category: 'Daily', reward: 200, actionText: 'Explore', actionUrl: '#', status: 'active', iconType: 'bot', partnerName: 'Sponsor Drop' },
+        { id: 't-1', title: 'Subscribe to @ToBOOST_Ai Channel', category: 'Social', reward: 200, actionText: 'Join Channel', actionUrl: 'https://t.me/ToFarmsAi_Bot', status: 'active', iconType: 'telegram', partnerName: 'ToBOOST Official' },
+        { id: 't-2', title: 'Follow ToBOOSTAi on X / Twitter', category: 'Social', reward: 200, actionText: 'Follow @ToBOOST', actionUrl: 'https://x.com', status: 'active', iconType: 'twitter', partnerName: 'Twitter Drop' },
+        { id: 't-3', title: 'Join TON Station Partner Community', category: 'Partners', reward: 200, actionText: 'Join Station', actionUrl: 'https://t.me/ToFarmsAi_Bot', status: 'active', iconType: 'telegram', partnerName: 'TON Station' },
+        { id: 't-4', title: 'Visit Sponsor Web3 Showcase', category: 'Daily', reward: 200, actionText: 'Explore', actionUrl: 'https://t.me/ToFarmsAi_Bot', status: 'active', iconType: 'bot', partnerName: 'Sponsor Drop' },
       ];
 
       function App() {
@@ -1663,7 +1721,6 @@
         const [currentLanguage, setCurrentLanguage] = useState('EN');
         const dict = DICTIONARY[currentLanguage] || DICTIONARY.EN;
 
-        // Modal visibility states
         const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
         const [isPostBountyOpen, setIsPostBountyOpen] = useState(false);
         const [isLevelModalOpen, setIsLevelModalOpen] = useState(false);
@@ -1675,6 +1732,7 @@
         const [statusToast, setStatusToast] = useState('');
 
         const [tasks, setTasks] = useState(INITIAL_TASKS);
+        const [completedTasksList, setCompletedTasksList] = useState([]);
 
         const showToast = (msg) => {
           setStatusToast(msg);
@@ -1702,11 +1760,33 @@
           }));
         };
 
-        // 1. Initial Load: Fetch Live User from Firestore & Completed Tasks & Referral
+        // TON Connect UI Initialization (Using tonconnect-manifest.json)
+        useEffect(() => {
+          try {
+            if (window.TON_CONNECT_UI) {
+              const tonConnectUI = new window.TON_CONNECT_UI.TonConnectUI({
+                manifestUrl: 'https://toboostaicom-lihr.vercel.app/tonconnect-manifest.json',
+              });
+
+              tonConnectUI.onStatusChange((wallet) => {
+                if (wallet && wallet.account) {
+                  setStats(p => ({ ...p, walletAddress: wallet.account.address }));
+                } else {
+                  setStats(p => ({ ...p, walletAddress: null }));
+                }
+              });
+
+              window.tonConnectUIInstance = tonConnectUI;
+            }
+          } catch (e) {
+            console.warn('TonConnect UI init skipped:', e);
+          }
+        }, []);
+
+        // 1. Initial Load: Fetch Live User from Firestore & Tasks
         useEffect(() => {
           const initData = tg?.initData || '';
           
-          // Telegram start_param (supports tgWebAppStartParam query parameter & unsafe object)
           const urlParams = new URLSearchParams(window.location.search);
           const startParam = tg?.initDataUnsafe?.start_param || 
                              urlParams.get('tgWebAppStartParam') || 
@@ -1714,6 +1794,7 @@
 
           if (!initData) return;
 
+          // ইউজার তথ্য আনা
           fetch('/api/user', {
             method: 'POST',
             headers: {
@@ -1743,13 +1824,21 @@
                 completedTasksToday: completedList.length,
               }));
 
-              // ফায়ারবেসে আগে করা টাস্কগুলো "Done" দেখানো
-              if (completedList.length > 0) {
-                setTasks(prev => prev.map(t => completedList.includes(t.id) ? { ...t, status: 'completed' } : t));
-              }
+              // সম্পন্ন হওয়া টাস্ক সংরক্ষণ (যা ভেনিশ করে দেয়া হবে)
+              setCompletedTasksList(completedList);
             }
           })
           .catch(err => console.error('Error loading user profile:', err));
+
+          // লাইভ টাস্ক লিস্ট ডাটাবেজ থেকে ফেচ করা
+          fetch('/api/tasks')
+            .then(res => res.json().catch(() => ({})))
+            .then(data => {
+              if (data && Array.isArray(data.tasks) && data.tasks.length > 0) {
+                setTasks(data.tasks);
+              }
+            })
+            .catch(err => console.error('Error loading tasks:', err));
         }, []);
 
         // Passive Energy Regeneration
@@ -1773,7 +1862,6 @@
           showToast('Preparing sponsor ad...');
 
           try {
-            // Step 1: Request temporary session token from backend
             const startRes = await fetch('/api/ad-start', {
               method: 'POST',
               headers: {
@@ -1789,14 +1877,14 @@
 
             const sessionToken = startData.sessionId || startData.sessionToken;
 
-            // Step 2: Show Monetag Ad (show_11923110)
+            // Show Monetag Ad
             if (typeof window.show_11923110 === 'function') {
               await window.show_11923110();
             } else {
               await new Promise(r => setTimeout(r, 2000));
             }
 
-            // Step 3: Claim Reward on backend
+            // Claim Reward on backend
             showToast('Verifying points reward...');
             const rewardRes = await fetch('/api/reward', {
               method: 'POST',
@@ -1833,7 +1921,7 @@
           }
         };
 
-        // 3. Daily Check-in Trigger: Connect to api/daily-checkin
+        // 3. Daily Check-in Trigger
         const handleClaimCheckIn = async () => {
           const initData = tg?.initData || '';
           showToast('Processing daily bonus...');
@@ -1877,20 +1965,26 @@
           }
         };
 
-        // 4. Task Completion Handler (Firebase Connected & Permanent Save)
+        // 4. Task Completion: Points save in Firestore & TASK IMMEDIATELY VANISHES
         const handleStartTask = async (taskId, url) => {
           if (stats.completedTasksToday >= dailyTaskLimit) {
             setIsTaskLimitModalOpen(true);
             return;
           }
 
-          if (url && url !== '#') window.open(url, '_blank');
+          if (url && url !== '#') {
+            if (tg?.openTelegramLink && url.includes('t.me')) {
+              tg.openTelegramLink(url);
+            } else {
+              window.open(url, '_blank');
+            }
+          }
 
           setTasks((prev) =>
             prev.map((t) => (t.id === taskId ? { ...t, status: 'verifying' } : t))
           );
 
-          // ৩ সেকেন্ড চেকিং সিমুলেশন শেষে ফায়ারবেসে ২০০ পয়েন্ট পার্মানেন্ট সেভ করা
+          // ৩ সেকেন্ড পর ডাটাবেজে পয়েন্ট সেভ ও সাথে সাথে স্ক্রিন থেকে গায়েব (ভেনিশ)
           setTimeout(async () => {
             try {
               const initData = tg?.initData || '';
@@ -1907,18 +2001,16 @@
               if (res.ok && data.success) {
                 const newPts = data.points !== undefined ? data.points : stats.starBalance + 200;
                 updateBalance(newPts);
-                setTasks((prev) =>
-                  prev.map((t) => (t.id === taskId ? { ...t, status: 'completed' } : t))
-                );
+                
+                // টাস্কটি সম্পন্ন লিস্টে যোগ -> স্ক্রিন থেকে অটোমেটিক অদৃশ্য হয়ে যাবে!
+                setCompletedTasksList(prev => [...prev, taskId]);
                 setStats((p) => ({ ...p, completedTasksToday: p.completedTasksToday + 1 }));
+                
                 showToast('🎉 Task completed! +200 PTS');
                 try { confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } }); } catch (e) {}
               } else {
-                // Already done or previous state
-                setTasks((prev) =>
-                  prev.map((t) => (t.id === taskId ? { ...t, status: 'completed' } : t))
-                );
-                showToast(data.message || 'Task completed!');
+                setCompletedTasksList(prev => [...prev, taskId]);
+                showToast(data.message || 'Task already completed!');
               }
             } catch (err) {
               console.error('Task save error:', err);
@@ -1930,14 +2022,40 @@
           }, 3000);
         };
 
-        const handleAddBounty = (newBounty) => {
-          const taskObj = {
-            ...newBounty,
-            id: 'bounty-' + Date.now(),
-            status: 'active',
-          };
-          setTasks((prev) => [taskObj, ...prev]);
-          showToast('✅ Bounty task successfully published!');
+        // 5. Publish New Bounty Task: Saves permanently to Firestore via /api/tasks
+        const handleAddBounty = async (newBounty) => {
+          const initData = tg?.initData || '';
+          try {
+            const res = await fetch('/api/tasks', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'x-telegram-init-data': initData
+              },
+              body: JSON.stringify({
+                title: newBounty.title,
+                url: newBounty.actionUrl,
+                category: newBounty.category,
+                reward: newBounty.reward || 200
+              })
+            });
+
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data.success) {
+              const taskObj = {
+                ...newBounty,
+                id: data.task?.id || 'bounty-' + Date.now(),
+                status: 'active',
+              };
+              setTasks((prev) => [taskObj, ...prev]);
+              showToast('✅ Bounty task successfully published and saved!');
+            } else {
+              showToast(data.error || 'Failed to save bounty task');
+            }
+          } catch (e) {
+            console.error('Error posting task:', e);
+            showToast('Network error publishing task.');
+          }
         };
 
         return (
@@ -1992,6 +2110,7 @@
 
                     <BountyTasksSection
                       tasks={tasks}
+                      completedTasksList={completedTasksList}
                       onStartTask={handleStartTask}
                       onPostBountyClick={() => setIsPostBountyOpen(true)}
                       dict={dict}
