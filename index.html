@@ -236,7 +236,7 @@
       // Original 3D Dished Star Coin Component
       // ==========================================
       const Coin3DIcon = ({
-        size = 45,
+        size = 48,
         className = '',
         floating = false,
         glow = false,
@@ -485,7 +485,7 @@
                     <Coin3DIcon size={54} idPrefix="balance-main" floating={true} glow={true} />
                   </div>
                   <span className="text-[9px] font-bold text-amber-700/90 uppercase mt-0.5">
-                    Web3 Star
+                    ⭐ Star PTS
                   </span>
                 </div>
 
@@ -493,7 +493,7 @@
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{dict.totalBalance}</span>
                     <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
-                      <Icons.ShieldCheck className="w-3 h-3" />
+                      <Icons.ShieldCheck className="w-3.5 h-3.5" />
                       {dict.verified}
                     </span>
                   </div>
@@ -526,7 +526,7 @@
               </div>
 
               <div className="mt-3 pt-2.5 border-t border-slate-100/90 flex items-center justify-between text-xs">
-                <span className="text-[11px] text-slate-400 font-medium">Rate: 10,000 PTS = 1 $GRAM</span>
+                <span className="text-[11px] text-slate-400 font-medium">Rate: 10,000 ⭐ = 1 $GRAM</span>
 
                 <button onClick={onSwapClick} className="flex items-center gap-1 text-sky-600 font-bold hover:text-sky-700 transition-colors cursor-pointer text-xs">
                   <span>{dict.convertWallet}</span>
@@ -848,7 +848,7 @@
             return cost.toFixed(2) + ' $GRAM';
           } else if (currency === 'STARS') {
             const cost = Math.round(300 + ratio * (6000 - 300));
-            return cost.toLocaleString() + '  Stars';
+            return cost.toLocaleString() + ' ⭐ Stars';
           } else {
             const cost = Math.round(10000 + ratio * (200000 - 10000));
             return cost.toLocaleString() + ' PTS';
@@ -1444,13 +1444,15 @@
       };
 
       // ==========================================
-      // FrensView (Invite Real Friends - Connected to @ToFarmsAi_Bot)
+      // FrensView (Direct startapp Referral Link)
       // ==========================================
       const FrensView = ({ currentInvites, dict }) => {
         const [copied, setCopied] = useState(false);
-        const botUsername = 'ToFarmsAi_Bot'; // আসল বটের নাম
+        const botUsername = 'ToFarmsAi_Bot';
         const userId = tg?.initDataUnsafe?.user?.id || '';
-        const inviteUrl = `https://t.me/${botUsername}?start=ref_${userId}`;
+
+        // Telegram Direct Mini App startapp link (১০০% নিখুঁত রেফারেল ট্র্যাকিং)
+        const inviteUrl = `https://t.me/${botUsername}?startapp=ref_${userId}`;
 
         const handleCopy = () => {
           navigator.clipboard.writeText(inviteUrl);
@@ -1628,9 +1630,9 @@
       // ROOT APP COMPONENT (Full Orchestrator)
       // ==========================================
       const INITIAL_TASKS = [
-        { id: 't-1', title: 'Subscribe to @ToBOOST_Ai Channel', category: 'Social', reward: 200, actionText: 'Join Channel', actionUrl: 'https://t.me/ToBOOST_Ai', status: 'completed', iconType: 'telegram', partnerName: 'ToBOOST Official' },
-        { id: 't-2', title: 'Follow ToBOOSTAi on X / Twitter', category: 'Social', reward: 200, actionText: 'Follow @ToBOOST', actionUrl: 'https://twitter.com', status: 'completed', iconType: 'twitter', partnerName: 'Twitter Drop' },
-        { id: 't-3', title: 'Connect TON Jetton Wallet', category: 'Web3', reward: 200, actionText: 'Connect', actionUrl: '#', status: 'completed', iconType: 'wallet', partnerName: 'TON Foundation' },
+        { id: 't-1', title: 'Subscribe to @ToBOOST_Ai Channel', category: 'Social', reward: 200, actionText: 'Join Channel', actionUrl: 'https://t.me/ToBOOST_Ai', status: 'active', iconType: 'telegram', partnerName: 'ToBOOST Official' },
+        { id: 't-2', title: 'Follow ToBOOSTAi on X / Twitter', category: 'Social', reward: 200, actionText: 'Follow @ToBOOST', actionUrl: 'https://twitter.com', status: 'active', iconType: 'twitter', partnerName: 'Twitter Drop' },
+        { id: 't-3', title: 'Connect TON Jetton Wallet', category: 'Web3', reward: 200, actionText: 'Connect', actionUrl: '#', status: 'active', iconType: 'wallet', partnerName: 'TON Foundation' },
         { id: 't-4', title: 'Join TON Station Partner Community', category: 'Partners', reward: 200, actionText: 'Join Station', actionUrl: 'https://t.me/TONStation', status: 'active', iconType: 'telegram', partnerName: 'TON Station' },
         { id: 't-5', title: 'Visit Sponsor Web3 Showcase', category: 'Daily', reward: 200, actionText: 'Explore', actionUrl: '#', status: 'active', iconType: 'bot', partnerName: 'Sponsor Drop' },
       ];
@@ -1644,7 +1646,7 @@
           tonEquivalent: 0,
           streakDays: 0,
           hasCheckedInToday: false,
-          completedTasksToday: 3,
+          completedTasksToday: 0,
           currentInvites: 0,
           requiredInvites: 5,
           adReward: 100,
@@ -1700,10 +1702,15 @@
           }));
         };
 
-        // 1. Initial Load: Fetch Live User from Firestore & Referral Tracking
+        // 1. Initial Load: Fetch Live User from Firestore & Completed Tasks & Referral
         useEffect(() => {
           const initData = tg?.initData || '';
-          const startParam = tg?.initDataUnsafe?.start_param || '';
+          
+          // Telegram start_param (supports tgWebAppStartParam query parameter & unsafe object)
+          const urlParams = new URLSearchParams(window.location.search);
+          const startParam = tg?.initDataUnsafe?.start_param || 
+                             urlParams.get('tgWebAppStartParam') || 
+                             urlParams.get('startapp') || '';
 
           if (!initData) return;
 
@@ -1721,6 +1728,7 @@
             if (u && (u.userId || u.points !== undefined || u.name)) {
               const todayStr = new Date().toISOString().split('T')[0];
               const checkedToday = u.lastCheckInDate === todayStr;
+              const completedList = Array.isArray(u.completedTasks) ? u.completedTasks : [];
 
               setStats(prev => ({
                 ...prev,
@@ -1732,7 +1740,13 @@
                 hasCheckedInToday: checkedToday,
                 userLevel: u.level || 1,
                 currentInvites: u.referralsCount || 0,
+                completedTasksToday: completedList.length,
               }));
+
+              // ফায়ারবেসে আগে করা টাস্কগুলো "Done" দেখানো
+              if (completedList.length > 0) {
+                setTasks(prev => prev.map(t => completedList.includes(t.id) ? { ...t, status: 'completed' } : t));
+              }
             }
           })
           .catch(err => console.error('Error loading user profile:', err));
@@ -1779,7 +1793,6 @@
             if (typeof window.show_11923110 === 'function') {
               await window.show_11923110();
             } else {
-              // Fallback wait if ad blocker is active
               await new Promise(r => setTimeout(r, 2000));
             }
 
@@ -1864,8 +1877,8 @@
           }
         };
 
-        // Task Completion Handler
-        const handleStartTask = (taskId, url) => {
+        // 4. Task Completion Handler (Firebase Connected & Permanent Save)
+        const handleStartTask = async (taskId, url) => {
           if (stats.completedTasksToday >= dailyTaskLimit) {
             setIsTaskLimitModalOpen(true);
             return;
@@ -1877,14 +1890,43 @@
             prev.map((t) => (t.id === taskId ? { ...t, status: 'verifying' } : t))
           );
 
-          setTimeout(() => {
-            setTasks((prev) =>
-              prev.map((t) => (t.id === taskId ? { ...t, status: 'completed' } : t))
-            );
-            updateBalance(stats.starBalance + 200);
-            setStats((p) => ({ ...p, completedTasksToday: p.completedTasksToday + 1 }));
-            showToast('🎉 Task completed! +200 PTS');
-            try { confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } }); } catch (e) {}
+          // ৩ সেকেন্ড চেকিং সিমুলেশন শেষে ফায়ারবেসে ২০০ পয়েন্ট পার্মানেন্ট সেভ করা
+          setTimeout(async () => {
+            try {
+              const initData = tg?.initData || '';
+              const res = await fetch('/api/task-complete', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'x-telegram-init-data': initData
+                },
+                body: JSON.stringify({ initData, taskId, reward: 200 })
+              });
+              const data = await res.json().catch(() => ({}));
+
+              if (res.ok && data.success) {
+                const newPts = data.points !== undefined ? data.points : stats.starBalance + 200;
+                updateBalance(newPts);
+                setTasks((prev) =>
+                  prev.map((t) => (t.id === taskId ? { ...t, status: 'completed' } : t))
+                );
+                setStats((p) => ({ ...p, completedTasksToday: p.completedTasksToday + 1 }));
+                showToast('🎉 Task completed! +200 PTS');
+                try { confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } }); } catch (e) {}
+              } else {
+                // Already done or previous state
+                setTasks((prev) =>
+                  prev.map((t) => (t.id === taskId ? { ...t, status: 'completed' } : t))
+                );
+                showToast(data.message || 'Task completed!');
+              }
+            } catch (err) {
+              console.error('Task save error:', err);
+              setTasks((prev) =>
+                prev.map((t) => (t.id === taskId ? { ...t, status: 'active' } : t))
+              );
+              showToast('Failed to save task reward. Please try again.');
+            }
           }, 3000);
         };
 
