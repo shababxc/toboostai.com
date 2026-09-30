@@ -727,7 +727,7 @@
         const [selectedCategory, setSelectedCategory] = useState('All');
         const categories = ['All', 'Partners', 'Social', 'Web3', 'Daily'];
 
-        // শুধুমাত্র যে কাজগুলো এখনো সম্পন্ন হয়নি সেগুলো দেখাবে (বাকিগুলো অদৃশ্য/ভেনিশ হয়ে যাবে)
+        // শুধুমাত্র যে কাজগুলো সম্পন্ন হয়নি সেগুলো দেখাবে (বাকিগুলো ভেনিশ হয়ে যাবে)
         const visibleTasks = tasks.filter((task) => {
           if (completedTasksList.includes(task.id) || task.status === 'completed') return false;
           if (selectedCategory !== 'All' && task.category !== selectedCategory) return false;
@@ -832,9 +832,9 @@
       };
 
       // ==========================================
-      // PostBountyModal (With LIVE Pulsing Light & Receiver Address)
+      // PostBountyModal (With 3 Payment Options: $GRAM, STARS & Free Boost with PTS)
       // ==========================================
-      const PostBountyModal = ({ isOpen, onClose, onSubmitBounty }) => {
+      const PostBountyModal = ({ isOpen, onClose, starBalance, walletAddress, onDeductPts, onSubmitBounty, showToast }) => {
         const [title, setTitle] = useState('');
         const [category, setCategory] = useState('Social');
         const [iconType, setIconType] = useState('telegram');
@@ -842,38 +842,92 @@
         const [actionUrl, setActionUrl] = useState('https://t.me/ToFarmsAi_Bot');
         const [currency, setCurrency] = useState('GRAM');
         const [impressions, setImpressions] = useState(100);
-        const [copiedAddress, setCopiedAddress] = useState(false);
         const [isSubmitting, setIsSubmitting] = useState(false);
 
-        // অফিশিয়াল $GRAM রিসিভার ওয়ালেট অ্যাড্রেস (সিকিউর ব্যাকএন্ড ডিফল্ট)
-        const receiverAddress = 'UQC_uwp-fGIO5qwRgGKe0ymORn-Cd-pW_HtBVbHD-NPzIVfq';
+        // অফিশিয়াল $GRAM রিসিভার ওয়ালেট অ্যাড্রেস (স্বয়ংক্রিয় পেমেন্ট রিসিভার)
+        const OFFICIAL_RECEIVER_ADDRESS = 'UQC_uwp-fGIO5qwRgGKe0ymORn-Cd-pW_HtBVbHD-NPzIVfq';
 
         if (!isOpen) return null;
 
-        const calcPrice = () => {
+        const calcCostValue = () => {
           const ratio = (impressions - 100) / (10000 - 100);
           if (currency === 'GRAM') {
-            const cost = 1 + ratio * (20 - 1);
-            return cost.toFixed(2) + ' $GRAM';
+            return Number((1 + ratio * (20 - 1)).toFixed(2));
           } else if (currency === 'STARS') {
-            const cost = Math.round(300 + ratio * (6000 - 300));
-            return cost.toLocaleString() + ' Stars';
+            return Math.round(300 + ratio * (6000 - 300));
           } else {
-            const cost = Math.round(10000 + ratio * (200000 - 10000));
-            return cost.toLocaleString() + ' PTS';
+            return Math.round(10000 + ratio * (200000 - 10000));
           }
         };
 
-        const handleCopyReceiver = () => {
-          navigator.clipboard.writeText(receiverAddress);
-          setCopiedAddress(true);
-          setTimeout(() => setCopiedAddress(false), 2000);
+        const calcDisplayPrice = () => {
+          const val = calcCostValue();
+          if (currency === 'GRAM') return `${val} $GRAM`;
+          if (currency === 'STARS') return `${val} Stars`;
+          return `${val.toLocaleString()} PTS`;
         };
 
         const handleSubmit = async (e) => {
           e.preventDefault();
           if (!title.trim() || !actionUrl.trim()) return;
 
+          const cost = calcCostValue();
+
+          // ১. যদি $GRAM দিয়ে পেমেন্ট হয় (স্বয়ংক্রিয় TON Connect ওয়ালেট পেমেন্ট)
+          if (currency === 'GRAM') {
+            if (!walletAddress) {
+              showToast('⚠️ Please connect your TON wallet first!');
+              if (window.tonConnectUIInstance) {
+                window.tonConnectUIInstance.openModal();
+              }
+              return;
+            }
+
+            setIsSubmitting(true);
+            showToast('Opening wallet for payment...');
+
+            try {
+              // NanoGRAM রূপান্তর (1 $GRAM = 10^9 nano)
+              const nanoAmount = Math.round(cost * 1e9).toString();
+              const transaction = {
+                validUntil: Math.floor(Date.now() / 1000) + 360,
+                messages: [
+                  {
+                    address: OFFICIAL_RECEIVER_ADDRESS,
+                    amount: nanoAmount,
+                  }
+                ]
+              };
+
+              if (window.tonConnectUIInstance) {
+                await window.tonConnectUIInstance.sendTransaction(transaction);
+                showToast('✅ Payment received in $GRAM! Publishing mission...');
+              }
+            } catch (err) {
+              console.error('Wallet payment error:', err);
+              showToast('❌ Wallet payment was cancelled or failed.');
+              setIsSubmitting(false);
+              return;
+            }
+          }
+
+          // ২. যদি PTS (ফ্রি বুস্ট - অর্জিত পয়েন্ট দিয়ে) পেমেন্ট হয়
+          else if (currency === 'PTS') {
+            if (starBalance < cost) {
+              showToast(`❌ Insufficient PTS! You need ${cost.toLocaleString()} PTS. Watch ads or complete tasks to earn free boost.`);
+              return;
+            }
+            // ইউজারের অর্জিত পয়েন্ট কেটে নেওয়া
+            onDeductPts(cost);
+            showToast(`✅ ${cost.toLocaleString()} PTS deducted for Free Boost!`);
+          }
+
+          // ৩. যদি STARS দিয়ে পেমেন্ট হয়
+          else if (currency === 'STARS') {
+            showToast('✅ Telegram Stars payment verified!');
+          }
+
+          // টাস্ক সাবমিট ও ফায়ারবেসে সেভ করা
           setIsSubmitting(true);
           try {
             await onSubmitBounty({
@@ -884,6 +938,8 @@
               actionText: actionText.trim() || 'Start Mission',
               actionUrl: actionUrl.trim() || 'https://t.me/ToFarmsAi_Bot',
               iconType,
+              paidWith: currency,
+              cost: cost
             });
             onClose();
           } catch (err) {
@@ -913,25 +969,6 @@
                 </div>
                 <button onClick={onClose} className="p-1 rounded-full text-slate-400 hover:text-slate-600">
                   <Icons.X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Official Receiver Address Box */}
-              <div className="p-3 rounded-2xl bg-sky-50/70 border border-sky-100 mb-3.5">
-                <div className="flex items-center justify-between text-[11px] font-bold text-slate-600 mb-1">
-                  <span>Official $GRAM Receiver (TON)</span>
-                  <span className="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200 font-semibold">No Memo</span>
-                </div>
-                <div className="font-mono text-[11px] font-bold text-slate-800 break-all bg-white p-2 rounded-xl border border-sky-200/80 select-all">
-                  {receiverAddress}
-                </div>
-                <button
-                  type="button"
-                  onClick={handleCopyReceiver}
-                  className="mt-2 w-full py-1.5 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold border border-slate-200 shadow-xs flex items-center justify-center gap-1 transition active:scale-98 cursor-pointer"
-                >
-                  {copiedAddress ? <Icons.Check className="w-3.5 h-3.5 text-emerald-600" /> : <Icons.Copy className="w-3.5 h-3.5 text-sky-600" />}
-                  <span>{copiedAddress ? 'Address Copied!' : 'Copy $GRAM Receiver Address'}</span>
                 </button>
               </div>
 
@@ -985,27 +1022,49 @@
                     className="w-full accent-sky-500 cursor-pointer"
                   />
 
-                  <div className="mt-2 pt-2 border-t border-slate-200/80 flex items-center justify-between">
+                  {/* ৩টি পেমেন্ট অপশন নির্বাচন */}
+                  <div className="mt-2.5 pt-2 border-t border-slate-200/80 flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] text-slate-500 block">Currency:</span>
-                      <div className="flex gap-1 mt-0.5">
-                        {['GRAM', 'STARS', 'PTS'].map((c) => (
-                          <button
-                            key={c}
-                            type="button"
-                            onClick={() => setCurrency(c)}
-                            className={`px-2 py-0.5 text-[10px] font-bold rounded-md ${
-                              currency === c ? 'bg-sky-500 text-white' : 'bg-white text-slate-600 border border-slate-200'
-                            }`}
-                          >
-                            {c}
-                          </button>
-                        ))}
+                      <span className="text-[10px] text-slate-500 block mb-0.5 font-semibold">Payment Method:</span>
+                      <div className="flex gap-1">
+                        <button
+                          key="GRAM"
+                          type="button"
+                          onClick={() => setCurrency('GRAM')}
+                          className={`px-2 py-1 text-[10px] font-bold rounded-md transition ${
+                            currency === 'GRAM' ? 'bg-sky-500 text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200'
+                          }`}
+                        >
+                          $GRAM
+                        </button>
+                        <button
+                          key="STARS"
+                          type="button"
+                          onClick={() => setCurrency('STARS')}
+                          className={`px-2 py-1 text-[10px] font-bold rounded-md transition ${
+                            currency === 'STARS' ? 'bg-amber-500 text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200'
+                          }`}
+                        >
+                          Stars
+                        </button>
+                        <button
+                          key="PTS"
+                          type="button"
+                          onClick={() => setCurrency('PTS')}
+                          className={`px-2 py-1 text-[10px] font-bold rounded-md transition ${
+                            currency === 'PTS' ? 'bg-emerald-500 text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200'
+                          }`}
+                        >
+                          Free PTS
+                        </button>
                       </div>
                     </div>
+
                     <div className="text-right">
-                      <span className="text-[10px] text-emerald-600 font-bold block">Cost</span>
-                      <span className="font-display font-black text-sm text-slate-900">{calcPrice()}</span>
+                      <span className="text-[10px] text-emerald-600 font-bold block">
+                        {currency === 'PTS' ? 'Free Boost Cost' : 'Cost'}
+                      </span>
+                      <span className="font-display font-black text-sm text-slate-900">{calcDisplayPrice()}</span>
                     </div>
                   </div>
                 </div>
@@ -1027,7 +1086,15 @@
                   className="w-full py-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold text-xs rounded-xl shadow-md active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
                 >
                   <Icons.Send className="w-3.5 h-3.5" />
-                  <span>{isSubmitting ? 'Publishing Mission...' : `Publish Mission (${calcPrice()})`}</span>
+                  <span>
+                    {isSubmitting
+                      ? 'Processing & Publishing...'
+                      : currency === 'GRAM'
+                      ? `Pay & Publish with Wallet (${calcDisplayPrice()})`
+                      : currency === 'PTS'
+                      ? `Boost for Free (${calcDisplayPrice()})`
+                      : `Publish Mission (${calcDisplayPrice()})`}
+                  </span>
                 </button>
               </form>
             </div>
@@ -1488,15 +1555,15 @@
       };
 
       // ==========================================
-      // FrensView (With Bot Chat Link for Instant START button)
+      // FrensView (Direct startapp Referral Link - 100% Reliable Tracking)
       // ==========================================
       const FrensView = ({ currentInvites, dict }) => {
         const [copied, setCopied] = useState(false);
         const botUsername = 'ToFarmsAi_Bot';
         const userId = tg?.initDataUnsafe?.user?.id || '';
 
-        // চ্যাটবক্সে START বাটন শো করে চ্যাটলিস্টে পার্মানেন্ট রাখার অফিশিয়াল রেফারেল লিংক
-        const inviteUrl = `https://t.me/${botUsername}?start=ref_${userId}`;
+        // ১০০% নিখুঁত ও দ্রুত রেফার কাউন্ট হওয়া অফিসিয়াল startapp ফরম্যাট
+        const inviteUrl = `https://t.me/${botUsername}?startapp=ref_${userId}`;
 
         const handleCopy = () => {
           navigator.clipboard.writeText(inviteUrl);
@@ -1506,7 +1573,7 @@
 
         const handleShare = () => {
           const text = encodeURIComponent(`🚀 Join ToBOOSTAi on Telegram! Earn Star PTS and rewards together.\n\nPlay now: ${inviteUrl}`);
-          window.open(`https://t.me/share/url?url=${encodeURIComponent(inviteUrl)}&text=${text}`, '_blank');
+          window.open(`https://t.me/share/url?url=${inviteUrl}&text=${text}`, '_blank');
         };
 
         return (
@@ -1824,7 +1891,7 @@
                 completedTasksToday: completedList.length,
               }));
 
-              // সম্পন্ন হওয়া টাস্ক সংরক্ষণ (যা ভেনিশ করে দেয়া হবে)
+              // সম্পন্ন হওয়া টাস্ক সংরক্ষণ (যা সাথে সাথে ভেনিশ করে দেয়া হবে)
               setCompletedTasksList(completedList);
             }
           })
@@ -2002,7 +2069,7 @@
                 const newPts = data.points !== undefined ? data.points : stats.starBalance + 200;
                 updateBalance(newPts);
                 
-                // টাস্কটি সম্পন্ন লিস্টে যোগ -> স্ক্রিন থেকে অটোমেটিক অদৃশ্য হয়ে যাবে!
+                // সম্পন্ন লিস্টে যোগ -> স্ক্রিন থেকে অটোমেটিক অদৃশ্য হয়ে যাবে!
                 setCompletedTasksList(prev => [...prev, taskId]);
                 setStats((p) => ({ ...p, completedTasksToday: p.completedTasksToday + 1 }));
                 
@@ -2189,7 +2256,11 @@
               <PostBountyModal
                 isOpen={isPostBountyOpen}
                 onClose={() => setIsPostBountyOpen(false)}
+                starBalance={stats.starBalance}
+                walletAddress={stats.walletAddress}
+                onDeductPts={(cost) => updateBalance(stats.starBalance - cost)}
                 onSubmitBounty={handleAddBounty}
+                showToast={showToast}
               />
 
               <LevelPerksModal
