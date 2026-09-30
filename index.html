@@ -848,7 +848,7 @@
             return cost.toFixed(2) + ' $GRAM';
           } else if (currency === 'STARS') {
             const cost = Math.round(300 + ratio * (6000 - 300));
-            return cost.toLocaleString() + ' ⭐ Stars';
+            return cost.toLocaleString() + '  Stars';
           } else {
             const cost = Math.round(10000 + ratio * (200000 - 10000));
             return cost.toLocaleString() + ' PTS';
