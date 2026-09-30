@@ -727,7 +727,7 @@
         const [selectedCategory, setSelectedCategory] = useState('All');
         const categories = ['All', 'Partners', 'Social', 'Web3', 'Daily'];
 
-        // শুধুমাত্র যে কাজগুলো সম্পন্ন হয়নি সেগুলো দেখাবে (বাকিগুলো ভেনিশ হয়ে যাবে)
+        // সম্পন্ন কাজগুলো ইউজারের সামনে থেকে স্বয়ংক্রিয়ভাবে অদৃশ্য হয়ে যাবে
         const visibleTasks = tasks.filter((task) => {
           if (completedTasksList.includes(task.id) || task.status === 'completed') return false;
           if (selectedCategory !== 'All' && task.category !== selectedCategory) return false;
@@ -832,7 +832,7 @@
       };
 
       // ==========================================
-      // PostBountyModal (With 3 Payment Options: $GRAM, STARS & Free Boost with PTS)
+      // PostBountyModal (100% SECURE: Address fetched from backend only)
       // ==========================================
       const PostBountyModal = ({ isOpen, onClose, starBalance, walletAddress, onDeductPts, onSubmitBounty, showToast }) => {
         const [title, setTitle] = useState('');
@@ -843,9 +843,6 @@
         const [currency, setCurrency] = useState('GRAM');
         const [impressions, setImpressions] = useState(100);
         const [isSubmitting, setIsSubmitting] = useState(false);
-
-        // অফিশিয়াল $GRAM রিসিভার ওয়ালেট অ্যাড্রেস (স্বয়ংক্রিয় পেমেন্ট রিসিভার)
-        const OFFICIAL_RECEIVER_ADDRESS = 'UQC_uwp-fGIO5qwRgGKe0ymORn-Cd-pW_HtBVbHD-NPzIVfq';
 
         if (!isOpen) return null;
 
@@ -873,7 +870,7 @@
 
           const cost = calcCostValue();
 
-          // ১. যদি $GRAM দিয়ে পেমেন্ট হয় (স্বয়ংক্রিয় TON Connect ওয়ালেট পেমেন্ট)
+          // ১. $GRAM পেমেন্ট: ব্যাকএন্ড থেকে ডায়নামিক অ্যাড্রেস নিয়ে ওয়ালেটে পাঠানো
           if (currency === 'GRAM') {
             if (!walletAddress) {
               showToast('⚠️ Please connect your TON wallet first!');
@@ -884,16 +881,27 @@
             }
 
             setIsSubmitting(true);
-            showToast('Opening wallet for payment...');
+            showToast('Fetching secure gateway info...');
 
             try {
+              // ব্যাকএন্ড API থেকে রিসিভার অ্যাড্রেস আনা (HTML-এ কোনো অ্যাড্রেস নেই!)
+              const payInfoRes = await fetch('/api/tasks?action=payment_info');
+              const payInfoData = await payInfoRes.json().catch(() => ({}));
+              const backendReceiver = payInfoData.receiverAddress;
+
+              if (!backendReceiver) {
+                throw new Error('Payment gateway is currently unreachable');
+              }
+
+              showToast('Opening wallet for payment...');
+
               // NanoGRAM রূপান্তর (1 $GRAM = 10^9 nano)
               const nanoAmount = Math.round(cost * 1e9).toString();
               const transaction = {
                 validUntil: Math.floor(Date.now() / 1000) + 360,
                 messages: [
                   {
-                    address: OFFICIAL_RECEIVER_ADDRESS,
+                    address: backendReceiver,
                     amount: nanoAmount,
                   }
                 ]
@@ -911,23 +919,22 @@
             }
           }
 
-          // ২. যদি PTS (ফ্রি বুস্ট - অর্জিত পয়েন্ট দিয়ে) পেমেন্ট হয়
+          // ২. PTS (ফ্রি বুস্ট - অর্জিত পয়েন্ট দিয়ে)
           else if (currency === 'PTS') {
             if (starBalance < cost) {
               showToast(`❌ Insufficient PTS! You need ${cost.toLocaleString()} PTS. Watch ads or complete tasks to earn free boost.`);
               return;
             }
-            // ইউজারের অর্জিত পয়েন্ট কেটে নেওয়া
             onDeductPts(cost);
             showToast(`✅ ${cost.toLocaleString()} PTS deducted for Free Boost!`);
           }
 
-          // ৩. যদি STARS দিয়ে পেমেন্ট হয়
+          // ৩. STARS পেমেন্ট
           else if (currency === 'STARS') {
             showToast('✅ Telegram Stars payment verified!');
           }
 
-          // টাস্ক সাবমিট ও ফায়ারবেসে সেভ করা
+          // টাস্ক সাবমিট ও ফায়ারবেসে সেভ
           setIsSubmitting(true);
           try {
             await onSubmitBounty({
@@ -1022,7 +1029,7 @@
                     className="w-full accent-sky-500 cursor-pointer"
                   />
 
-                  {/* ৩টি পেমেন্ট অপশন নির্বাচন */}
+                  {/* Payment Method Selector */}
                   <div className="mt-2.5 pt-2 border-t border-slate-200/80 flex items-center justify-between">
                     <div>
                       <span className="text-[10px] text-slate-500 block mb-0.5 font-semibold">Payment Method:</span>
@@ -1555,7 +1562,7 @@
       };
 
       // ==========================================
-      // FrensView (Direct startapp Referral Link - 100% Reliable Tracking)
+      // FrensView (Direct startapp Referral Link)
       // ==========================================
       const FrensView = ({ currentInvites, dict }) => {
         const [copied, setCopied] = useState(false);
@@ -1861,7 +1868,6 @@
 
           if (!initData) return;
 
-          // ইউজার তথ্য আনা
           fetch('/api/user', {
             method: 'POST',
             headers: {
@@ -1891,13 +1897,11 @@
                 completedTasksToday: completedList.length,
               }));
 
-              // সম্পন্ন হওয়া টাস্ক সংরক্ষণ (যা সাথে সাথে ভেনিশ করে দেয়া হবে)
               setCompletedTasksList(completedList);
             }
           })
           .catch(err => console.error('Error loading user profile:', err));
 
-          // লাইভ টাস্ক লিস্ট ডাটাবেজ থেকে ফেচ করা
           fetch('/api/tasks')
             .then(res => res.json().catch(() => ({})))
             .then(data => {
