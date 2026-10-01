@@ -71,12 +71,13 @@
         }
       }
 
+      /* ৩ডি ব্লু কালারের গ্লোয়িং পালস ইফেক্ট */
       @keyframes coin-pulse-glow {
         0%, 100% {
-          filter: drop-shadow(0 4px 10px rgba(245, 158, 11, 0.3));
+          filter: drop-shadow(0 4px 12px rgba(2, 132, 199, 0.45));
         }
         50% {
-          filter: drop-shadow(0 8px 18px rgba(245, 158, 11, 0.55));
+          filter: drop-shadow(0 8px 22px rgba(56, 189, 248, 0.7));
         }
       }
 
@@ -236,14 +237,14 @@
       };
 
       // ==========================================
-      // Original 3D Dished Star Coin Component
+      // NEW 3D Cyber Sapphire Blue Coin Component
       // ==========================================
       const Coin3DIcon = ({
         size = 45,
         className = '',
         floating = false,
         glow = false,
-        idPrefix = 'toboost',
+        idPrefix = 'toboost-blue',
       }) => {
         const outerRim = `${idPrefix}-outer-rim`;
         const bevelLight = `${idPrefix}-bevel-light`;
@@ -262,59 +263,65 @@
           >
             <svg viewBox="0 0 100 100" width="100%" height="100%" className="w-full h-full overflow-visible drop-shadow-md">
               <defs>
+                {/* Electric Blue Drop Shadow */}
                 <filter id={coinShadow} x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="0" dy="4" stdDeviation="3" floodColor="#92400e" floodOpacity="0.4" />
+                  <feDropShadow dx="0" dy="4" stdDeviation="3.5" floodColor="#0284c7" floodOpacity="0.5" />
                 </filter>
+                {/* 3D Sapphire Blue Outer Rim */}
                 <linearGradient id={outerRim} x1="15%" y1="10%" x2="85%" y2="90%">
-                  <stop offset="0%" stopColor="#FFF9D2" />
-                  <stop offset="20%" stopColor="#FBBF24" />
-                  <stop offset="50%" stopColor="#F59E0B" />
-                  <stop offset="78%" stopColor="#D97706" />
-                  <stop offset="100%" stopColor="#78350F" />
+                  <stop offset="0%" stopColor="#E0F2FE" />
+                  <stop offset="20%" stopColor="#7DD3FC" />
+                  <stop offset="50%" stopColor="#0284C7" />
+                  <stop offset="78%" stopColor="#0369A1" />
+                  <stop offset="100%" stopColor="#075985" />
                 </linearGradient>
+                {/* Shiny Bevel Highlight */}
                 <linearGradient id={bevelLight} x1="10%" y1="10%" x2="90%" y2="90%">
-                  <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.85" />
-                  <stop offset="35%" stopColor="#FDE68A" stopOpacity="0.45" />
-                  <stop offset="70%" stopColor="#92400E" stopOpacity="0.2" />
-                  <stop offset="100%" stopColor="#451A03" stopOpacity="0.8" />
+                  <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.9" />
+                  <stop offset="35%" stopColor="#BAE6FD" stopOpacity="0.5" />
+                  <stop offset="70%" stopColor="#0369A1" stopOpacity="0.3" />
+                  <stop offset="100%" stopColor="#082F49" stopOpacity="0.8" />
                 </linearGradient>
+                {/* Deep Concave Blue Coin Center */}
                 <radialGradient id={dishedConcave} cx="46%" cy="38%" r="62%">
-                  <stop offset="0%" stopColor="#92400E" />
-                  <stop offset="30%" stopColor="#B45309" />
-                  <stop offset="65%" stopColor="#D97706" />
-                  <stop offset="85%" stopColor="#F59E0B" />
-                  <stop offset="97%" stopColor="#FDE68A" />
-                  <stop offset="100%" stopColor="#FEF3C7" />
+                  <stop offset="0%" stopColor="#082F49" />
+                  <stop offset="30%" stopColor="#0C4A6E" />
+                  <stop offset="65%" stopColor="#0369A1" />
+                  <stop offset="85%" stopColor="#0284C7" />
+                  <stop offset="97%" stopColor="#7DD3FC" />
+                  <stop offset="100%" stopColor="#E0F2FE" />
                 </radialGradient>
+                {/* Inner Depth Shadow */}
                 <linearGradient id={dishedInnerShadow} x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#451A03" stopOpacity="0.6" />
-                  <stop offset="50%" stopColor="#78350F" stopOpacity="0.1" />
-                  <stop offset="100%" stopColor="#FFFBEB" stopOpacity="0.5" />
+                  <stop offset="0%" stopColor="#082F49" stopOpacity="0.7" />
+                  <stop offset="50%" stopColor="#0C4A6E" stopOpacity="0.2" />
+                  <stop offset="100%" stopColor="#F0F9FF" stopOpacity="0.6" />
                 </linearGradient>
+                {/* 3D Star Facets (Electric Cyan to Royal Blue) */}
                 <linearGradient id={starFacetLight} x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#FFFFFF" />
-                  <stop offset="40%" stopColor="#FEF08A" />
-                  <stop offset="100%" stopColor="#FDE047" />
+                  <stop offset="40%" stopColor="#E0F2FE" />
+                  <stop offset="100%" stopColor="#BAE6FD" />
                 </linearGradient>
                 <linearGradient id={starFacetMid} x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#FDE047" />
-                  <stop offset="100%" stopColor="#F59E0B" />
+                  <stop offset="0%" stopColor="#BAE6FD" />
+                  <stop offset="100%" stopColor="#38BDF8" />
                 </linearGradient>
                 <linearGradient id={starFacetDark} x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#D97706" />
-                  <stop offset="100%" stopColor="#B45309" />
+                  <stop offset="0%" stopColor="#0284C7" />
+                  <stop offset="100%" stopColor="#0369A1" />
                 </linearGradient>
                 <linearGradient id={starFacetDeep} x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#92400E" />
-                  <stop offset="100%" stopColor="#713F12" />
+                  <stop offset="0%" stopColor="#075985" />
+                  <stop offset="100%" stopColor="#0C4A6E" />
                 </linearGradient>
               </defs>
               <circle cx="50" cy="50" r="46" fill={`url(#${outerRim})`} filter={`url(#${coinShadow})`} />
               <circle cx="50" cy="50" r="45.5" fill="none" stroke={`url(#${bevelLight})`} strokeWidth="1.5" />
-              <circle cx="50" cy="50" r="42" fill="none" stroke="#78350F" strokeOpacity="0.4" strokeWidth="1" />
+              <circle cx="50" cy="50" r="42" fill="none" stroke="#082F49" strokeOpacity="0.4" strokeWidth="1" />
               <circle cx="50" cy="50" r="38.5" fill={`url(#${dishedConcave})`} />
               <circle cx="50" cy="50" r="38.5" fill="none" stroke={`url(#${dishedInnerShadow})`} strokeWidth="2.5" />
-              <circle cx="50" cy="50" r="34" fill="none" stroke="#FFFBEB" strokeWidth="1.2" strokeDasharray="2 3" strokeOpacity="0.65" />
+              <circle cx="50" cy="50" r="34" fill="none" stroke="#F0F9FF" strokeWidth="1.2" strokeDasharray="2 3" strokeOpacity="0.75" />
               <g id="faceted-star">
                 <polygon points="50,50 50,26 44.1,41.9" fill={`url(#${starFacetLight})`} />
                 <polygon points="50,50 50,26 55.9,41.9" fill={`url(#${starFacetMid})`} />
@@ -327,8 +334,8 @@
                 <polygon points="50,50 27.2,42.6 40.5,53.1" fill={`url(#${starFacetLight})`} />
                 <polygon points="50,50 27.2,42.6 44.1,41.9" fill={`url(#${starFacetLight})`} />
               </g>
-              <circle cx="49.5" cy="48.5" r="3" fill="#FFFFFF" fillOpacity="0.85" />
-              <circle cx="47" cy="32" r="1.8" fill="#FFFFFF" fillOpacity="0.9" />
+              <circle cx="49.5" cy="48.5" r="3" fill="#FFFFFF" fillOpacity="0.9" />
+              <circle cx="47" cy="32" r="1.8" fill="#FFFFFF" fillOpacity="0.95" />
             </svg>
           </div>
         );
@@ -415,9 +422,9 @@
               <div className="flex items-center gap-1.5 shrink-0">
                 <button
                   onClick={onOpenLevelModal}
-                  className="flex items-center gap-1 px-2.5 py-1 bg-gradient-to-r from-amber-50 to-amber-100/80 border border-amber-200/90 text-amber-800 rounded-full text-xs font-bold shadow-xs active:scale-95 transition-all cursor-pointer"
+                  className="flex items-center gap-1 px-2.5 py-1 bg-gradient-to-r from-sky-50 to-blue-100/80 border border-sky-200/90 text-sky-800 rounded-full text-xs font-bold shadow-xs active:scale-95 transition-all cursor-pointer"
                 >
-                  <Icons.Sparkles className="w-3 h-3 text-amber-600" />
+                  <Icons.Sparkles className="w-3 h-3 text-sky-600" />
                   <span className="tabular-nums">LV.{userLevel}</span>
                 </button>
 
@@ -487,8 +494,8 @@
                   <div className="relative flex items-center justify-center p-0.5">
                     <Coin3DIcon size={54} idPrefix="balance-main" floating={true} glow={true} />
                   </div>
-                  <span className="text-[9px] font-bold text-amber-700/90 uppercase mt-0.5">
-                    web3 Star
+                  <span className="text-[9px] font-bold text-sky-700/90 uppercase mt-0.5">
+                    3D Sapphire Star
                   </span>
                 </div>
 
@@ -505,7 +512,7 @@
                     <span className="font-display font-extrabold text-2xl sm:text-3xl text-slate-900 tracking-tight tabular-nums">
                       {formattedStars}
                     </span>
-                    <span className="text-xs font-extrabold text-amber-600">PTS</span>
+                    <span className="text-xs font-extrabold text-sky-600">PTS</span>
                   </div>
 
                   <div className="mt-1.5 flex items-center gap-2 flex-wrap">
@@ -519,7 +526,7 @@
 
                     <button
                       onClick={onBoostClick}
-                      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[11px] font-bold shadow-xs active:scale-95 transition-all cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-sky-500 to-blue-600 text-white text-[11px] font-bold shadow-xs active:scale-95 transition-all cursor-pointer"
                     >
                       <Icons.Zap className="w-3 h-3" fill="#ffffff" />
                       <span>{dict.boost}</span>
@@ -622,7 +629,7 @@
                   <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-400 to-blue-500 flex items-center justify-center text-white shadow-xs">
                     <Icons.PlayCircle className="w-5 h-5 stroke-white" />
                   </div>
-                  <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200/80 text-amber-700 text-[11px] font-extrabold tabular-nums">
+                  <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-sky-50 border border-sky-200/80 text-sky-700 text-[11px] font-extrabold tabular-nums">
                     <Coin3DIcon size={13} idPrefix="ad-reward" />
                     <span>+{adReward} PTS</span>
                   </div>
@@ -641,21 +648,21 @@
               {/* BUTTON 2: Daily Check-in */}
               <div onClick={onCheckInClick} role="button" className="group relative flex flex-col justify-between p-3.5 rounded-[18px] bg-white border border-sky-100 shadow-[0_2px_12px_rgba(56,189,248,0.08)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden">
                 <div className="flex items-start justify-between">
-                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center text-white shadow-xs">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-xs">
                     <Icons.CalendarCheck className="w-5 h-5" />
                   </div>
-                  <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200/80 text-amber-700 text-[11px] font-extrabold tabular-nums">
+                  <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-sky-50 border border-sky-200/80 text-sky-700 text-[11px] font-extrabold tabular-nums">
                     <Coin3DIcon size={13} idPrefix="checkin-reward" />
                     <span>+{checkInReward} PTS</span>
                   </div>
                 </div>
                 <div className="mt-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-display font-bold text-slate-800 text-sm group-hover:text-amber-600 transition-colors">{dict.dailyCheckIn}</h3>
+                    <h3 className="font-display font-bold text-slate-800 text-sm group-hover:text-sky-600 transition-colors">{dict.dailyCheckIn}</h3>
                     <Icons.ChevronRight className="w-4 h-4 text-slate-300" />
                   </div>
-                  <div className="flex items-center gap-1 text-[11px] font-semibold text-orange-600 mt-0.5">
-                    <Icons.Flame className="w-3.5 h-3.5 text-orange-500" fill="#f97316" />
+                  <div className="flex items-center gap-1 text-[11px] font-semibold text-blue-600 mt-0.5">
+                    <Icons.Flame className="w-3.5 h-3.5 text-blue-500" fill="#0284c7" />
                     <span>{dict.streak} {streakDays}</span>
                     {hasCheckedInToday && <span className="text-[10px] text-emerald-600 font-bold ml-auto">Done</span>}
                   </div>
@@ -727,7 +734,6 @@
         const [selectedCategory, setSelectedCategory] = useState('All');
         const categories = ['All', 'Partners', 'Social', 'Web3', 'Daily'];
 
-        // সম্পন্ন কাজগুলো ইউজারের সামনে থেকে স্বয়ংক্রিয়ভাবে অদৃশ্য হয়ে যাবে
         const visibleTasks = tasks.filter((task) => {
           if (completedTasksList.includes(task.id) || task.status === 'completed') return false;
           if (selectedCategory !== 'All' && task.category !== selectedCategory) return false;
@@ -800,7 +806,7 @@
                           {task.partnerName && <span className="text-[10px] text-slate-400 font-medium">· {task.partnerName}</span>}
                         </div>
                         <h4 className="font-display font-bold text-slate-800 text-sm leading-tight truncate">{task.title}</h4>
-                        <div className="inline-flex items-center gap-1 mt-1 text-xs font-extrabold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 tabular-nums">
+                        <div className="inline-flex items-center gap-1 mt-1 text-xs font-extrabold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-full border border-sky-200/60 tabular-nums">
                           <Coin3DIcon size={13} idPrefix={`task-coin-${task.id}`} />
                           <span>+{task.reward || 200} PTS</span>
                         </div>
@@ -809,8 +815,8 @@
 
                     <div className="shrink-0">
                       {task.status === 'verifying' ? (
-                        <button disabled className="flex items-center gap-1 px-3.5 py-1.5 bg-amber-100 text-amber-800 rounded-full text-xs font-bold transition-all whitespace-nowrap">
-                          <Icons.Loader2 className="w-3 h-3 animate-spin text-amber-600" />
+                        <button disabled className="flex items-center gap-1 px-3.5 py-1.5 bg-sky-100 text-sky-800 rounded-full text-xs font-bold transition-all whitespace-nowrap">
+                          <Icons.Loader2 className="w-3 h-3 animate-spin text-sky-600" />
                           <span>Checking (3s)</span>
                         </button>
                       ) : (
@@ -884,7 +890,6 @@
             showToast('Fetching secure gateway info...');
 
             try {
-              // ব্যাকএন্ড API থেকে রিসিভার অ্যাড্রেস আনা (HTML-এ কোনো অ্যাড্রেস নেই!)
               const payInfoRes = await fetch('/api/tasks?action=payment_info');
               const payInfoData = await payInfoRes.json().catch(() => ({}));
               const backendReceiver = payInfoData.receiverAddress;
@@ -895,7 +900,6 @@
 
               showToast('Opening wallet for payment...');
 
-              // NanoGRAM রূপান্তর (1 $GRAM = 10^9 nano)
               const nanoAmount = Math.round(cost * 1e9).toString();
               const transaction = {
                 validUntil: Math.floor(Date.now() / 1000) + 360,
@@ -1128,12 +1132,12 @@
             <div className="relative w-full max-w-sm rounded-[24px] bg-white border border-sky-100 shadow-2xl p-5 overflow-hidden">
               <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center">
-                    <Icons.Trophy className="w-5 h-5 text-amber-600" />
+                  <div className="w-9 h-9 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center">
+                    <Icons.Trophy className="w-5 h-5 text-sky-600" />
                   </div>
                   <div>
                     <h3 className="font-display font-black text-slate-900 text-base">Level {userLevel} Perks</h3>
-                    <p className="text-[11px] text-slate-400">Current Multiplier: <strong className="text-amber-600">{multiplier}x</strong></p>
+                    <p className="text-[11px] text-slate-400">Current Multiplier: <strong className="text-sky-600">{multiplier}x</strong></p>
                   </div>
                 </div>
                 <button onClick={onClose} className="p-1 rounded-full text-slate-400 hover:text-slate-600">
@@ -1141,15 +1145,15 @@
                 </button>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50/50 border border-amber-200/80 mb-4">
-                <div className="flex justify-between items-center text-xs mb-1.5 font-bold text-amber-900">
+              <div className="p-3.5 rounded-2xl bg-gradient-to-r from-sky-50 to-blue-50/50 border border-sky-200/80 mb-4">
+                <div className="flex justify-between items-center text-xs mb-1.5 font-bold text-sky-900">
                   <span>Next Level: Lv.{userLevel + 1}</span>
                   <span className="tabular-nums">{currentInvites}/{requiredInvites} Invites</span>
                 </div>
-                <div className="w-full bg-amber-200/60 h-2 rounded-full overflow-hidden">
-                  <div className="bg-gradient-to-r from-amber-500 to-orange-500 h-full rounded-full" style={{ width: `${Math.min(100, (currentInvites / requiredInvites) * 100)}%` }} />
+                <div className="w-full bg-sky-200/60 h-2 rounded-full overflow-hidden">
+                  <div className="bg-gradient-to-r from-sky-500 to-blue-600 h-full rounded-full" style={{ width: `${Math.min(100, (currentInvites / requiredInvites) * 100)}%` }} />
                 </div>
-                <p className="text-[11px] text-amber-800/80 mt-2 font-medium">
+                <p className="text-[11px] text-sky-800/80 mt-2 font-medium">
                   Invite {Math.max(0, requiredInvites - currentInvites)} more friends to unlock higher daily tasks!
                 </p>
               </div>
@@ -1305,8 +1309,8 @@
         if (!isOpen) return null;
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in">
-            <div className="relative w-full max-w-sm rounded-[24px] bg-white border border-amber-200 shadow-2xl p-5 text-center">
-              <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-3">
+            <div className="relative w-full max-w-sm rounded-[24px] bg-white border border-sky-200 shadow-2xl p-5 text-center">
+              <div className="w-12 h-12 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center mx-auto mb-3">
                 <Icons.Lock className="w-6 h-6" />
               </div>
               <h3 className="font-display font-black text-slate-900 text-base mb-1">
@@ -1392,8 +1396,8 @@
             <div className="relative w-full max-w-sm rounded-[24px] bg-white border border-sky-100 shadow-2xl p-5 overflow-hidden">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-orange-600 bg-orange-50 px-2.5 py-0.5 rounded-full border border-orange-200/60 w-fit mb-1">
-                    <Icons.Flame className="w-3.5 h-3.5 text-orange-500" fill="#f97316" />
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-sky-700 bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-200/60 w-fit mb-1">
+                    <Icons.Flame className="w-3.5 h-3.5 text-sky-600" fill="#0284c7" />
                     <span>Streak: Day {currentStreak}</span>
                   </div>
                   <h3 className="font-display font-black text-slate-900 text-xl tracking-tight">Daily Check-in</h3>
@@ -1414,7 +1418,7 @@
                     <div
                       key={d.day}
                       className={`relative rounded-2xl p-2 flex flex-col items-center justify-between text-center ${
-                        isDay7 ? 'col-span-2 bg-gradient-to-br from-amber-100/70 to-yellow-100 border-2 border-amber-300' : ''
+                        isDay7 ? 'col-span-2 bg-gradient-to-br from-sky-100/80 to-blue-100 border-2 border-sky-300' : ''
                       } ${isClaimed ? 'bg-slate-50 border border-slate-200 opacity-80' : isToday ? 'bg-sky-50 border-2 border-sky-400' : 'bg-white border border-slate-100'}`}
                     >
                       <span className="text-[10px] font-bold text-slate-500">Day {d.day}</span>
@@ -1441,7 +1445,7 @@
               ) : (
                 <button
                   onClick={() => onClaimToday(todayReward)}
-                  className="w-full py-3 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white font-black text-sm rounded-xl shadow-md active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-gradient-to-r from-sky-500 via-blue-600 to-sky-600 text-white font-black text-sm rounded-xl shadow-md active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   <Icons.Sparkles className="w-4 h-4" />
                   <span>Claim Day {currentStreak + 1} (+{todayReward} PTS)</span>
@@ -1460,8 +1464,8 @@
         const [floatingPoints, setFloatingPoints] = useState([]);
 
         const boosts = [
-          { id: 'turbo', name: 'Turbo Booster Multiplier', desc: 'Increases yield by +0.2x per level', cost: 5000, effect: `+${(multiplier + 0.2).toFixed(1)}x`, icon: Icons.Gauge, color: 'from-amber-400 to-orange-500' },
-          { id: 'autobot', name: 'Bounty Collector Bot', desc: 'Auto task perks while you are away', cost: 12000, effect: '+150 ⭐ / hour', icon: Icons.Bot, color: 'from-sky-400 to-blue-600' },
+          { id: 'turbo', name: 'Turbo Booster Multiplier', desc: 'Increases yield by +0.2x per level', cost: 5000, effect: `+${(multiplier + 0.2).toFixed(1)}x`, icon: Icons.Gauge, color: 'from-sky-400 to-blue-500' },
+          { id: 'autobot', name: 'Bounty Collector Bot', desc: 'Auto task perks while you are away', cost: 12000, effect: '+150 ⭐ / hour', icon: Icons.Bot, color: 'from-indigo-400 to-blue-600' },
           { id: 'battery', name: 'Energy Reservoir', desc: 'Extends energy limit by +500 units', cost: 3000, effect: `+500 (${maxEnergy + 500} Max)`, icon: Icons.BatteryCharging, color: 'from-emerald-400 to-teal-600' },
         ];
 
@@ -1493,7 +1497,7 @@
             <div className="rounded-[22px] bg-white border border-sky-100 shadow-[0_4px_20px_rgba(56,189,248,0.1)] p-5 text-center relative overflow-hidden">
               <div className="flex items-center justify-between mb-3 text-xs">
                 <span className="font-bold text-slate-500 uppercase tracking-wider">Turbo Booster Tap</span>
-                <span className="font-extrabold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                <span className="font-extrabold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full border border-sky-200">
                   {multiplier.toFixed(1)}x Multiplier Active
                 </span>
               </div>
@@ -1503,7 +1507,7 @@
                   <Coin3DIcon size={110} idPrefix="boost-tap-coin" floating={!tapEffect} glow={true} />
                 </div>
                 {floatingPoints.map((pt) => (
-                  <span key={pt.id} className="absolute text-sm font-black text-amber-500 pointer-events-none transition-all duration-700 -translate-y-8 opacity-0 font-display" style={{ left: pt.x, top: pt.y }}>
+                  <span key={pt.id} className="absolute text-sm font-black text-sky-600 pointer-events-none transition-all duration-700 -translate-y-8 opacity-0 font-display" style={{ left: pt.x, top: pt.y }}>
                     +{(10 * multiplier).toFixed(0)} ⭐
                   </span>
                 ))}
@@ -1512,15 +1516,15 @@
               <div className="space-y-1.5 mt-2">
                 <div className="flex items-center justify-between text-xs font-bold">
                   <span className="flex items-center gap-1 text-slate-600">
-                    <Icons.Zap className="w-3.5 h-3.5 text-amber-500" fill="#f59e0b" />
+                    <Icons.Zap className="w-3.5 h-3.5 text-sky-500" fill="#0284c7" />
                     <span>Energy:</span>
                   </span>
                   <span className="tabular-nums text-slate-800">{energy} / {maxEnergy}</span>
                 </div>
                 <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden p-0.5">
-                  <div className="bg-gradient-to-r from-amber-400 via-orange-500 to-sky-500 h-full rounded-full transition-all duration-300" style={{ width: `${energyPercent}%` }} />
+                  <div className="bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-600 h-full rounded-full transition-all duration-300" style={{ width: `${energyPercent}%` }} />
                 </div>
-                <p className="text-[11px] text-slate-400 font-medium">Tap the star coin for instant bonus energy!</p>
+                <p className="text-[11px] text-slate-400 font-medium">Tap the sapphire coin for instant bonus energy!</p>
               </div>
             </div>
 
@@ -1569,7 +1573,6 @@
         const botUsername = 'ToFarmsAi_Bot';
         const userId = tg?.initDataUnsafe?.user?.id || '';
 
-        // ১০০% নিখুঁত ও দ্রুত রেফার কাউন্ট হওয়া অফিসিয়াল startapp ফরম্যাট
         const inviteUrl = `https://t.me/${botUsername}?startapp=ref_${userId}`;
 
         const handleCopy = () => {
@@ -1723,7 +1726,7 @@
                       step={1000}
                       className="bg-transparent font-display font-extrabold text-xl text-slate-900 focus:outline-none w-1/2"
                     />
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white rounded-lg border border-slate-200 text-xs font-bold text-amber-700">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white rounded-lg border border-slate-200 text-xs font-bold text-sky-700">
                       <Coin3DIcon size={16} idPrefix="swap-coin-icon" />
                       <span> POINTS</span>
                     </div>
@@ -1948,14 +1951,12 @@
 
             const sessionToken = startData.sessionId || startData.sessionToken;
 
-            // Show Monetag Ad
             if (typeof window.show_11923110 === 'function') {
               await window.show_11923110();
             } else {
               await new Promise(r => setTimeout(r, 2000));
             }
 
-            // Claim Reward on backend
             showToast('Verifying points reward...');
             const rewardRes = await fetch('/api/reward', {
               method: 'POST',
@@ -2055,7 +2056,6 @@
             prev.map((t) => (t.id === taskId ? { ...t, status: 'verifying' } : t))
           );
 
-          // ৩ সেকেন্ড পর ডাটাবেজে পয়েন্ট সেভ ও সাথে সাথে স্ক্রিন থেকে গায়েব (ভেনিশ)
           setTimeout(async () => {
             try {
               const initData = tg?.initData || '';
@@ -2073,7 +2073,6 @@
                 const newPts = data.points !== undefined ? data.points : stats.starBalance + 200;
                 updateBalance(newPts);
                 
-                // সম্পন্ন লিস্টে যোগ -> স্ক্রিন থেকে অটোমেটিক অদৃশ্য হয়ে যাবে!
                 setCompletedTasksList(prev => [...prev, taskId]);
                 setStats((p) => ({ ...p, completedTasksToday: p.completedTasksToday + 1 }));
                 
