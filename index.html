@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -83,43 +84,22 @@
       }
 
       @keyframes coin-float {
-        0%, 100% {
-          transform: translateY(0px) rotate(0deg);
-        }
-        50% {
-          transform: translateY(-3px) rotate(1.5deg);
-        }
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-3px) rotate(1.5deg); }
       }
 
       @keyframes coin-pulse-glow {
-        0%, 100% {
-          filter: drop-shadow(0 3px 10px rgba(2, 132, 199, 0.45));
-        }
-        50% {
-          filter: drop-shadow(0 6px 18px rgba(56, 189, 248, 0.7));
-        }
+        0%, 100% { filter: drop-shadow(0 3px 10px rgba(2, 132, 199, 0.45)); }
+        50% { filter: drop-shadow(0 6px 18px rgba(56, 189, 248, 0.7)); }
       }
 
-      .animate-coin-float {
-        animation: coin-float 3.2s ease-in-out infinite;
-      }
+      .animate-coin-float { animation: coin-float 3.2s ease-in-out infinite; }
+      .animate-coin-glow { animation: coin-pulse-glow 2.4s ease-in-out infinite; }
 
-      .animate-coin-glow {
-        animation: coin-pulse-glow 2.4s ease-in-out infinite;
-      }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-      .no-scrollbar::-webkit-scrollbar {
-        display: none;
-      }
-      .no-scrollbar {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
-
-      .tab-enter {
-        animation: fadeIn 0.2s ease-out forwards;
-      }
-
+      .tab-enter { animation: fadeIn 0.2s ease-out forwards; }
       @keyframes fadeIn {
         from { opacity: 0; transform: translateY(4px); }
         to { opacity: 1; transform: translateY(0); }
@@ -143,7 +123,7 @@
         }
       }
 
-      // Safe Link Opener
+      // Safe External Link Opener
       const openSafeLink = (url) => {
         if (!url || url === '#') return;
         try {
@@ -165,7 +145,7 @@
 
       const getTodayUtc = () => new Date().toISOString().split('T')[0];
 
-      // Multi-Account Isolated Local Storage (Separated by Telegram User ID)
+      // Multi-Account Isolated Storage (Scoped to Telegram User ID)
       const getStoredAdCount = (uid) => {
         try {
           const raw = localStorage.getItem(`toboost_ad_stats_${uid || 'guest'}`);
@@ -233,7 +213,7 @@
       const DICTIONARY = {
         EN: {
           welcome: 'Welcome back,',
-          totalBalance: 'Total Balance',
+          totalBalance: 'TOTAL BALANCE',
           verified: 'Verified',
           watchAd: 'Watch Ad',
           dailyCheckIn: 'Daily Check-in',
@@ -248,7 +228,7 @@
         },
         RU: {
           welcome: 'С возвращением,',
-          totalBalance: 'Общий баланс',
+          totalBalance: 'ОБЩИЙ БАЛАНС',
           verified: 'Проверено',
           watchAd: 'Смотреть рекламу',
           dailyCheckIn: 'Ежедневный вход',
@@ -263,7 +243,7 @@
         },
         ES: {
           welcome: 'Bienvenido de nuevo,',
-          totalBalance: 'Saldo Total',
+          totalBalance: 'SALDO TOTAL',
           verified: 'Verificado',
           watchAd: 'Ver Anuncio',
           dailyCheckIn: 'Registro Diario',
@@ -293,13 +273,69 @@
         },
       };
 
-      // Pure SVG Icons Collection (Size bumped for improved touch target)
+      // ==========================================
+      // OFFICIAL SOCIAL MEDIA VECTOR SVGS
+      // ==========================================
       const Icons = {
+        Telegram: ({ className = "w-6 h-6" }) => (
+          <svg className={className} viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="12" fill="#24A1DE" />
+            <path d="M17.65 6.94l-2.07 9.8c-.15.7-.56.87-1.14.54l-3.17-2.34-1.53 1.47c-.17.17-.31.31-.64.31l.23-3.23 5.88-5.31c.25-.23-.06-.35-.39-.13L7.6 12.63l-3.13-.98c-.68-.21-.69-.68.14-1.01l12.24-4.72c.57-.21 1.06.14.88.99z" fill="#FFFFFF"/>
+          </svg>
+        ),
+        Twitter: ({ className = "w-6 h-6" }) => (
+          <svg className={className} viewBox="0 0 24 24" fill="none">
+            <rect width="24" height="24" rx="6" fill="#000000" />
+            <path d="M17.48 4.5h2.46l-5.38 6.15 6.32 8.35h-4.95l-3.88-5.07-4.44 5.07H5.15l5.76-6.58L4.85 4.5h5.08l3.51 4.65 4.04-4.65zm-.86 13.03h1.36L8.85 5.91H7.39l9.23 11.62z" fill="#FFFFFF"/>
+          </svg>
+        ),
+        Youtube: ({ className = "w-6 h-6" }) => (
+          <svg className={className} viewBox="0 0 24 24" fill="none">
+            <path fillRule="evenodd" clipRule="evenodd" d="M21.58 7.19a2.7 2.7 0 00-1.9-1.9C17.99 4.75 12 4.75 12 4.75s-5.99 0-7.68.54a2.7 2.7 0 00-1.9 1.9C1.88 8.88 1.88 12 1.88 12s0 3.12.54 4.81a2.7 2.7 0 001.9 1.9c1.69.54 7.68.54 7.68.54s5.99 0 7.68-.54a2.7 2.7 0 001.9-1.9c.54-1.69.54-4.81.54-4.81s0-3.12-.54-4.81z" fill="#FF0000"/>
+            <path d="M10.25 15.25L15.25 12l-5-3.25v6.5z" fill="#FFFFFF" />
+          </svg>
+        ),
+        Facebook: ({ className = "w-6 h-6" }) => (
+          <svg className={className} viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="12" fill="#1877F2" />
+            <path d="M15.04 12.01l.53-3.48h-3.34V6.28c0-.95.47-1.88 1.96-1.88h1.52V1.44S14.33 1.2 13.02 1.2c-2.75 0-4.55 1.67-4.55 4.69v2.64H5.41v3.48h3.06V20.45A12.08 12.08 0 0012 20.66a12.08 12.08 0 003.54-.51v-8.14h-.5z" fill="#FFFFFF"/>
+          </svg>
+        ),
+        Instagram: ({ className = "w-6 h-6" }) => (
+          <svg className={className} viewBox="0 0 24 24" fill="none">
+            <defs>
+              <radialGradient id="ig-rg" cx="20%" cy="110%" r="140%">
+                <stop offset="0%" stopColor="#FEC564" /><stop offset="10%" stopColor="#FEC564" /><stop offset="50%" stopColor="#FD1D1D" /><stop offset="100%" stopColor="#833AB4" />
+              </radialGradient>
+            </defs>
+            <rect width="24" height="24" rx="6.5" fill="url(#ig-rg)" />
+            <rect x="5.25" y="5.25" width="13.5" height="13.5" rx="3.8" stroke="#FFFFFF" strokeWidth="1.6" />
+            <circle cx="12" cy="12" r="3.2" stroke="#FFFFFF" strokeWidth="1.6" />
+            <circle cx="15.8" cy="8.2" r="0.9" fill="#FFFFFF" />
+          </svg>
+        ),
+        Bot: ({ className = "w-6 h-6" }) => (
+          <svg className={className} viewBox="0 0 24 24" fill="none">
+            <rect width="24" height="24" rx="6" fill="#10B981" />
+            <path d="M12 6v2M9 4h6" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" />
+            <rect x="5" y="8" width="14" height="11" rx="3" fill="#FFFFFF" />
+            <circle cx="9" cy="13.5" r="1.5" fill="#10B981" />
+            <circle cx="15" cy="13.5" r="1.5" fill="#10B981" />
+            <path d="M10 16.5h4" stroke="#10B981" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+        ),
+        Globe: ({ className = "w-6 h-6" }) => (
+          <svg className={className} viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="12" fill="#0284C7" />
+            <circle cx="12" cy="12" r="7.5" stroke="#FFFFFF" strokeWidth="1.5" />
+            <line x1="4.5" y1="12" x2="19.5" y2="12" stroke="#FFFFFF" strokeWidth="1.5" />
+            <ellipse cx="12" cy="12" rx="3.5" ry="7.5" stroke="#FFFFFF" strokeWidth="1.5" />
+          </svg>
+        ),
         Send: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>,
         ExternalLink: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>,
         HelpCircle: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>,
         Settings: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>,
-        Globe: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>,
         ChevronDown: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>,
         Sparkles: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"></path></svg>,
         Zap: ({ className, fill }) => <svg className={className} viewBox="0 0 24 24" fill={fill || "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>,
@@ -317,30 +353,21 @@
         Plus: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
         Check: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>,
         Loader2: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>,
-        Twitter: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>,
-        Youtube: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="white"></polygon></svg>,
-        Facebook: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>,
-        Instagram: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>,
-        Bot: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg>,
-        Volume2: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>,
-        Gift: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>,
-        Gauge: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 14 4-4"></path><path d="M3.34 19a10 10 0 1 1 17.32 0"></path></svg>,
-        BatteryCharging: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 7h1a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-2"></path><path d="M6 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h1"></path><line x1="11" y1="7" x2="9" y2="12"></line><line x1="15" y1="12" x2="13" y2="17"></line><line x1="22" y1="11" x2="22" y2="13"></line></svg>,
-        Copy: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>,
-        Share2: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>,
-        ArrowDownUp: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 16 4 4 4-4"></path><path d="M7 20V4"></path><path d="m21 8-4-4-4 4"></path><path d="M17 4v16"></path></svg>,
-        ArrowRight: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>,
-        X: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
-        AlertCircle: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>,
-        Trophy: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path><path d="M6 4h12v7a6 6 0 0 1-12 0V4z"></path></svg>,
         User: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>,
         Smartphone: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>,
         Lock: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>,
+        AlertCircle: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>,
+        Trophy: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path><path d="M6 4h12v7a6 6 0 0 1-12 0V4z"></path></svg>,
+        Volume2: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>,
+        Gift: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>,
+        Copy: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>,
+        Share2: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>,
+        ArrowDownUp: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 16 4 4 4-4"></path><path d="M7 20V4"></path><path d="m21 8-4-4-4 4"></path><path d="M17 4v16"></path></svg>,
       };
 
       // 3D Sapphire Blue Coin Component
       const Coin3DIcon = ({
-        size = 38,
+        size = 36,
         className = '',
         floating = false,
         glow = false,
@@ -367,47 +394,28 @@
                   <feDropShadow dx="0" dy="3.5" stdDeviation="3" floodColor="#0284c7" floodOpacity="0.5" />
                 </filter>
                 <linearGradient id={outerRim} x1="15%" y1="10%" x2="85%" y2="90%">
-                  <stop offset="0%" stopColor="#E0F2FE" />
-                  <stop offset="20%" stopColor="#7DD3FC" />
-                  <stop offset="50%" stopColor="#0284C7" />
-                  <stop offset="78%" stopColor="#0369A1" />
-                  <stop offset="100%" stopColor="#075985" />
+                  <stop offset="0%" stopColor="#E0F2FE" /><stop offset="20%" stopColor="#7DD3FC" /><stop offset="50%" stopColor="#0284C7" /><stop offset="78%" stopColor="#0369A1" /><stop offset="100%" stopColor="#075985" />
                 </linearGradient>
                 <linearGradient id={bevelLight} x1="10%" y1="10%" x2="90%" y2="90%">
-                  <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.9" />
-                  <stop offset="35%" stopColor="#BAE6FD" stopOpacity="0.5" />
-                  <stop offset="70%" stopColor="#0369A1" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#082F49" stopOpacity="0.8" />
+                  <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.9" /><stop offset="35%" stopColor="#BAE6FD" stopOpacity="0.5" /><stop offset="70%" stopColor="#0369A1" stopOpacity="0.3" /><stop offset="100%" stopColor="#082F49" stopOpacity="0.8" />
                 </linearGradient>
                 <radialGradient id={dishedConcave} cx="46%" cy="38%" r="62%">
-                  <stop offset="0%" stopColor="#082F49" />
-                  <stop offset="30%" stopColor="#0C4A6E" />
-                  <stop offset="65%" stopColor="#0369A1" />
-                  <stop offset="85%" stopColor="#0284C7" />
-                  <stop offset="97%" stopColor="#7DD3FC" />
-                  <stop offset="100%" stopColor="#E0F2FE" />
+                  <stop offset="0%" stopColor="#082F49" /><stop offset="30%" stopColor="#0C4A6E" /><stop offset="65%" stopColor="#0369A1" /><stop offset="85%" stopColor="#0284C7" /><stop offset="97%" stopColor="#7DD3FC" /><stop offset="100%" stopColor="#E0F2FE" />
                 </radialGradient>
                 <linearGradient id={dishedInnerShadow} x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#082F49" stopOpacity="0.7" />
-                  <stop offset="50%" stopColor="#0C4A6E" stopOpacity="0.2" />
-                  <stop offset="100%" stopColor="#F0F9FF" stopOpacity="0.6" />
+                  <stop offset="0%" stopColor="#082F49" stopOpacity="0.7" /><stop offset="50%" stopColor="#0C4A6E" stopOpacity="0.2" /><stop offset="100%" stopColor="#F0F9FF" stopOpacity="0.6" />
                 </linearGradient>
                 <linearGradient id={starFacetLight} x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#FFFFFF" />
-                  <stop offset="40%" stopColor="#E0F2FE" />
-                  <stop offset="100%" stopColor="#BAE6FD" />
+                  <stop offset="0%" stopColor="#FFFFFF" /><stop offset="40%" stopColor="#E0F2FE" /><stop offset="100%" stopColor="#BAE6FD" />
                 </linearGradient>
                 <linearGradient id={starFacetMid} x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#BAE6FD" />
-                  <stop offset="100%" stopColor="#38BDF8" />
+                  <stop offset="0%" stopColor="#BAE6FD" /><stop offset="100%" stopColor="#38BDF8" />
                 </linearGradient>
                 <linearGradient id={starFacetDark} x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#0284C7" />
-                  <stop offset="100%" stopColor="#0369A1" />
+                  <stop offset="0%" stopColor="#0284C7" /><stop offset="100%" stopColor="#0369A1" />
                 </linearGradient>
                 <linearGradient id={starFacetDeep} x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#075985" />
-                  <stop offset="100%" stopColor="#0C4A6E" />
+                  <stop offset="0%" stopColor="#075985" /><stop offset="100%" stopColor="#0C4A6E" />
                 </linearGradient>
               </defs>
               <circle cx="50" cy="50" r="46" fill={`url(#${outerRim})`} filter={`url(#${coinShadow})`} />
@@ -437,7 +445,7 @@
 
       // TopVerifiedBanner
       const TopVerifiedBanner = () => (
-        <header className="sticky top-0 z-30 w-full bg-white/95 backdrop-blur-md border-b border-sky-100 shadow-[0_1px_8px_rgba(56,189,248,0.06)] px-3.5 py-2 shrink-0 transition-all">
+        <header className="sticky top-0 z-30 w-full bg-white/95 backdrop-blur-md border-b border-sky-100 shadow-[0_1px_8px_rgba(56,189,248,0.06)] px-3.5 py-1.5 shrink-0 transition-all">
           <div className="max-w-md mx-auto flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-xs">
@@ -455,7 +463,7 @@
 
             <button
               onClick={() => openSafeLink('https://t.me/ToBOOST_Ai')}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-bold text-white bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 active:scale-95 transition-all rounded-full shadow-xs shadow-sky-500/25 border border-sky-400/30 cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1 text-[12px] font-bold text-white bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 active:scale-95 transition-all rounded-full shadow-xs shadow-sky-500/25 border border-sky-400/30 cursor-pointer"
             >
               <Icons.Send className="w-3 h-3 -translate-x-[0.5px] translate-y-[0.5px]" />
               <span>Community</span>
@@ -465,7 +473,7 @@
         </header>
       );
 
-      // UserHeaderSection (+3px font & icon size boost)
+      // UserHeaderSection
       const UserHeaderSection = ({
         username,
         userLevel,
@@ -486,7 +494,7 @@
         ];
 
         return (
-          <section className="w-full px-3.5 py-1.5 shrink-0">
+          <section className="w-full px-3.5 py-1 shrink-0">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div onClick={onOpenSettingsModal} role="button" className="relative cursor-pointer group shrink-0">
@@ -532,7 +540,7 @@
                     onClick={() => setLangMenuOpen(!langMenuOpen)}
                     className="h-7 px-2 rounded-full bg-white/90 border border-slate-200/80 text-slate-700 hover:text-sky-600 flex items-center gap-1 text-[11px] font-bold transition-all shadow-xs active:scale-95 cursor-pointer"
                   >
-                    <Icons.Globe className="w-3 h-3 text-slate-500" />
+                    <Icons.Globe className="w-3.5 h-3.5 text-slate-500" />
                     <span>{currentLanguage}</span>
                     <Icons.ChevronDown className="w-3 h-3 text-slate-400" />
                   </button>
@@ -566,45 +574,46 @@
         );
       };
 
-      // Compact Slim Balance Card (Halved Height, $TON Removed, Booster Button Removed)
-      const DynamicBalanceCard = ({ starBalance, tokenBalance, onSwapClick, dict }) => {
+      // Slim Dynamic Balance Card (20% Slimmer, Verified Top Right, Clean $GRAM)
+      const DynamicBalanceCard = ({ starBalance, tokenBalance, dict }) => {
         const formattedStars = starBalance.toLocaleString();
         const displayGram = tokenBalance.toFixed(3);
 
         return (
           <div className="w-full">
-            <div className="relative overflow-hidden rounded-[15px] bg-gradient-to-r from-white via-white to-sky-50/90 border border-white/90 shadow-[0_2px_8px_rgba(56,189,248,0.06)] px-3 py-2">
-              <div className="relative z-10 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5">
+            <div className="relative overflow-hidden rounded-[16px] bg-gradient-to-r from-white via-white to-sky-50/95 border border-white shadow-[0_2px_8px_rgba(56,189,248,0.06)] px-3.5 py-2">
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 whitespace-nowrap">
+                  {dict.totalBalance}
+                </span>
+                
+                <div className="inline-flex items-center gap-1 text-[10.5px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/70 shrink-0">
+                  <Icons.ShieldCheck className="w-3.5 h-3.5" />
+                  <span>{dict.verified}</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2.5 min-w-0">
                   <div className="relative flex items-center justify-center shrink-0">
                     <Coin3DIcon size={36} idPrefix="balance-main" floating={true} glow={true} />
                   </div>
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{dict.totalBalance}</span>
-                      <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-200/60">
-                        <Icons.ShieldCheck className="w-3 h-3" />
-                        {dict.verified}
-                      </span>
-                    </div>
-                    <div className="flex items-baseline gap-1 mt-0.5">
-                      <span className="font-display font-extrabold text-[22px] text-slate-900 tracking-tight tabular-nums leading-none">
-                        {formattedStars}
-                      </span>
-                      <span className="text-[12px] font-extrabold text-sky-600">PTS</span>
-                      <span className="ml-2 px-2 py-0.5 rounded-full bg-sky-100/80 text-sky-800 text-[11px] font-bold">
-                        ≈ {displayGram} $GRAM
-                      </span>
-                    </div>
+                  <div className="flex items-baseline gap-1.5 flex-wrap">
+                    <span className="font-display font-extrabold text-[23px] text-slate-900 tracking-tight tabular-nums leading-none">
+                      {formattedStars}
+                    </span>
+                    <span className="text-[12px] font-extrabold text-sky-600">PTS</span>
+                    
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-sky-100/90 text-sky-800 text-[11px] font-bold border border-sky-200/70 ml-1">
+                      ≈ {displayGram} $GRAM
+                    </span>
                   </div>
                 </div>
 
-                <div className="flex flex-col items-end justify-center">
-                  <button onClick={onSwapClick} className="flex items-center gap-1 text-sky-600 font-bold hover:text-sky-700 transition-colors cursor-pointer text-[12px] bg-sky-50 px-2.5 py-1 rounded-full border border-sky-200/80">
-                    <span>{dict.convertWallet}</span>
-                    <Icons.ArrowUpRight className="w-3 h-3" />
-                  </button>
-                  <span className="text-[10px] text-slate-400 font-medium mt-1">10,000 PTS = 1 $GRAM</span>
+                <div className="shrink-0 text-right">
+                  <span className="text-[10px] text-slate-400 font-semibold tracking-tight whitespace-nowrap block">
+                    10,000 PTS = 1 $GRAM
+                  </span>
                 </div>
               </div>
             </div>
@@ -612,19 +621,18 @@
         );
       };
 
-      // BottomNavBar
+      // BottomNavBar (4 Clean Tabs - Booster Button Removed)
       const BottomNavBar = ({ activeTab, onSelectTab, hasCheckedInToday }) => {
         const tabs = [
           { id: 'home', label: 'Home', icon: Icons.Home },
-          { id: 'boost', label: 'Booster', icon: Icons.Zap },
           { id: 'checkin', label: 'Check-in', icon: Icons.Calendar, isCheckin: true },
           { id: 'frens', label: 'Frens', icon: Icons.Users },
           { id: 'wallet', label: 'Wallet', icon: Icons.Wallet },
         ];
 
         return (
-          <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-sky-100/90 shadow-[0_-3px_15px_rgba(56,189,248,0.08)] px-2 pb-1.5 pt-1 transition-all">
-            <div className="max-w-md mx-auto grid grid-cols-5 items-center justify-around">
+          <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-sky-100/90 shadow-[0_-3px_15px_rgba(56,189,248,0.08)] px-4 pb-2 pt-1.5 transition-all">
+            <div className="max-w-md mx-auto grid grid-cols-4 items-center justify-around">
               {tabs.map((tab) => {
                 const IconComponent = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -638,7 +646,7 @@
                     }`}
                   >
                     {isActive && (
-                      <span className="absolute -top-1 w-5 h-1 rounded-full bg-gradient-to-r from-sky-400 to-blue-600" />
+                      <span className="absolute -top-1 w-6 h-1 rounded-full bg-gradient-to-r from-sky-400 to-blue-600" />
                     )}
 
                     <div className="relative flex items-center justify-center">
@@ -667,7 +675,7 @@
         );
       };
 
-      // Slightly Enlarged QuickActionsGrid with '0/10 Watched' Format
+      // QuickActionsGrid (With '0/10 Watched' Badge)
       const QuickActionsGrid = ({
         adReward,
         checkInReward,
@@ -691,7 +699,6 @@
         return (
           <div className="w-full">
             <div className="grid grid-cols-2 gap-2">
-              {/* BUTTON 1: Monetag Ad */}
               <div onClick={onWatchAdClick} role="button" className="group relative flex flex-col justify-between p-2.5 rounded-[15px] bg-white border border-sky-100 shadow-[0_2px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden min-h-[76px]">
                 <div className="flex items-start justify-between">
                   <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-sky-400 to-blue-500 flex items-center justify-center text-white shadow-xs">
@@ -713,7 +720,6 @@
                 </div>
               </div>
 
-              {/* BUTTON 2: Daily Check-in */}
               <div onClick={onCheckInClick} role="button" className="group relative flex flex-col justify-between p-2.5 rounded-[15px] bg-white border border-sky-100 shadow-[0_2px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden min-h-[76px]">
                 <div className="flex items-start justify-between">
                   <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-xs">
@@ -737,7 +743,6 @@
                 </div>
               </div>
 
-              {/* BUTTON 3: Referral & Level */}
               <div onClick={onInviteClick} role="button" className="group relative flex flex-col justify-between p-2.5 rounded-[15px] bg-white border border-sky-100 shadow-[0_2px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden min-h-[76px]">
                 <div className="flex items-start justify-between">
                   <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-xs">
@@ -764,7 +769,6 @@
                 </div>
               </div>
 
-              {/* BUTTON 4: Daily Tasks */}
               <div onClick={onTasksClick} role="button" className="group relative flex flex-col justify-between p-2.5 rounded-[15px] bg-white border border-sky-100 shadow-[0_2px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden min-h-[76px]">
                 <div className="flex items-start justify-between">
                   <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-emerald-400 to-teal-600 flex items-center justify-center text-white shadow-xs">
@@ -795,7 +799,7 @@
         );
       };
 
-      // Slim Island Bounty Tasks with Larger Text
+      // BountyTasksSection (With Official Social SVGs)
       const BountyTasksSection = ({ tasks, completedTasksList = [], onStartTask, onPostBountyClick, dict }) => {
         const [selectedCategory, setSelectedCategory] = useState('All');
         const categories = ['All', 'Partners', 'Social', 'Web3', 'Daily'];
@@ -807,16 +811,15 @@
         });
 
         const renderIcon = (type) => {
-          switch (type) {
-            case 'telegram': return <Icons.Send className="w-4 h-4 text-[#2AABEE]" />;
-            case 'twitter': return <Icons.Twitter className="w-4 h-4 text-sky-500" />;
-            case 'youtube': return <Icons.Youtube className="w-4 h-4 text-red-500" />;
-            case 'facebook': return <Icons.Facebook className="w-4 h-4 text-[#1877F2]" />;
-            case 'instagram': return <Icons.Instagram className="w-4 h-4 text-[#E4405F]" />;
-            case 'wallet': return <Icons.Wallet className="w-4 h-4 text-indigo-500" />;
-            case 'bot': return <Icons.Bot className="w-4 h-4 text-emerald-500" />;
+          switch (type?.toLowerCase()) {
+            case 'telegram': return <Icons.Telegram className="w-7 h-7 shrink-0 drop-shadow-xs" />;
+            case 'twitter': return <Icons.Twitter className="w-7 h-7 shrink-0 drop-shadow-xs" />;
+            case 'youtube': return <Icons.Youtube className="w-7 h-7 shrink-0 drop-shadow-xs" />;
+            case 'facebook': return <Icons.Facebook className="w-7 h-7 shrink-0 drop-shadow-xs" />;
+            case 'instagram': return <Icons.Instagram className="w-7 h-7 shrink-0 drop-shadow-xs" />;
+            case 'bot': return <Icons.Bot className="w-7 h-7 shrink-0 drop-shadow-xs" />;
             case 'others':
-            default: return <Icons.Globe className="w-4 h-4 text-sky-600" />;
+            default: return <Icons.Globe className="w-7 h-7 shrink-0 drop-shadow-xs" />;
           }
         };
 
@@ -867,7 +870,7 @@
                     className="py-2 px-3 rounded-[14px] bg-white border border-sky-100/90 shadow-[0_1px_6px_rgba(56,189,248,0.05)] flex items-center justify-between gap-2.5 transition-all hover:border-sky-300"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-8 h-8 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center shrink-0">
+                      <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0">
                         {renderIcon(task.iconType)}
                       </div>
                       <div className="min-w-0">
@@ -907,7 +910,7 @@
         );
       };
 
-      // PostBountyModal (With Direct In-App Telegram Stars Bottom Sheet Invoice Support)
+      // PostBountyModal (Requires Wallet for $GRAM & Enforces Stars Payment)
       const PostBountyModal = ({ isOpen, onClose, starBalance, walletAddress, onDeductPts, onSubmitBounty, showToast }) => {
         const [title, setTitle] = useState('');
         const [category, setCategory] = useState('Social');
@@ -944,10 +947,10 @@
 
           const cost = calcCostValue();
 
-          // 1. $GRAM Payment (Safe TON Connect)
+          // 1. $GRAM Payment: Enforce Connected Wallet
           if (currency === 'GRAM') {
             if (!walletAddress) {
-              showToast('⚠️ Please connect your TON wallet first!');
+              showToast('⚠️ Please connect your TON wallet to pay $GRAM!');
               if (window.tonConnectUIInstance) {
                 window.tonConnectUIInstance.openModal();
               }
@@ -956,15 +959,12 @@
 
             setIsSubmitting(true);
             showToast('Fetching secure gateway info...');
-
             try {
               const payInfoRes = await fetch('/api/tasks?action=payment_info');
               const payInfoData = await payInfoRes.json().catch(() => ({}));
               const backendReceiver = payInfoData.receiverAddress;
 
-              if (!backendReceiver) {
-                throw new Error('Payment gateway is currently unreachable');
-              }
+              if (!backendReceiver) throw new Error('Gateway unreachable');
 
               const nanoAmount = Math.round(cost * 1e9).toString();
               const transaction = {
@@ -975,12 +975,26 @@
               if (window.tonConnectUIInstance) {
                 await window.tonConnectUIInstance.sendTransaction(transaction);
                 showToast('✅ Payment received in $GRAM! Publishing mission...');
+                
+                await onSubmitBounty({
+                  title: title.trim(),
+                  description: `Complete this ${category.toLowerCase()} mission to earn ⭐ stars!`,
+                  category,
+                  reward: 200,
+                  actionText: actionText.trim() || 'Start Mission',
+                  actionUrl: actionUrl.trim() || 'https://t.me/ToBOOST_Ai',
+                  iconType,
+                  paidWith: 'GRAM',
+                  cost: cost
+                });
+                onClose();
               }
             } catch (err) {
               showToast('❌ Wallet payment was cancelled or failed.');
+            } finally {
               setIsSubmitting(false);
-              return;
             }
+            return;
           }
 
           // 2. Free PTS Boost
@@ -989,97 +1003,88 @@
               showToast(`❌ Insufficient PTS! You need ${cost.toLocaleString()} PTS.`);
               return;
             }
+
+            setIsSubmitting(true);
             onDeductPts(cost);
-            showToast(`✅ ${cost.toLocaleString()} PTS deducted for Free Boost!`);
+            showToast(`✅ ${cost.toLocaleString()} PTS deducted for Boost!`);
+
+            try {
+              await onSubmitBounty({
+                title: title.trim(),
+                description: `Complete this ${category.toLowerCase()} mission to earn ⭐ stars!`,
+                category,
+                reward: 200,
+                actionText: actionText.trim() || 'Start Mission',
+                actionUrl: actionUrl.trim() || 'https://t.me/ToBOOST_Ai',
+                iconType,
+                paidWith: 'PTS',
+                cost: cost
+              });
+              onClose();
+            } catch (err) {
+              showToast('Error publishing task.');
+            } finally {
+              setIsSubmitting(false);
+            }
+            return;
           }
 
-          // 3. Official Telegram Stars In-App Payment Bottom-Sheet Sheet
+          // 3. Telegram Stars In-App Sheet Payment
           else if (currency === 'STARS') {
             setIsSubmitting(true);
             showToast('Opening Stars Payment Sheet...');
 
             try {
-              let invoiceOpened = false;
-              if (window.Telegram?.WebApp?.openInvoice) {
-                try {
-                  const invRes = await fetch('/api/create-stars-invoice', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      'x-telegram-init-data': tg?.initData || ''
-                    },
-                    body: JSON.stringify({
+              const invRes = await fetch('/api/create-stars-invoice', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'x-telegram-init-data': tg?.initData || ''
+                },
+                body: JSON.stringify({
+                  title: title.trim(),
+                  starsCost: cost,
+                  impressions,
+                  actionUrl: actionUrl.trim()
+                })
+              });
+              
+              const invData = await invRes.json().catch(() => ({}));
+
+              if (invData && invData.invoiceLink && window.Telegram?.WebApp?.openInvoice) {
+                window.Telegram.WebApp.openInvoice(invData.invoiceLink, async (status) => {
+                  if (status === 'paid') {
+                    showToast('⭐️ Stars Payment Confirmed! Publishing...');
+                    await onSubmitBounty({
                       title: title.trim(),
-                      starsCost: cost,
-                      impressions,
-                      actionUrl: actionUrl.trim()
-                    })
-                  });
-                  const invData = await invRes.json().catch(() => ({}));
-
-                  if (invData && invData.invoiceLink) {
-                    invoiceOpened = true;
-                    // Trigger native Telegram Stars Sheet (as requested in screenshot)
-                    window.Telegram.WebApp.openInvoice(invData.invoiceLink, async (status) => {
-                      if (status === 'paid') {
-                        showToast('⭐️ Stars Payment Confirmed! Publishing Bounty...');
-                        await onSubmitBounty({
-                          title: title.trim(),
-                          description: `Complete this ${category.toLowerCase()} mission to earn ⭐ stars!`,
-                          category,
-                          reward: 200,
-                          actionText: actionText.trim() || 'Start Mission',
-                          actionUrl: actionUrl.trim() || 'https://t.me/ToBOOST_Ai',
-                          iconType,
-                          paidWith: 'STARS',
-                          cost: cost
-                        });
-                        onClose();
-                      } else if (status === 'cancelled') {
-                        showToast('Stars checkout cancelled.');
-                      } else {
-                        showToast('Stars payment status: ' + status);
-                      }
+                      description: `Complete this ${category.toLowerCase()} mission to earn ⭐ stars!`,
+                      category,
+                      reward: 200,
+                      actionText: actionText.trim() || 'Start Mission',
+                      actionUrl: actionUrl.trim() || 'https://t.me/ToBOOST_Ai',
+                      iconType,
+                      paidWith: 'STARS',
+                      cost: cost
                     });
-                    setIsSubmitting(false);
-                    return;
+                    onClose();
+                  } else if (status === 'cancelled') {
+                    showToast('Payment was cancelled.');
+                  } else {
+                    showToast('Stars checkout pending or failed.');
                   }
-                } catch (apiErr) {
-                  console.warn('Stars invoice API fallback:', apiErr);
-                }
-              }
-
-              if (!invoiceOpened) {
-                // Direct fallback link to bot if invoice api unavailable
-                const starPayUrl = `https://t.me/ToFarmsAi_Bot?start=stars_${cost}_${Date.now()}`;
-                openSafeLink(starPayUrl);
-                showToast(`⭐️ Please confirm ${cost} Stars payment in Bot.`);
+                  setIsSubmitting(false);
+                });
+                return;
+              } else {
+                showToast(invData?.error || 'Stars invoice gateway unavailable');
+                setIsSubmitting(false);
+                return;
               }
             } catch (err) {
               showToast('Stars gateway error. Please try again.');
               setIsSubmitting(false);
               return;
             }
-          }
-
-          setIsSubmitting(true);
-          try {
-            await onSubmitBounty({
-              title: title.trim(),
-              description: `Complete this ${category.toLowerCase()} mission to earn ⭐ stars!`,
-              category,
-              reward: 200,
-              actionText: actionText.trim() || 'Start Mission',
-              actionUrl: actionUrl.trim() || 'https://t.me/ToBOOST_Ai',
-              iconType,
-              paidWith: currency,
-              cost: cost
-            });
-            onClose();
-          } catch (err) {
-            console.error('Error submitting bounty:', err);
-          } finally {
-            setIsSubmitting(false);
           }
         };
 
@@ -1206,6 +1211,19 @@
                       <span className="font-display font-black text-base text-slate-900">{calcDisplayPrice()}</span>
                     </div>
                   </div>
+
+                  {currency === 'GRAM' && !walletAddress && (
+                    <div className="mt-2 p-2 bg-amber-50 rounded-xl border border-amber-200/80 flex items-center justify-between">
+                      <span className="text-[10.5px] text-amber-800 font-semibold">Wallet connection required</span>
+                      <button
+                        type="button"
+                        onClick={() => window.tonConnectUIInstance?.openModal()}
+                        className="px-2 py-0.5 bg-amber-500 text-white text-[10px] font-bold rounded-md"
+                      >
+                        Connect
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -1227,7 +1245,7 @@
                   <Icons.Send className="w-4 h-4" />
                   <span>
                     {isSubmitting
-                      ? 'Opening Telegram Stars...'
+                      ? 'Processing Payment...'
                       : currency === 'STARS'
                       ? `Confirm & Pay with Stars (${calcDisplayPrice()})`
                       : currency === 'GRAM'
@@ -1240,7 +1258,8 @@
           </div>
         );
       };
- // LevelPerksModal Component
+
+      // LevelPerksModal Component
       const LevelPerksModal = ({ isOpen, onClose, userLevel, currentInvites, requiredInvites, multiplier }) => {
         if (!isOpen) return null;
 
@@ -1314,7 +1333,7 @@
         const faqs = [
           { q: 'What is ToBOOSTAi?', a: 'ToBOOSTAi is a Web3 Mini App where users complete social bounties, watch sponsor ads, and convert earned Star PTS to $GRAM tokens.' },
           { q: 'How to increase Daily Task limits?', a: 'You start with 5 daily tasks. By inviting 5, 10, 15+ friends, you unlock 10, 15, up to 20 high-reward tasks every day.' },
-          { q: 'What are Withdrawal Rules?', a: 'Withdrawals require meeting the minimum PTS threshold for your tier (10,000 PTS for 1st, 20,000 for 2nd, etc.), 7 consecutive daily check-ins, and watching at least 10 sponsor ads today.' },
+          { q: 'What are Withdrawal Rules?', a: 'Withdrawals require meeting the minimum PTS threshold for your tier (10,000 PTS for 1st, 20,000 for 2nd, etc.), 7 consecutive daily check-ins, watching at least 10 sponsor ads today, and a connected TON Wallet.' },
         ];
 
         return (
@@ -1510,6 +1529,7 @@
         );
       };
 
+      // Strict Withdraw Alert Modal (Checks Balance, Streak, Ads & Wallet)
       const WithdrawAlertModal = ({ isOpen, onClose, conditions }) => {
         if (!isOpen || !conditions) return null;
         const tier = conditions.tier || 1;
@@ -1526,12 +1546,16 @@
                 Tier {tier} Withdrawal Locked!
               </h3>
               <p className="text-xs text-slate-500 mb-3">
-                Please fulfill all mandatory Web3 withdrawal criteria:
+                Please fulfill all mandatory Web3 criteria to withdraw:
               </p>
               <div className="text-left space-y-2 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200 mb-4">
+                <div className={`flex items-center gap-2 ${conditions.hasWallet !== false ? 'text-emerald-600 font-bold' : 'text-red-600 font-medium'}`}>
+                  {conditions.hasWallet !== false ? <Icons.Check className="w-4 h-4 shrink-0" /> : <Icons.X className="w-4 h-4 shrink-0" />}
+                  <span>TON Wallet: {conditions.hasWallet !== false ? 'Connected' : 'Not Connected (Connect from Wallet tab)'}</span>
+                </div>
                 <div className={`flex items-center gap-2 ${conditions.hasMinBalance ? 'text-emerald-600 font-bold' : 'text-red-600 font-medium'}`}>
                   {conditions.hasMinBalance ? <Icons.Check className="w-4 h-4 shrink-0" /> : <Icons.X className="w-4 h-4 shrink-0" />}
-                  <span>Tier {tier} Minimum {requiredPts.toLocaleString()} PTS ({requiredGram} $GRAM)</span>
+                  <span>Tier {tier} Min {requiredPts.toLocaleString()} PTS ({requiredGram} $GRAM)</span>
                 </div>
                 <div className={`flex items-center gap-2 ${conditions.hasStreak ? 'text-emerald-600 font-bold' : 'text-red-600 font-medium'}`}>
                   {conditions.hasStreak ? <Icons.Check className="w-4 h-4 shrink-0" /> : <Icons.X className="w-4 h-4 shrink-0" />}
@@ -1631,114 +1655,6 @@
         );
       };
 
-      // BoostView Component
-      const BoostView = ({ starBalance, energy, maxEnergy, multiplier, onUpgradeBoost, onTapToBoost }) => {
-        const [tapEffect, setTapEffect] = useState(false);
-        const [floatingPoints, setFloatingPoints] = useState([]);
-
-        const boosts = [
-          { id: 'turbo', name: 'Turbo Booster Multiplier', desc: 'Increases yield by +0.2x per level', cost: 5000, effect: `+${(multiplier + 0.2).toFixed(1)}x`, icon: Icons.Gauge, color: 'from-sky-400 to-blue-500' },
-          { id: 'autobot', name: 'Bounty Collector Bot', desc: 'Auto task perks while you are away', cost: 12000, effect: '+150 ⭐ / hour', icon: Icons.Bot, color: 'from-indigo-400 to-blue-600' },
-          { id: 'battery', name: 'Energy Reservoir', desc: 'Extends energy limit by +500 units', cost: 3000, effect: `+500 (${maxEnergy + 500} Max)`, icon: Icons.BatteryCharging, color: 'from-emerald-400 to-teal-600' },
-        ];
-
-        const handleTap = (e) => {
-          if (energy <= 0) return;
-          onTapToBoost();
-          setTapEffect(true);
-          setTimeout(() => setTapEffect(false), 150);
-
-          const rect = e.currentTarget.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-          const newPoint = { id: Date.now() + Math.random(), x, y };
-          setFloatingPoints((prev) => [...prev, newPoint]);
-          setTimeout(() => setFloatingPoints((prev) => prev.filter((p) => p.id !== newPoint.id)), 800);
-        };
-
-        const handleUpgrade = (cost, id) => {
-          if (starBalance >= cost) {
-            onUpgradeBoost(cost, id);
-            if (typeof confetti === 'function') {
-              try { confetti({ particleCount: 40, spread: 50, origin: { y: 0.7 } }); } catch (err) {}
-            }
-          }
-        };
-
-        const energyPercent = Math.min(100, Math.round((energy / maxEnergy) * 100));
-
-        return (
-          <div className="w-full px-4 pt-2 pb-20 space-y-3 tab-enter">
-            <div className="rounded-[20px] bg-white border border-sky-100 shadow-[0_3px_15px_rgba(56,189,248,0.08)] p-4 text-center relative overflow-hidden">
-              <div className="flex items-center justify-between mb-2 text-xs">
-                <span className="font-bold text-slate-500 uppercase tracking-wider">Turbo Booster Tap</span>
-                <span className="font-extrabold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full border border-sky-200">
-                  {multiplier.toFixed(1)}x Multiplier Active
-                </span>
-              </div>
-
-              <div onClick={handleTap} className="relative my-3 inline-flex items-center justify-center cursor-pointer select-none">
-                <div className={`transition-transform duration-100 ${tapEffect ? 'scale-90 rotate-3' : 'hover:scale-105 active:scale-95'}`}>
-                  <Coin3DIcon size={95} idPrefix="boost-tap-coin" floating={!tapEffect} glow={true} />
-                </div>
-                {floatingPoints.map((pt) => (
-                  <span key={pt.id} className="absolute text-sm font-black text-sky-600 pointer-events-none transition-all duration-700 -translate-y-8 opacity-0 font-display" style={{ left: pt.x, top: pt.y }}>
-                    +{(10 * multiplier).toFixed(0)} ⭐
-                  </span>
-                ))}
-              </div>
-
-              <div className="space-y-1 mt-1">
-                <div className="flex items-center justify-between text-xs font-bold">
-                  <span className="flex items-center gap-1 text-slate-600">
-                    <Icons.Zap className="w-3.5 h-3.5 text-sky-500" fill="#0284c7" />
-                    <span>Energy:</span>
-                  </span>
-                  <span className="tabular-nums text-slate-800">{energy} / {maxEnergy}</span>
-                </div>
-                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden p-0.5">
-                  <div className="bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-600 h-full rounded-full transition-all duration-300" style={{ width: `${energyPercent}%` }} />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="font-display font-bold text-slate-900 text-sm mb-1.5 px-1">Power-Up Upgrades</h3>
-              <div className="space-y-2">
-                {boosts.map((boost) => {
-                  const IconComponent = boost.icon;
-                  const canAfford = starBalance >= boost.cost;
-                  return (
-                    <div key={boost.id} className="p-3 rounded-[16px] bg-white border border-sky-100 shadow-xs flex items-center justify-between gap-2.5">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className={`w-9 h-9 rounded-xl bg-gradient-to-tr ${boost.color} flex items-center justify-center text-white shrink-0`}>
-                          <IconComponent className="w-4 h-4" />
-                        </div>
-                        <div className="min-w-0">
-                          <h4 className="font-display font-bold text-slate-800 text-xs truncate">{boost.name}</h4>
-                          <p className="text-[10px] text-slate-400 truncate">{boost.desc}</p>
-                          <div className="text-[9.5px] font-bold text-sky-600 mt-0.5">{boost.effect}</div>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleUpgrade(boost.cost, boost.id)}
-                        disabled={!canAfford}
-                        className={`px-3 py-1 rounded-full text-xs font-bold transition-all shrink-0 flex items-center gap-1 ${
-                          canAfford ? 'bg-slate-900 text-white cursor-pointer active:scale-95' : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                        }`}
-                      >
-                        <Coin3DIcon size={11} idPrefix={`boost-btn-${boost.id}`} />
-                        <span className="tabular-nums">{boost.cost.toLocaleString()}</span>
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        );
-      };
-
       // FrensView
       const FrensView = ({ currentInvites, dict }) => {
         const [copied, setCopied] = useState(false);
@@ -1795,7 +1711,7 @@
         );
       };
 
-      // WalletView ($TON completely removed, only $GRAM token)
+      // WalletView (Strict TON Wallet Requirement for Withdrawal)
       const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, withdrawCount = 0, onConnectWallet, onDisconnectWallet, onConvertStars, onShowAlert }) => {
         const tier = withdrawCount + 1;
         const minRequiredPts = tier * 10000;
@@ -1825,15 +1741,18 @@
         };
 
         const handleWithdrawClick = () => {
+          const hasWallet = !!walletAddress;
           const hasMinBalance = starBalance >= minRequiredPts && parsedSwap >= minRequiredPts && parsedSwap <= starBalance;
           const hasStreak = streakDays >= 7;
           const hasAds = adsWatchedToday >= 10;
 
-          if (!hasMinBalance || !hasStreak || !hasAds) {
+          // Strictly enforce connected wallet along with balance, streak and ads
+          if (!hasWallet || !hasMinBalance || !hasStreak || !hasAds) {
             onShowAlert({
               tier,
               minRequiredPts,
               minGramTokens,
+              hasWallet,
               hasMinBalance,
               hasStreak,
               hasAds,
@@ -1841,6 +1760,9 @@
               currentStreak: streakDays,
               currentAds: adsWatchedToday,
             });
+            if (!hasWallet) {
+              handleConnectClick();
+            }
             return;
           }
 
@@ -1860,7 +1782,7 @@
                   </div>
                   <div>
                     <h3 className="font-display font-bold text-slate-900 text-xs sm:text-sm">Web3 Wallet</h3>
-                    <p className="text-[10px] text-slate-400">{walletAddress ? 'Connected' : 'Connect for $GRAM token withdrawal'}</p>
+                    <p className="text-[10px] text-slate-400">{walletAddress ? 'Connected to TON Wallet' : 'Connect for $GRAM token withdrawal'}</p>
                   </div>
                 </div>
                 {walletAddress ? (
@@ -1883,7 +1805,7 @@
                   className="w-full py-2.5 bg-gradient-to-r from-[#0088CC] to-[#0077B5] text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer flex items-center justify-center gap-1.5 active:scale-98 transition"
                 >
                   <Icons.Wallet className="w-3.5 h-3.5" />
-                  <span>Connect Wallet</span>
+                  <span>Connect TON Wallet</span>
                 </button>
               )}
             </div>
@@ -1940,6 +1862,7 @@
                     </span>
                   </div>
                   <div className="text-[10px] leading-relaxed">
+                    • TON Wallet Connected: {walletAddress ? '✅ Connected' : '❌ Connect from Wallet tab'}<br />
                     • Minimum: {minRequiredPts.toLocaleString()} PTS = {minGramTokens} $GRAM<br />
                     • 7-Day Streak ({streakDays}/7) • 10 Daily Ads ({adsWatchedToday}/10)
                   </div>
@@ -1958,7 +1881,7 @@
         );
       };
 
-      // REACT ERROR BOUNDARY
+      // ErrorBoundary
       class ErrorBoundary extends Component {
         constructor(props) {
           super(props);
@@ -2016,9 +1939,6 @@
           adReward: 100,
           checkInReward: 100,
           walletAddress: null,
-          multiplier: 1.0,
-          energy: 950,
-          maxEnergy: 1000,
           adsWatchedToday: getStoredAdCount(currentUserId),
           withdrawCount: getStoredWithdrawCount(currentUserId),
           avatarUrl: tg?.initDataUnsafe?.user?.photo_url || null,
@@ -2065,6 +1985,7 @@
           }));
         };
 
+        // TON Connect UI Initialization
         useEffect(() => {
           try {
             if (window.TON_CONNECT_UI) {
@@ -2074,7 +1995,18 @@
 
               tonConnectUI.onStatusChange((wallet) => {
                 if (wallet && wallet.account) {
-                  setStats(p => ({ ...p, walletAddress: wallet.account.address }));
+                  const rawAddr = wallet.account.address;
+                  setStats(p => ({ ...p, walletAddress: rawAddr }));
+                  
+                  // Silently save connected wallet to Firestore
+                  const initData = tg?.initData || '';
+                  if (initData) {
+                    fetch('/api/user', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json', 'x-telegram-init-data': initData },
+                      body: JSON.stringify({ walletAddress: rawAddr })
+                    }).catch(() => {});
+                  }
                 } else {
                   setStats(p => ({ ...p, walletAddress: null }));
                 }
@@ -2146,7 +2078,8 @@
                 hasCheckedInToday: checkedToday,
                 userLevel: u.level || 1,
                 currentInvites: u.referralsCount || 0,
-                adsWatchedToday: typeof u.adsWatchedToday === 'number' ? u.adsWatchedToday : prev.adsWatchedToday
+                adsWatchedToday: typeof u.adsWatchedToday === 'number' ? u.adsWatchedToday : prev.adsWatchedToday,
+                walletAddress: u.walletAddress || prev.walletAddress
               }));
 
               setCompletedTasksList(mergedCompleted);
@@ -2164,19 +2097,6 @@
             })
             .catch(err => console.error('Error loading tasks:', err));
         }, [currentUserId]);
-
-        // Passive Energy Regeneration
-        useEffect(() => {
-          const timer = setInterval(() => {
-            setStats((prev) => {
-              if (prev.energy < prev.maxEnergy) {
-                return { ...prev, energy: Math.min(prev.maxEnergy, prev.energy + 2) };
-              }
-              return prev;
-            });
-          }, 1500);
-          return () => clearInterval(timer);
-        }, []);
 
         // Monetag Ad Trigger (Tracked per Telegram User ID)
         const handleWatchAd = async () => {
@@ -2299,7 +2219,7 @@
           }
         };
 
-        // Bounty Task Handler (Smooth vanishing with no white-screen bug)
+        // Bounty Task Handler
         const handleStartTask = async (taskId, url) => {
           if (stats.completedTasksToday >= dailyTaskLimit) {
             setIsTaskLimitModalOpen(true);
@@ -2421,7 +2341,6 @@
                     <DynamicBalanceCard
                       starBalance={stats.starBalance}
                       tokenBalance={stats.tokenBalance}
-                      onSwapClick={() => setActiveTab('wallet')}
                       dict={dict}
                     />
 
@@ -2471,27 +2390,7 @@
                 </div>
               )}
 
-              {activeTab === 'boost' && (
-                <div className="flex-1 min-h-0 w-full overflow-y-auto no-scrollbar touch-pan-y" style={{ WebkitOverflowScrolling: 'touch' }}>
-                  <BoostView
-                    starBalance={stats.starBalance}
-                    energy={stats.energy}
-                    maxEnergy={stats.maxEnergy}
-                    multiplier={stats.multiplier}
-                    onUpgradeBoost={(cost, id) => {
-                      updateBalance(stats.starBalance - cost);
-                      if (id === 'turbo') setStats((p) => ({ ...p, multiplier: Number((p.multiplier + 0.2).toFixed(1)) }));
-                    }}
-                    onTapToBoost={() => {
-                      if (stats.energy >= 5) {
-                        setStats((p) => ({ ...p, energy: p.energy - 5 }));
-                        updateBalance(stats.starBalance + Math.round(10 * stats.multiplier));
-                      }
-                    }}
-                  />
-                </div>
-              )}
-
+              {/* FRENS VIEW */}
               {activeTab === 'frens' && (
                 <div className="flex-1 min-h-0 w-full overflow-y-auto no-scrollbar touch-pan-y" style={{ WebkitOverflowScrolling: 'touch' }}>
                   <FrensView
@@ -2501,6 +2400,7 @@
                 </div>
               )}
 
+              {/* WALLET VIEW */}
               {activeTab === 'wallet' && (
                 <div className="flex-1 min-h-0 w-full overflow-y-auto no-scrollbar touch-pan-y" style={{ WebkitOverflowScrolling: 'touch' }}>
                   <WalletView
