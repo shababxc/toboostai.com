@@ -91,7 +91,6 @@
         }
       }
 
-      /* ৩ডি ব্লু কালারের গ্লোয়িং পালস ইফেক্ট */
       @keyframes coin-pulse-glow {
         0%, 100% {
           filter: drop-shadow(0 3px 10px rgba(2, 132, 199, 0.45));
@@ -144,7 +143,7 @@
         }
       }
 
-      // Safe External & Telegram Link Opener (Prevents White-Screen Bug)
+      // Safe Link Opener
       const openSafeLink = (url) => {
         if (!url || url === '#') return;
         try {
@@ -160,18 +159,16 @@
             window.open(url, '_blank', 'noopener,noreferrer');
           }
         } catch (err) {
-          console.warn('Link opening fallback:', err);
           window.open(url, '_blank', 'noopener,noreferrer');
         }
       };
 
-      // UTC Helpers for Daily Resets (00:00 UTC)
       const getTodayUtc = () => new Date().toISOString().split('T')[0];
 
-      // Monetag Ad Count Storage (Resets daily at 00:00 UTC)
-      const getStoredAdCount = () => {
+      // Multi-Account Isolated Local Storage (Separated by Telegram User ID)
+      const getStoredAdCount = (uid) => {
         try {
-          const raw = localStorage.getItem('toboost_ad_stats');
+          const raw = localStorage.getItem(`toboost_ad_stats_${uid || 'guest'}`);
           if (raw) {
             const parsed = JSON.parse(raw);
             if (parsed.date === getTodayUtc()) {
@@ -182,19 +179,18 @@
         return 0;
       };
 
-      const saveStoredAdCount = (count) => {
+      const saveStoredAdCount = (uid, count) => {
         try {
-          localStorage.setItem('toboost_ad_stats', JSON.stringify({
+          localStorage.setItem(`toboost_ad_stats_${uid || 'guest'}`, JSON.stringify({
             date: getTodayUtc(),
             count: count
           }));
         } catch (e) {}
       };
 
-      // Daily Tasks Completed Storage (Resets daily at 00:00 UTC)
-      const getStoredDailyTaskData = () => {
+      const getStoredDailyTaskData = (uid) => {
         try {
-          const raw = localStorage.getItem('toboost_daily_tasks');
+          const raw = localStorage.getItem(`toboost_daily_tasks_${uid || 'guest'}`);
           if (raw) {
             const parsed = JSON.parse(raw);
             if (parsed.date === getTodayUtc()) {
@@ -208,9 +204,9 @@
         return { count: 0, completedIds: [] };
       };
 
-      const saveStoredDailyTaskData = (count, completedIds) => {
+      const saveStoredDailyTaskData = (uid, count, completedIds) => {
         try {
-          localStorage.setItem('toboost_daily_tasks', JSON.stringify({
+          localStorage.setItem(`toboost_daily_tasks_${uid || 'guest'}`, JSON.stringify({
             date: getTodayUtc(),
             count: count,
             completedIds: completedIds
@@ -218,31 +214,27 @@
         } catch (e) {}
       };
 
-      // Withdrawal Count Tracker (For Escalating Thresholds: 10k, 20k, 30k, 40k...)
-      const getStoredWithdrawCount = () => {
+      const getStoredWithdrawCount = (uid) => {
         try {
-          const raw = localStorage.getItem('toboost_withdraw_count');
+          const raw = localStorage.getItem(`toboost_withdraw_count_${uid || 'guest'}`);
           return raw ? parseInt(raw, 10) || 0 : 0;
         } catch (e) {
           return 0;
         }
       };
 
-      const saveStoredWithdrawCount = (count) => {
+      const saveStoredWithdrawCount = (uid, count) => {
         try {
-          localStorage.setItem('toboost_withdraw_count', count.toString());
+          localStorage.setItem(`toboost_withdraw_count_${uid || 'guest'}`, count.toString());
         } catch (e) {}
       };
 
-      // ==========================================
-      // MULTI-LANGUAGE DICTIONARY (4 Languages)
-      // ==========================================
+      // Multi-Language Dictionary
       const DICTIONARY = {
         EN: {
           welcome: 'Welcome back,',
           totalBalance: 'Total Balance',
           verified: 'Verified',
-          boost: 'Booster',
           watchAd: 'Watch Ad',
           dailyCheckIn: 'Daily Check-in',
           referralLevel: 'Referral & Level',
@@ -258,7 +250,6 @@
           welcome: 'С возвращением,',
           totalBalance: 'Общий баланс',
           verified: 'Проверено',
-          boost: 'Ускоритель',
           watchAd: 'Смотреть рекламу',
           dailyCheckIn: 'Ежедневный вход',
           referralLevel: 'Рефералы и уровень',
@@ -274,7 +265,6 @@
           welcome: 'Bienvenido de nuevo,',
           totalBalance: 'Saldo Total',
           verified: 'Verificado',
-          boost: 'Impulsor',
           watchAd: 'Ver Anuncio',
           dailyCheckIn: 'Registro Diario',
           referralLevel: 'Referidos y Nivel',
@@ -290,7 +280,6 @@
           welcome: '欢迎回来，',
           totalBalance: '总星点余额',
           verified: '已认证',
-          boost: '加速器',
           watchAd: '观看赞助广告',
           dailyCheckIn: '每日签到',
           referralLevel: '推荐与等级',
@@ -304,9 +293,7 @@
         },
       };
 
-      // ==========================================
-      // ICON COMPONENTS (Pure SVG collection)
-      // ==========================================
+      // Pure SVG Icons Collection (Size bumped for improved touch target)
       const Icons = {
         Send: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>,
         ExternalLink: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>,
@@ -315,7 +302,6 @@
         Globe: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>,
         ChevronDown: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>,
         Sparkles: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"></path></svg>,
-        Repeat: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>,
         Zap: ({ className, fill }) => <svg className={className} viewBox="0 0 24 24" fill={fill || "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>,
         ArrowUpRight: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>,
         ShieldCheck: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>,
@@ -352,11 +338,9 @@
         Lock: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>,
       };
 
-      // ==========================================
-      // 3D Cyber Sapphire Blue Coin Component
-      // ==========================================
+      // 3D Sapphire Blue Coin Component
       const Coin3DIcon = ({
-        size = 40,
+        size = 38,
         className = '',
         floating = false,
         glow = false,
@@ -451,21 +435,19 @@
         );
       };
 
-      // ==========================================
-      // TopVerifiedBanner (With Official Community Link)
-      // ==========================================
+      // TopVerifiedBanner
       const TopVerifiedBanner = () => (
-        <header className="sticky top-0 z-30 w-full bg-white/95 backdrop-blur-md border-b border-sky-100 shadow-[0_1px_8px_rgba(56,189,248,0.06)] px-3 py-1.5 shrink-0 transition-all">
+        <header className="sticky top-0 z-30 w-full bg-white/95 backdrop-blur-md border-b border-sky-100 shadow-[0_1px_8px_rgba(56,189,248,0.06)] px-3.5 py-2 shrink-0 transition-all">
           <div className="max-w-md mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-xs">
-                <Icons.Send className="w-3 h-3 -translate-x-[0.5px] translate-y-[0.5px]" />
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-xs">
+                <Icons.Send className="w-3.5 h-3.5 -translate-x-[0.5px] translate-y-[0.5px]" />
               </div>
-              <div className="flex items-center gap-1">
-                <span className="font-display font-extrabold text-slate-900 tracking-tight text-sm sm:text-base">
+              <div className="flex items-center gap-1.5">
+                <span className="font-display font-black text-slate-900 tracking-tight text-[16px]">
                   ToBOOSTAi
                 </span>
-                <svg className="w-3.5 h-3.5 text-[#2AABEE] shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                <svg className="w-4 h-4 text-[#2AABEE] shrink-0" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.1 14.5l-4.2-4.2 1.41-1.41 2.79 2.79 6.29-6.29 1.41 1.41-7.7 7.7z" />
                 </svg>
               </div>
@@ -473,19 +455,17 @@
 
             <button
               onClick={() => openSafeLink('https://t.me/ToBOOST_Ai')}
-              className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold text-white bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 active:scale-95 transition-all rounded-full shadow-xs shadow-sky-500/25 border border-sky-400/30 cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-bold text-white bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 active:scale-95 transition-all rounded-full shadow-xs shadow-sky-500/25 border border-sky-400/30 cursor-pointer"
             >
-              <Icons.Send className="w-2.5 h-2.5 -translate-x-[0.5px] translate-y-[0.5px]" />
+              <Icons.Send className="w-3 h-3 -translate-x-[0.5px] translate-y-[0.5px]" />
               <span>Community</span>
-              <Icons.ExternalLink className="w-2.5 h-2.5 opacity-90" />
+              <Icons.ExternalLink className="w-3 h-3 opacity-90" />
             </button>
           </div>
         </header>
       );
 
-      // ==========================================
-      // UserHeaderSection
-      // ==========================================
+      // UserHeaderSection (+3px font & icon size boost)
       const UserHeaderSection = ({
         username,
         userLevel,
@@ -506,61 +486,61 @@
         ];
 
         return (
-          <section className="w-full px-3 py-1 shrink-0">
+          <section className="w-full px-3.5 py-1.5 shrink-0">
             <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 min-w-0">
+              <div className="flex items-center gap-2.5 min-w-0">
                 <div onClick={onOpenSettingsModal} role="button" className="relative cursor-pointer group shrink-0">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-sky-400/20 to-blue-500/20 p-0.5 border border-sky-200/80 shadow-xs flex items-center justify-center bg-white overflow-hidden">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-b from-sky-400/20 to-blue-500/20 p-0.5 border border-sky-200/80 shadow-xs flex items-center justify-center bg-white overflow-hidden">
                     {avatarUrl ? (
-                      <img src={avatarUrl} alt="User Avatar" className="w-full h-full object-cover rounded-[10px]" />
+                      <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover rounded-[10px]" />
                     ) : (
-                      <span className="font-display font-bold text-sky-600 text-xs">{(username || 'U')[0].toUpperCase()}</span>
+                      <span className="font-display font-bold text-sky-600 text-sm">{(username || 'U')[0].toUpperCase()}</span>
                     )}
                   </div>
-                  <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-emerald-500 border-2 border-white rounded-full"></span>
+                  <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></span>
                 </div>
 
                 <div className="min-w-0">
                   <div className="flex items-center gap-1">
-                    <span className="text-[10px] font-medium text-slate-500">{dict.welcome}</span>
+                    <span className="text-[12px] font-medium text-slate-500">{dict.welcome}</span>
                   </div>
-                  <button onClick={onOpenSettingsModal} className="text-left font-display font-bold text-slate-900 text-xs leading-tight truncate hover:text-sky-600 transition-colors flex items-center gap-1 cursor-pointer max-w-[120px] sm:max-w-[180px]">
+                  <button onClick={onOpenSettingsModal} className="text-left font-display font-bold text-slate-900 text-[14px] leading-tight truncate hover:text-sky-600 transition-colors flex items-center gap-1 cursor-pointer max-w-[130px] sm:max-w-[200px]">
                     <span className="truncate">{username}</span>
                   </button>
                 </div>
               </div>
 
-              <div className="flex items-center gap-1 shrink-0">
+              <div className="flex items-center gap-1.5 shrink-0">
                 <button
                   onClick={onOpenLevelModal}
-                  className="flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-sky-50 to-blue-100/80 border border-sky-200/90 text-sky-800 rounded-full text-[10.5px] font-bold shadow-xs active:scale-95 transition-all cursor-pointer"
+                  className="flex items-center gap-1 px-2.5 py-1 bg-gradient-to-r from-sky-50 to-blue-100/80 border border-sky-200/90 text-sky-800 rounded-full text-[12px] font-bold shadow-xs active:scale-95 transition-all cursor-pointer"
                 >
-                  <Icons.Sparkles className="w-2.5 h-2.5 text-sky-600" />
+                  <Icons.Sparkles className="w-3.5 h-3.5 text-sky-600" />
                   <span className="tabular-nums">LV.{userLevel}</span>
                 </button>
 
-                <button onClick={onOpenHelpModal} className="w-6 h-6 rounded-full bg-white/90 border border-slate-200/80 text-slate-600 hover:text-sky-600 flex items-center justify-center transition-all shadow-xs active:scale-95 cursor-pointer">
-                  <Icons.HelpCircle className="w-3 h-3" />
+                <button onClick={onOpenHelpModal} className="w-7 h-7 rounded-full bg-white/90 border border-slate-200/80 text-slate-600 hover:text-sky-600 flex items-center justify-center transition-all shadow-xs active:scale-95 cursor-pointer">
+                  <Icons.HelpCircle className="w-4 h-4" />
                 </button>
 
-                <button onClick={onOpenSettingsModal} className="w-6 h-6 rounded-full bg-white/90 border border-slate-200/80 text-slate-600 hover:text-sky-600 flex items-center justify-center transition-all shadow-xs active:scale-95 cursor-pointer">
-                  <Icons.Settings className="w-3 h-3" />
+                <button onClick={onOpenSettingsModal} className="w-7 h-7 rounded-full bg-white/90 border border-slate-200/80 text-slate-600 hover:text-sky-600 flex items-center justify-center transition-all shadow-xs active:scale-95 cursor-pointer">
+                  <Icons.Settings className="w-4 h-4" />
                 </button>
 
                 <div className="relative">
                   <button
                     onClick={() => setLangMenuOpen(!langMenuOpen)}
-                    className="h-6 px-1.5 rounded-full bg-white/90 border border-slate-200/80 text-slate-700 hover:text-sky-600 flex items-center gap-0.5 text-[10px] font-bold transition-all shadow-xs active:scale-95 cursor-pointer"
+                    className="h-7 px-2 rounded-full bg-white/90 border border-slate-200/80 text-slate-700 hover:text-sky-600 flex items-center gap-1 text-[11px] font-bold transition-all shadow-xs active:scale-95 cursor-pointer"
                   >
-                    <Icons.Globe className="w-2.5 h-2.5 text-slate-500" />
+                    <Icons.Globe className="w-3 h-3 text-slate-500" />
                     <span>{currentLanguage}</span>
-                    <Icons.ChevronDown className="w-2.5 h-2.5 text-slate-400" />
+                    <Icons.ChevronDown className="w-3 h-3 text-slate-400" />
                   </button>
 
                   {langMenuOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setLangMenuOpen(false)} />
-                      <div className="absolute right-0 mt-1.5 w-28 bg-white rounded-xl shadow-lg border border-slate-200/90 py-1 z-50">
+                      <div className="absolute right-0 mt-1.5 w-32 bg-white rounded-xl shadow-lg border border-slate-200/90 py-1 z-50">
                         {languages.map((lang) => (
                           <button
                             key={lang.code}
@@ -586,82 +566,53 @@
         );
       };
 
-      // ==========================================
-      // DynamicBalanceCard (Compact 50%-Safe Header Card)
-      // ==========================================
-      const DynamicBalanceCard = ({ starBalance, tokenBalance, tonEquivalent, onBoostClick, onSwapClick, dict }) => {
-        const [conversionCurrency, setConversionCurrency] = useState('GRAM');
-        const toggleCurrency = () => setConversionCurrency((prev) => (prev === 'GRAM' ? 'TON' : 'GRAM'));
-
+      // Compact Slim Balance Card (Halved Height, $TON Removed, Booster Button Removed)
+      const DynamicBalanceCard = ({ starBalance, tokenBalance, onSwapClick, dict }) => {
         const formattedStars = starBalance.toLocaleString();
-        const displayTokenAmount = conversionCurrency === 'GRAM' ? tokenBalance.toFixed(3) : tonEquivalent.toFixed(4);
-        const currencySymbol = conversionCurrency === 'GRAM' ? '$GRAM' : '$TON';
+        const displayGram = tokenBalance.toFixed(3);
 
         return (
           <div className="w-full">
-            <div className="relative overflow-hidden rounded-[16px] bg-gradient-to-br from-white via-white to-sky-50/80 border border-white/90 shadow-[0_2px_10px_rgba(56,189,248,0.07)] p-2.5">
-              <div className="relative z-10 flex items-center justify-between gap-2.5">
-                <div className="flex flex-col items-center shrink-0">
-                  <div className="relative flex items-center justify-center p-0.5">
+            <div className="relative overflow-hidden rounded-[15px] bg-gradient-to-r from-white via-white to-sky-50/90 border border-white/90 shadow-[0_2px_8px_rgba(56,189,248,0.06)] px-3 py-2">
+              <div className="relative z-10 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="relative flex items-center justify-center shrink-0">
                     <Coin3DIcon size={36} idPrefix="balance-main" floating={true} glow={true} />
                   </div>
-                  <span className="text-[8px] font-bold text-sky-700 uppercase mt-0.5 tracking-tight">
-                    Sapphire Star
-                  </span>
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-1">
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{dict.totalBalance}</span>
-                    <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-200/60">
-                      <Icons.ShieldCheck className="w-2.5 h-2.5" />
-                      {dict.verified}
-                    </span>
-                  </div>
-
-                  <div className="flex items-baseline gap-1 mt-0.5">
-                    <span className="font-display font-extrabold text-xl text-slate-900 tracking-tight tabular-nums">
-                      {formattedStars}
-                    </span>
-                    <span className="text-[11px] font-extrabold text-sky-600">PTS</span>
-                  </div>
-
-                  <div className="mt-1 flex items-center gap-1.5 flex-wrap">
-                    <button
-                      onClick={toggleCurrency}
-                      className="group inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-sky-100/70 hover:bg-sky-100 border border-sky-200 text-sky-800 text-[10px] font-bold transition-all active:scale-95 cursor-pointer"
-                    >
-                      <span>≈ {displayTokenAmount} {currencySymbol}</span>
-                      <Icons.Repeat className="w-2.5 h-2.5 text-sky-600 group-hover:rotate-180 transition-transform duration-300" />
-                    </button>
-
-                    <button
-                      onClick={onBoostClick}
-                      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-sky-500 to-blue-600 text-white text-[10px] font-bold shadow-xs active:scale-95 transition-all cursor-pointer"
-                    >
-                      <Icons.Zap className="w-2.5 h-2.5" fill="#ffffff" />
-                      <span>{dict.boost}</span>
-                    </button>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{dict.totalBalance}</span>
+                      <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-200/60">
+                        <Icons.ShieldCheck className="w-3 h-3" />
+                        {dict.verified}
+                      </span>
+                    </div>
+                    <div className="flex items-baseline gap-1 mt-0.5">
+                      <span className="font-display font-extrabold text-[22px] text-slate-900 tracking-tight tabular-nums leading-none">
+                        {formattedStars}
+                      </span>
+                      <span className="text-[12px] font-extrabold text-sky-600">PTS</span>
+                      <span className="ml-2 px-2 py-0.5 rounded-full bg-sky-100/80 text-sky-800 text-[11px] font-bold">
+                        ≈ {displayGram} $GRAM
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="mt-1.5 pt-1.5 border-t border-slate-100/90 flex items-center justify-between text-xs">
-                <span className="text-[9.5px] text-slate-400 font-medium">Rate: 10,000 PTS = 1 $GRAM</span>
-
-                <button onClick={onSwapClick} className="flex items-center gap-1 text-sky-600 font-bold hover:text-sky-700 transition-colors cursor-pointer text-[10px]">
-                  <span>{dict.convertWallet}</span>
-                  <Icons.ArrowUpRight className="w-2.5 h-2.5" />
-                </button>
+                <div className="flex flex-col items-end justify-center">
+                  <button onClick={onSwapClick} className="flex items-center gap-1 text-sky-600 font-bold hover:text-sky-700 transition-colors cursor-pointer text-[12px] bg-sky-50 px-2.5 py-1 rounded-full border border-sky-200/80">
+                    <span>{dict.convertWallet}</span>
+                    <Icons.ArrowUpRight className="w-3 h-3" />
+                  </button>
+                  <span className="text-[10px] text-slate-400 font-medium mt-1">10,000 PTS = 1 $GRAM</span>
+                </div>
               </div>
             </div>
           </div>
         );
       };
 
-      // ==========================================
-      // BottomNavBar Component (With Pulsing Amber & Steady Green Indicators)
-      // ==========================================
+      // BottomNavBar
       const BottomNavBar = ({ activeTab, onSelectTab, hasCheckedInToday }) => {
         const tabs = [
           { id: 'home', label: 'Home', icon: Icons.Home },
@@ -682,7 +633,7 @@
                   <button
                     key={tab.id}
                     onClick={() => onSelectTab(tab.id)}
-                    className={`relative flex flex-col items-center justify-center py-1 px-1 min-h-[44px] rounded-xl transition-all duration-200 cursor-pointer active:scale-90 ${
+                    className={`relative flex flex-col items-center justify-center py-1 px-1 min-h-[46px] rounded-xl transition-all duration-200 cursor-pointer active:scale-90 ${
                       isActive ? 'text-sky-600' : 'text-slate-400 hover:text-slate-600'
                     }`}
                   >
@@ -691,24 +642,21 @@
                     )}
 
                     <div className="relative flex items-center justify-center">
-                      <IconComponent className={`w-4 h-4 transition-transform duration-200 ${isActive ? 'scale-110' : ''}`} />
+                      <IconComponent className={`w-5 h-5 transition-transform duration-200 ${isActive ? 'scale-110' : ''}`} />
                       
-                      {/* Daily Check-in Status Light Indicator */}
                       {tab.isCheckin && (
                         !hasCheckedInToday ? (
-                          /* BEFORE check-in: Blinking/Pulsing Amber-Yellow light */
-                          <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                          <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400 border border-white"></span>
+                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-400 border border-white"></span>
                           </span>
                         ) : (
-                          /* AFTER check-in: Calm, steady Emerald Green light */
-                          <span className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-500 rounded-full border border-white shadow-xs"></span>
+                          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border border-white shadow-xs"></span>
                         )
                       )}
                     </div>
 
-                    <span className={`text-[10px] font-semibold tracking-tight mt-0.5 ${isActive ? 'font-bold text-sky-600' : 'text-slate-500'}`}>
+                    <span className={`text-[11px] font-semibold tracking-tight mt-0.5 ${isActive ? 'font-bold text-sky-600' : 'text-slate-500'}`}>
                       {tab.label}
                     </span>
                   </button>
@@ -719,9 +667,7 @@
         );
       };
 
-      // ==========================================
-      // QuickActionsGrid (Stationary Top 50% Control Grid)
-      // ==========================================
+      // Slightly Enlarged QuickActionsGrid with '0/10 Watched' Format
       const QuickActionsGrid = ({
         adReward,
         checkInReward,
@@ -744,100 +690,100 @@
 
         return (
           <div className="w-full">
-            <div className="grid grid-cols-2 gap-1.5">
+            <div className="grid grid-cols-2 gap-2">
               {/* BUTTON 1: Monetag Ad */}
-              <div onClick={onWatchAdClick} role="button" className="group relative flex flex-col justify-between p-2 rounded-[13px] bg-white border border-sky-100 shadow-[0_1px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden">
+              <div onClick={onWatchAdClick} role="button" className="group relative flex flex-col justify-between p-2.5 rounded-[15px] bg-white border border-sky-100 shadow-[0_2px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden min-h-[76px]">
                 <div className="flex items-start justify-between">
-                  <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-sky-400 to-blue-500 flex items-center justify-center text-white shadow-xs">
-                    <Icons.PlayCircle className="w-3.5 h-3.5 stroke-white" />
+                  <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-sky-400 to-blue-500 flex items-center justify-center text-white shadow-xs">
+                    <Icons.PlayCircle className="w-4 h-4 stroke-white" />
                   </div>
-                  <div className="inline-flex items-center gap-0.5 px-1 py-0.5 rounded-full bg-sky-50 border border-sky-200/80 text-sky-700 text-[9px] font-extrabold tabular-nums">
-                    <Coin3DIcon size={9} idPrefix="ad-reward" />
+                  <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-sky-50 border border-sky-200/80 text-sky-700 text-[11px] font-extrabold tabular-nums">
+                    <Coin3DIcon size={11} idPrefix="ad-reward" />
                     <span>+{adReward}</span>
                   </div>
                 </div>
                 <div className="mt-1">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-display font-bold text-slate-800 text-[10.5px] group-hover:text-sky-600 transition-colors leading-tight">{dict.watchAd}</h3>
-                    <Icons.ChevronRight className="w-3 h-3 text-slate-300" />
+                    <h3 className="font-display font-bold text-slate-800 text-[12px] group-hover:text-sky-600 transition-colors leading-tight">{dict.watchAd}</h3>
+                    <Icons.ChevronRight className="w-3.5 h-3.5 text-slate-300" />
                   </div>
-                  <p className="text-[9px] text-slate-500 font-medium mt-0.5 truncate">
-                    Daily: <strong className="text-sky-600">{adsWatchedToday}/10</strong>
+                  <p className="text-[11px] text-slate-500 font-semibold mt-0.5 truncate">
+                    <strong className="text-sky-600 font-bold">{adsWatchedToday}/10 Watched</strong>
                   </p>
                 </div>
               </div>
 
               {/* BUTTON 2: Daily Check-in */}
-              <div onClick={onCheckInClick} role="button" className="group relative flex flex-col justify-between p-2 rounded-[13px] bg-white border border-sky-100 shadow-[0_1px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden">
+              <div onClick={onCheckInClick} role="button" className="group relative flex flex-col justify-between p-2.5 rounded-[15px] bg-white border border-sky-100 shadow-[0_2px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden min-h-[76px]">
                 <div className="flex items-start justify-between">
-                  <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-xs">
-                    <Icons.CalendarCheck className="w-3.5 h-3.5" />
+                  <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-xs">
+                    <Icons.CalendarCheck className="w-4 h-4" />
                   </div>
-                  <div className="inline-flex items-center gap-0.5 px-1 py-0.5 rounded-full bg-sky-50 border border-sky-200/80 text-sky-700 text-[9px] font-extrabold tabular-nums">
-                    <Coin3DIcon size={9} idPrefix="checkin-reward" />
+                  <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-sky-50 border border-sky-200/80 text-sky-700 text-[11px] font-extrabold tabular-nums">
+                    <Coin3DIcon size={11} idPrefix="checkin-reward" />
                     <span>+{checkInReward}</span>
                   </div>
                 </div>
                 <div className="mt-1">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-display font-bold text-slate-800 text-[10.5px] group-hover:text-sky-600 transition-colors leading-tight">{dict.dailyCheckIn}</h3>
-                    <Icons.ChevronRight className="w-3 h-3 text-slate-300" />
+                    <h3 className="font-display font-bold text-slate-800 text-[12px] group-hover:text-sky-600 transition-colors leading-tight">{dict.dailyCheckIn}</h3>
+                    <Icons.ChevronRight className="w-3.5 h-3.5 text-slate-300" />
                   </div>
-                  <div className="flex items-center gap-0.5 text-[9px] font-semibold text-blue-600 mt-0.5">
-                    <Icons.Flame className="w-2.5 h-2.5 text-blue-500" fill="#0284c7" />
+                  <div className="flex items-center gap-1 text-[11px] font-semibold text-blue-600 mt-0.5">
+                    <Icons.Flame className="w-3 h-3 text-blue-500" fill="#0284c7" />
                     <span>{dict.streak} {streakDays}</span>
-                    {hasCheckedInToday && <span className="text-[8.5px] text-emerald-600 font-bold ml-auto">Done</span>}
+                    {hasCheckedInToday && <span className="text-[10px] text-emerald-600 font-bold ml-auto">Done</span>}
                   </div>
                 </div>
               </div>
 
               {/* BUTTON 3: Referral & Level */}
-              <div onClick={onInviteClick} role="button" className="group relative flex flex-col justify-between p-2 rounded-[13px] bg-white border border-sky-100 shadow-[0_1px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden">
+              <div onClick={onInviteClick} role="button" className="group relative flex flex-col justify-between p-2.5 rounded-[15px] bg-white border border-sky-100 shadow-[0_2px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden min-h-[76px]">
                 <div className="flex items-start justify-between">
-                  <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-xs">
-                    <Icons.Users className="w-3.5 h-3.5" />
+                  <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-xs">
+                    <Icons.Users className="w-4 h-4" />
                   </div>
-                  <span className="text-[9px] font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded-full border border-indigo-200/70 tabular-nums">
+                  <span className="text-[10.5px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200/70 tabular-nums">
                     Lv.{userLevel}
                   </span>
                 </div>
                 <div className="mt-1">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-display font-bold text-slate-800 text-[10.5px] group-hover:text-indigo-600 transition-colors leading-tight">{dict.referralLevel}</h3>
-                    <span className="text-[9px] font-extrabold text-indigo-600">+100 PTS</span>
+                    <h3 className="font-display font-bold text-slate-800 text-[12px] group-hover:text-indigo-600 transition-colors leading-tight">{dict.referralLevel}</h3>
+                    <span className="text-[10px] font-extrabold text-indigo-600">+100 PTS</span>
                   </div>
-                  <div className="mt-0.5 space-y-0.5">
-                    <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
+                  <div className="mt-1 space-y-0.5">
+                    <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
                       <div className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full transition-all duration-500" style={{ width: `${invitePercentage}%` }} />
                     </div>
-                    <div className="flex justify-between items-center text-[8.5px] text-slate-400 font-medium">
+                    <div className="flex justify-between items-center text-[10px] text-slate-500 font-medium">
                       <span>Perks</span>
-                      <span className="font-semibold text-slate-600 tabular-nums">{currentInvites}/{requiredInvites} frens</span>
+                      <span className="font-semibold text-slate-700 tabular-nums">{currentInvites}/{requiredInvites} frens</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* BUTTON 4: Daily Tasks */}
-              <div onClick={onTasksClick} role="button" className="group relative flex flex-col justify-between p-2 rounded-[13px] bg-white border border-sky-100 shadow-[0_1px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden">
+              <div onClick={onTasksClick} role="button" className="group relative flex flex-col justify-between p-2.5 rounded-[15px] bg-white border border-sky-100 shadow-[0_2px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden min-h-[76px]">
                 <div className="flex items-start justify-between">
-                  <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-emerald-400 to-teal-600 flex items-center justify-center text-white shadow-xs">
-                    <Icons.CheckCircle2 className="w-3.5 h-3.5" />
+                  <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-emerald-400 to-teal-600 flex items-center justify-center text-white shadow-xs">
+                    <Icons.CheckCircle2 className="w-4 h-4" />
                   </div>
-                  <span className="text-[9px] font-bold text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded-full border border-teal-200/70 tabular-nums">
+                  <span className="text-[10.5px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200/70 tabular-nums">
                     {completedTasksToday}/{dailyTaskLimit} Done
                   </span>
                 </div>
                 <div className="mt-1">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-display font-bold text-slate-800 text-[10.5px] group-hover:text-teal-600 transition-colors leading-tight">{dict.dailyTasks}</h3>
-                    <Icons.ChevronRight className="w-3 text-slate-300" />
+                    <h3 className="font-display font-bold text-slate-800 text-[12px] group-hover:text-teal-600 transition-colors leading-tight">{dict.dailyTasks}</h3>
+                    <Icons.ChevronRight className="w-3.5 text-slate-300" />
                   </div>
-                  <div className="mt-0.5 space-y-0.5">
-                    <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
+                  <div className="mt-1 space-y-0.5">
+                    <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
                       <div className="bg-gradient-to-r from-teal-400 to-emerald-500 h-full rounded-full transition-all duration-500" style={{ width: `${taskPercentage}%` }} />
                     </div>
-                    <div className="flex items-center justify-between text-[8.5px] text-slate-500 font-medium">
+                    <div className="flex items-center justify-between text-[10px] text-slate-500 font-medium">
                       <span>200 PTS/task</span>
                       <span className="font-bold text-teal-600">Max {dailyTaskLimit}</span>
                     </div>
@@ -849,9 +795,7 @@
         );
       };
 
-      // ==========================================
-      // BountyTasksSection (Sliding Bounties List for Lower 50%)
-      // ==========================================
+      // Slim Island Bounty Tasks with Larger Text
       const BountyTasksSection = ({ tasks, completedTasksList = [], onStartTask, onPostBountyClick, dict }) => {
         const [selectedCategory, setSelectedCategory] = useState('All');
         const categories = ['All', 'Partners', 'Social', 'Web3', 'Daily'];
@@ -864,42 +808,41 @@
 
         const renderIcon = (type) => {
           switch (type) {
-            case 'telegram': return <Icons.Send className="w-3.5 h-3.5 text-[#2AABEE]" />;
-            case 'twitter': return <Icons.Twitter className="w-3.5 h-3.5 text-sky-500" />;
-            case 'youtube': return <Icons.Youtube className="w-3.5 h-3.5 text-red-500" />;
-            case 'facebook': return <Icons.Facebook className="w-3.5 h-3.5 text-[#1877F2]" />;
-            case 'instagram': return <Icons.Instagram className="w-3.5 h-3.5 text-[#E4405F]" />;
-            case 'wallet': return <Icons.Wallet className="w-3.5 h-3.5 text-indigo-500" />;
-            case 'bot': return <Icons.Bot className="w-3.5 h-3.5 text-emerald-500" />;
+            case 'telegram': return <Icons.Send className="w-4 h-4 text-[#2AABEE]" />;
+            case 'twitter': return <Icons.Twitter className="w-4 h-4 text-sky-500" />;
+            case 'youtube': return <Icons.Youtube className="w-4 h-4 text-red-500" />;
+            case 'facebook': return <Icons.Facebook className="w-4 h-4 text-[#1877F2]" />;
+            case 'instagram': return <Icons.Instagram className="w-4 h-4 text-[#E4405F]" />;
+            case 'wallet': return <Icons.Wallet className="w-4 h-4 text-indigo-500" />;
+            case 'bot': return <Icons.Bot className="w-4 h-4 text-emerald-500" />;
             case 'others':
-            default: return <Icons.Globe className="w-3.5 h-3.5 text-sky-600" />;
+            default: return <Icons.Globe className="w-4 h-4 text-sky-600" />;
           }
         };
 
         return (
           <section id="bounty-section" className="w-full pt-1 pb-4">
             <div className="flex items-center justify-between gap-2 mb-1.5">
-              <div className="flex items-center gap-1.5">
-                <h2 className="font-display font-extrabold text-slate-900 text-xs sm:text-sm tracking-tight">{dict.activeBounties}</h2>
-                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-sky-100 text-sky-700">200 PTS each</span>
+              <div className="flex items-center gap-2">
+                <h2 className="font-display font-extrabold text-slate-900 text-[15px] tracking-tight">{dict.activeBounties}</h2>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-700">200 PTS each</span>
               </div>
               
-              {/* Vibrant Blue Gradient POST Button without redundant symbols */}
               <button
                 onClick={onPostBountyClick}
-                className="flex items-center gap-1 px-2.5 py-1 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 text-white rounded-full text-[11px] font-bold transition-all shadow-xs shadow-sky-500/30 active:scale-95 cursor-pointer"
+                className="flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 text-white rounded-full text-[12px] font-bold transition-all shadow-xs shadow-sky-500/30 active:scale-95 cursor-pointer"
               >
-                <Icons.Plus className="w-3 h-3 stroke-[2.5]" />
+                <Icons.Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                 <span>POST</span>
               </button>
             </div>
 
-            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-1.5">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1.5">
               {categories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-2.5 py-0.5 text-[10.5px] font-semibold rounded-full whitespace-nowrap transition-all cursor-pointer ${
+                  className={`px-3 py-1 text-[11.5px] font-semibold rounded-full whitespace-nowrap transition-all cursor-pointer ${
                     selectedCategory === cat
                       ? 'bg-sky-500 text-white shadow-xs shadow-sky-500/30'
                       : 'bg-white/80 hover:bg-white text-slate-600 border border-sky-100'
@@ -913,28 +856,28 @@
             <div className="space-y-1.5">
               {visibleTasks.length === 0 ? (
                 <div className="p-4 rounded-[16px] bg-white/90 border border-sky-100 text-center shadow-xs">
-                  <span className="text-xl mb-0.5 block">🎉</span>
-                  <h4 className="font-display font-bold text-slate-800 text-[11px]">All Bounties Completed!</h4>
-                  <p className="text-[10px] text-slate-500 mt-0.5">Check back later for newly published missions.</p>
+                  <span className="text-2xl mb-1 block">🎉</span>
+                  <h4 className="font-display font-bold text-slate-800 text-[13px]">All Bounties Completed!</h4>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Check back later for newly published missions.</p>
                 </div>
               ) : (
                 visibleTasks.map((task) => (
                   <div
                     key={task.id}
-                    className="p-2.5 rounded-[15px] bg-white border border-sky-100/90 shadow-[0_1px_8px_rgba(56,189,248,0.05)] flex items-center justify-between gap-2.5 transition-all hover:border-sky-300"
+                    className="py-2 px-3 rounded-[14px] bg-white border border-sky-100/90 shadow-[0_1px_6px_rgba(56,189,248,0.05)] flex items-center justify-between gap-2.5 transition-all hover:border-sky-300"
                   >
-                    <div className="flex items-center gap-2 min-w-0">
+                    <div className="flex items-center gap-2.5 min-w-0">
                       <div className="w-8 h-8 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center shrink-0">
                         {renderIcon(task.iconType)}
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-1 flex-wrap">
-                          <span className="text-[9px] font-bold text-sky-600 uppercase tracking-wider">{task.category}</span>
-                          {task.partnerName && <span className="text-[9px] text-slate-400 font-medium">· {task.partnerName}</span>}
+                          <span className="text-[10px] font-bold text-sky-600 uppercase tracking-wider">{task.category}</span>
+                          {task.partnerName && <span className="text-[10px] text-slate-400 font-medium">· {task.partnerName}</span>}
                         </div>
-                        <h4 className="font-display font-bold text-slate-800 text-xs leading-tight truncate">{task.title}</h4>
-                        <div className="inline-flex items-center gap-0.5 mt-0.5 text-[9.5px] font-extrabold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded-full border border-sky-200/60 tabular-nums">
-                          <Coin3DIcon size={10} idPrefix={`task-coin-${task.id}`} />
+                        <h4 className="font-display font-bold text-slate-800 text-[13px] leading-tight truncate">{task.title}</h4>
+                        <div className="inline-flex items-center gap-1 mt-0.5 text-[10.5px] font-extrabold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-full border border-sky-200/60 tabular-nums">
+                          <Coin3DIcon size={11} idPrefix={`task-coin-${task.id}`} />
                           <span>+{task.reward || 200} PTS</span>
                         </div>
                       </div>
@@ -942,17 +885,17 @@
 
                     <div className="shrink-0">
                       {task.status === 'verifying' ? (
-                        <button disabled className="flex items-center gap-1 px-2.5 py-1 bg-sky-100 text-sky-800 rounded-full text-[10.5px] font-bold transition-all whitespace-nowrap">
-                          <Icons.Loader2 className="w-3 h-3 animate-spin text-sky-600" />
+                        <button disabled className="flex items-center gap-1 px-3 py-1 bg-sky-100 text-sky-800 rounded-full text-[11.5px] font-bold transition-all whitespace-nowrap">
+                          <Icons.Loader2 className="w-3.5 h-3.5 animate-spin text-sky-600" />
                           <span>Checking (3s)</span>
                         </button>
                       ) : (
                         <button
                           onClick={() => onStartTask(task.id, task.actionUrl || task.url)}
-                          className="flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 text-white rounded-full text-[10.5px] font-bold transition-all shadow-xs active:scale-95 whitespace-nowrap cursor-pointer"
+                          className="flex items-center gap-1 px-3.5 py-1 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 text-white rounded-full text-[11.5px] font-bold transition-all shadow-xs active:scale-95 whitespace-nowrap cursor-pointer"
                         >
                           <span>{task.actionText || 'Start'}</span>
-                          <Icons.ExternalLink className="w-2.5 h-2.5 opacity-80" />
+                          <Icons.ExternalLink className="w-3 h-3 opacity-80" />
                         </button>
                       )}
                     </div>
@@ -964,16 +907,14 @@
         );
       };
 
-      // ==========================================
-      // PostBountyModal (With 6 Icons & Direct Telegram Stars Flow)
-      // ==========================================
+      // PostBountyModal (With Direct In-App Telegram Stars Bottom Sheet Invoice Support)
       const PostBountyModal = ({ isOpen, onClose, starBalance, walletAddress, onDeductPts, onSubmitBounty, showToast }) => {
         const [title, setTitle] = useState('');
         const [category, setCategory] = useState('Social');
         const [iconType, setIconType] = useState('telegram');
         const [actionText, setActionText] = useState('Join Channel');
         const [actionUrl, setActionUrl] = useState('https://t.me/ToBOOST_Ai');
-        const [currency, setCurrency] = useState('GRAM');
+        const [currency, setCurrency] = useState('STARS');
         const [impressions, setImpressions] = useState(100);
         const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -1025,17 +966,10 @@
                 throw new Error('Payment gateway is currently unreachable');
               }
 
-              showToast('Opening wallet for payment...');
-
               const nanoAmount = Math.round(cost * 1e9).toString();
               const transaction = {
                 validUntil: Math.floor(Date.now() / 1000) + 360,
-                messages: [
-                  {
-                    address: backendReceiver,
-                    amount: nanoAmount,
-                  }
-                ]
+                messages: [{ address: backendReceiver, amount: nanoAmount }]
               };
 
               if (window.tonConnectUIInstance) {
@@ -1043,7 +977,6 @@
                 showToast('✅ Payment received in $GRAM! Publishing mission...');
               }
             } catch (err) {
-              console.error('Wallet payment error:', err);
               showToast('❌ Wallet payment was cancelled or failed.');
               setIsSubmitting(false);
               return;
@@ -1060,26 +993,36 @@
             showToast(`✅ ${cost.toLocaleString()} PTS deducted for Free Boost!`);
           }
 
-          // 3. Telegram Stars Payment (Direct In-App Telegram Stars Flow)
+          // 3. Official Telegram Stars In-App Payment Bottom-Sheet Sheet
           else if (currency === 'STARS') {
             setIsSubmitting(true);
-            showToast('Opening Telegram Stars checkout...');
+            showToast('Opening Stars Payment Sheet...');
 
             try {
               let invoiceOpened = false;
               if (window.Telegram?.WebApp?.openInvoice) {
                 try {
-                  const invRes = await fetch('/api/tasks?action=create_star_invoice', {
+                  const invRes = await fetch('/api/create-stars-invoice', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'x-telegram-init-data': tg?.initData || '' },
-                    body: JSON.stringify({ title, cost, impressions, actionUrl })
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'x-telegram-init-data': tg?.initData || ''
+                    },
+                    body: JSON.stringify({
+                      title: title.trim(),
+                      starsCost: cost,
+                      impressions,
+                      actionUrl: actionUrl.trim()
+                    })
                   });
                   const invData = await invRes.json().catch(() => ({}));
+
                   if (invData && invData.invoiceLink) {
                     invoiceOpened = true;
+                    // Trigger native Telegram Stars Sheet (as requested in screenshot)
                     window.Telegram.WebApp.openInvoice(invData.invoiceLink, async (status) => {
                       if (status === 'paid') {
-                        showToast('⭐️ Stars payment confirmed! Publishing bounty...');
+                        showToast('⭐️ Stars Payment Confirmed! Publishing Bounty...');
                         await onSubmitBounty({
                           title: title.trim(),
                           description: `Complete this ${category.toLowerCase()} mission to earn ⭐ stars!`,
@@ -1092,8 +1035,10 @@
                           cost: cost
                         });
                         onClose();
+                      } else if (status === 'cancelled') {
+                        showToast('Stars checkout cancelled.');
                       } else {
-                        showToast('❌ Stars payment was cancelled or pending.');
+                        showToast('Stars payment status: ' + status);
                       }
                     });
                     setIsSubmitting(false);
@@ -1105,12 +1050,12 @@
               }
 
               if (!invoiceOpened) {
+                // Direct fallback link to bot if invoice api unavailable
                 const starPayUrl = `https://t.me/ToFarmsAi_Bot?start=stars_${cost}_${Date.now()}`;
                 openSafeLink(starPayUrl);
-                showToast(`⭐️ Complete ${cost} Stars payment in @ToFarmsAi_Bot`);
+                showToast(`⭐️ Please confirm ${cost} Stars payment in Bot.`);
               }
             } catch (err) {
-              console.error('Stars Error:', err);
               showToast('Stars gateway error. Please try again.');
               setIsSubmitting(false);
               return;
@@ -1139,13 +1084,12 @@
         };
 
         return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="relative w-full max-w-sm rounded-[24px] bg-white border border-sky-100 shadow-2xl p-5 overflow-hidden max-h-[90vh] overflow-y-auto no-scrollbar">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="relative w-full max-w-sm rounded-[24px] bg-white border border-sky-100 shadow-2xl p-5 overflow-hidden max-h-[90vh] overflow-y-auto no-scrollbar text-slate-900">
               
-              {/* Header with LIVE Pulsing Green Light */}
               <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-700 text-[11px] font-bold tracking-wide">
+                  <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-700 text-[12px] font-bold tracking-wide">
                     <span className="relative flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -1153,7 +1097,7 @@
                     <span>LIVE</span>
                   </div>
                   <div>
-                    <h3 className="font-display font-bold text-slate-900 text-sm">Post Bounty Campaign</h3>
+                    <h3 className="font-display font-bold text-slate-900 text-[15px]">Post Bounty Campaign</h3>
                   </div>
                 </div>
                 <button onClick={onClose} className="p-1 rounded-full text-slate-400 hover:text-slate-600">
@@ -1163,42 +1107,50 @@
 
               <form onSubmit={handleSubmit} className="space-y-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Task Title *</label>
+                  <label className="block text-[13px] font-bold text-slate-700 mb-1">Task Title *</label>
                   <input
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="e.g. Join Official Community Channel"
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-sky-500 text-slate-900"
+                    className="w-full px-3 py-2 text-[13px] rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none focus:border-sky-500 text-slate-900 font-medium"
                     required
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Category</label>
-                    <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-2.5 py-2 text-xs rounded-xl border border-slate-200 bg-white">
-                      <option value="Social">Social</option>
-                      <option value="Partners">Partners</option>
-                      <option value="Web3">Web3</option>
-                      <option value="Daily">Daily</option>
+                    <label className="block text-[13px] font-bold text-slate-700 mb-1">Category</label>
+                    <select
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      className="w-full px-3 py-2 text-[13px] rounded-xl border border-slate-300 bg-slate-50 text-slate-900 font-semibold focus:outline-none focus:border-sky-500"
+                    >
+                      <option value="Social" className="text-slate-900 bg-white">Social</option>
+                      <option value="Partners" className="text-slate-900 bg-white">Partners</option>
+                      <option value="Web3" className="text-slate-900 bg-white">Web3</option>
+                      <option value="Daily" className="text-slate-900 bg-white">Daily</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Icon</label>
-                    <select value={iconType} onChange={(e) => setIconType(e.target.value)} className="w-full px-2.5 py-2 text-xs rounded-xl border border-slate-200 bg-white">
-                      <option value="telegram">Telegram</option>
-                      <option value="twitter">X / Twitter</option>
-                      <option value="youtube">YouTube</option>
-                      <option value="facebook">Facebook</option>
-                      <option value="instagram">Instagram</option>
-                      <option value="others">Others</option>
+                    <label className="block text-[13px] font-bold text-slate-700 mb-1">Icon</label>
+                    <select
+                      value={iconType}
+                      onChange={(e) => setIconType(e.target.value)}
+                      className="w-full px-3 py-2 text-[13px] rounded-xl border border-slate-300 bg-slate-50 text-slate-900 font-semibold focus:outline-none focus:border-sky-500"
+                    >
+                      <option value="telegram" className="text-slate-900 bg-white">Telegram</option>
+                      <option value="twitter" className="text-slate-900 bg-white">X / Twitter</option>
+                      <option value="youtube" className="text-slate-900 bg-white">YouTube</option>
+                      <option value="facebook" className="text-slate-900 bg-white">Facebook</option>
+                      <option value="instagram" className="text-slate-900 bg-white">Instagram</option>
+                      <option value="others" className="text-slate-900 bg-white">Others</option>
                     </select>
                   </div>
                 </div>
 
-                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100">
-                  <div className="flex justify-between items-center text-xs font-bold mb-1">
+                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200">
+                  <div className="flex justify-between items-center text-[13px] font-bold mb-1">
                     <span className="text-slate-700">Target Impressions</span>
                     <span className="text-sky-600 tabular-nums">{impressions.toLocaleString()} Views</span>
                   </div>
@@ -1212,37 +1164,36 @@
                     className="w-full accent-sky-500 cursor-pointer"
                   />
 
-                  {/* Payment Method Selector */}
-                  <div className="mt-2.5 pt-2 border-t border-slate-200/80 flex items-center justify-between">
+                  <div className="mt-2.5 pt-2 border-t border-slate-200 flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] text-slate-500 block mb-0.5 font-semibold">Payment Method:</span>
-                      <div className="flex gap-1">
+                      <span className="text-[11px] text-slate-500 block mb-1 font-semibold">Payment Method:</span>
+                      <div className="flex gap-1.5">
+                        <button
+                          key="STARS"
+                          type="button"
+                          onClick={() => setCurrency('STARS')}
+                          className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition ${
+                            currency === 'STARS' ? 'bg-amber-500 text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-300'
+                          }`}
+                        >
+                          ⭐️ Stars
+                        </button>
                         <button
                           key="GRAM"
                           type="button"
                           onClick={() => setCurrency('GRAM')}
-                          className={`px-2 py-1 text-[10px] font-bold rounded-md transition ${
-                            currency === 'GRAM' ? 'bg-sky-500 text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200'
+                          className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition ${
+                            currency === 'GRAM' ? 'bg-sky-500 text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-300'
                           }`}
                         >
                           $GRAM
                         </button>
                         <button
-                          key="STARS"
-                          type="button"
-                          onClick={() => setCurrency('STARS')}
-                          className={`px-2 py-1 text-[10px] font-bold rounded-md transition ${
-                            currency === 'STARS' ? 'bg-amber-500 text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200'
-                          }`}
-                        >
-                          Stars
-                        </button>
-                        <button
                           key="PTS"
                           type="button"
                           onClick={() => setCurrency('PTS')}
-                          className={`px-2 py-1 text-[10px] font-bold rounded-md transition ${
-                            currency === 'PTS' ? 'bg-emerald-500 text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200'
+                          className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition ${
+                            currency === 'PTS' ? 'bg-emerald-500 text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-300'
                           }`}
                         >
                           Free PTS
@@ -1251,21 +1202,19 @@
                     </div>
 
                     <div className="text-right">
-                      <span className="text-[10px] text-emerald-600 font-bold block">
-                        {currency === 'PTS' ? 'Free Boost Cost' : 'Cost'}
-                      </span>
-                      <span className="font-display font-black text-sm text-slate-900">{calcDisplayPrice()}</span>
+                      <span className="text-[11px] text-emerald-600 font-bold block">Cost</span>
+                      <span className="font-display font-black text-base text-slate-900">{calcDisplayPrice()}</span>
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Target Link / URL</label>
+                  <label className="block text-[13px] font-bold text-slate-700 mb-1">Target Link / URL</label>
                   <input
                     type="url"
                     value={actionUrl}
                     onChange={(e) => setActionUrl(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 text-slate-900"
+                    className="w-full px-3 py-2 text-[13px] rounded-xl border border-slate-300 bg-slate-50 focus:bg-white text-slate-900 font-medium"
                     required
                   />
                 </div>
@@ -1273,17 +1222,17 @@
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold text-xs rounded-xl shadow-md active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
+                  className="w-full py-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold text-[13px] rounded-xl shadow-md active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
                 >
-                  <Icons.Send className="w-3.5 h-3.5" />
+                  <Icons.Send className="w-4 h-4" />
                   <span>
                     {isSubmitting
-                      ? 'Processing & Publishing...'
+                      ? 'Opening Telegram Stars...'
+                      : currency === 'STARS'
+                      ? `Confirm & Pay with Stars (${calcDisplayPrice()})`
                       : currency === 'GRAM'
-                      ? `Pay & Publish with Wallet (${calcDisplayPrice()})`
-                      : currency === 'PTS'
-                      ? `Boost for Free (${calcDisplayPrice()})`
-                      : `Publish Mission (${calcDisplayPrice()})`}
+                      ? `Pay & Publish with $GRAM (${calcDisplayPrice()})`
+                      : `Boost for Free (${calcDisplayPrice()})`}
                   </span>
                 </button>
               </form>
@@ -1291,10 +1240,7 @@
           </div>
         );
       };
-
-      // ==========================================
-      // LevelPerksModal Component
-      // ==========================================
+ // LevelPerksModal Component
       const LevelPerksModal = ({ isOpen, onClose, userLevel, currentInvites, requiredInvites, multiplier }) => {
         if (!isOpen) return null;
 
@@ -1316,7 +1262,7 @@
                   </div>
                   <div>
                     <h3 className="font-display font-black text-slate-900 text-base">Level {userLevel} Perks</h3>
-                    <p className="text-[11px] text-slate-400">Current Multiplier: <strong className="text-sky-600">{multiplier}x</strong></p>
+                    <p className="text-[12px] text-slate-400">Current Multiplier: <strong className="text-sky-600">{multiplier}x</strong></p>
                   </div>
                 </div>
                 <button onClick={onClose} className="p-1 rounded-full text-slate-400 hover:text-slate-600">
@@ -1332,7 +1278,7 @@
                 <div className="w-full bg-sky-200/60 h-2 rounded-full overflow-hidden">
                   <div className="bg-gradient-to-r from-sky-500 to-blue-600 h-full rounded-full" style={{ width: `${Math.min(100, (currentInvites / requiredInvites) * 100)}%` }} />
                 </div>
-                <p className="text-[11px] text-sky-800/80 mt-2 font-medium">
+                <p className="text-[12px] text-sky-800/80 mt-2 font-medium">
                   Invite {Math.max(0, requiredInvites - currentInvites)} more friends to unlock higher daily tasks!
                 </p>
               </div>
@@ -1362,9 +1308,7 @@
         );
       };
 
-      // ==========================================
-      // HelpModal Component
-      // ==========================================
+      // HelpModal
       const HelpModal = ({ isOpen, onClose }) => {
         if (!isOpen) return null;
         const faqs = [
@@ -1381,7 +1325,7 @@
                   <Coin3DIcon size={30} idPrefix="help-coin" />
                   <div>
                     <h3 className="font-display font-black text-slate-900 text-base">ToBOOSTAi Guide</h3>
-                    <p className="text-[11px] text-slate-400">Rules & FAQ</p>
+                    <p className="text-[12px] text-slate-400">Rules & FAQ</p>
                   </div>
                 </div>
                 <button onClick={onClose} className="p-1 rounded-full text-slate-400 hover:text-slate-600">
@@ -1393,7 +1337,7 @@
                 {faqs.map((faq, idx) => (
                   <div key={idx} className="p-3 rounded-2xl bg-sky-50/50 border border-sky-100">
                     <div className="font-display font-bold text-xs text-slate-800 mb-1">{faq.q}</div>
-                    <p className="text-[11px] text-slate-600 leading-relaxed">{faq.a}</p>
+                    <p className="text-[12px] text-slate-600 leading-relaxed">{faq.a}</p>
                   </div>
                 ))}
               </div>
@@ -1406,9 +1350,7 @@
         );
       };
 
-      // ==========================================
-      // SettingsModal (With Community, X Twitter & Support Links)
-      // ==========================================
+      // SettingsModal
       const SettingsModal = ({ isOpen, onClose, username, onUpdateUsername }) => {
         const [editingName, setEditingName] = useState(username);
         const [soundEnabled, setSoundEnabled] = useState(true);
@@ -1437,7 +1379,7 @@
               <div className="py-3 space-y-3.5 max-h-[75vh] overflow-y-auto no-scrollbar">
                 <form onSubmit={handleSave} className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                    <Icons.User className="w-3.5 h-3.5 text-sky-600" />
+                    <Icons.User className="w-4 h-4 text-sky-600" />
                     <span>Display Name</span>
                   </label>
                   <div className="flex gap-2">
@@ -1454,13 +1396,11 @@
                   </div>
                 </form>
 
-                {/* Official Community, Twitter & Support Links */}
                 <div className="pt-2 border-t border-slate-100 space-y-2">
-                  <span className="text-[10.5px] font-bold text-slate-400 uppercase tracking-wider block">
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
                     Community & Support
                   </span>
                   
-                  {/* 1. Telegram Community */}
                   <button
                     onClick={() => openSafeLink('https://t.me/ToBOOST_Ai')}
                     className="w-full flex items-center justify-between p-2.5 rounded-xl bg-sky-50/70 hover:bg-sky-100/70 border border-sky-100 text-slate-800 text-xs font-bold transition active:scale-[0.98] cursor-pointer"
@@ -1471,13 +1411,12 @@
                       </div>
                       <span className="font-display text-slate-800">Community</span>
                     </div>
-                    <div className="flex items-center gap-1 text-[11px] text-sky-600 font-semibold">
+                    <div className="flex items-center gap-1 text-[12px] text-sky-600 font-semibold">
                       <span>Join</span>
                       <Icons.ChevronRight className="w-3.5 h-3.5" />
                     </div>
                   </button>
 
-                  {/* 2. X Twitter */}
                   <button
                     onClick={() => openSafeLink('https://x.com/toboostapp')}
                     className="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 text-xs font-bold transition active:scale-[0.98] cursor-pointer"
@@ -1488,13 +1427,12 @@
                       </div>
                       <span className="font-display text-slate-800">X Twitter</span>
                     </div>
-                    <div className="flex items-center gap-1 text-[11px] text-slate-500 font-semibold">
+                    <div className="flex items-center gap-1 text-[12px] text-slate-500 font-semibold">
                       <span>Follow</span>
                       <Icons.ChevronRight className="w-3.5 h-3.5" />
                     </div>
                   </button>
 
-                  {/* 3. Telegram Support */}
                   <button
                     onClick={() => openSafeLink('https://t.me/Toboostapp')}
                     className="w-full flex items-center justify-between p-2.5 rounded-xl bg-emerald-50/70 hover:bg-emerald-100/60 border border-emerald-100 text-slate-800 text-xs font-bold transition active:scale-[0.98] cursor-pointer"
@@ -1505,7 +1443,7 @@
                       </div>
                       <span className="font-display text-slate-800">Support</span>
                     </div>
-                    <div className="flex items-center gap-1 text-[11px] text-emerald-600 font-semibold">
+                    <div className="flex items-center gap-1 text-[12px] text-emerald-600 font-semibold">
                       <span>Chat</span>
                       <Icons.ChevronRight className="w-3.5 h-3.5" />
                     </div>
@@ -1539,9 +1477,7 @@
         );
       };
 
-      // ==========================================
       // Notification & Rule Modals
-      // ==========================================
       const TaskLimitModal = ({ isOpen, onClose, dailyLimit, invites, onGoToFrens }) => {
         if (!isOpen) return null;
         return (
@@ -1595,7 +1531,7 @@
               <div className="text-left space-y-2 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200 mb-4">
                 <div className={`flex items-center gap-2 ${conditions.hasMinBalance ? 'text-emerald-600 font-bold' : 'text-red-600 font-medium'}`}>
                   {conditions.hasMinBalance ? <Icons.Check className="w-4 h-4 shrink-0" /> : <Icons.X className="w-4 h-4 shrink-0" />}
-                  <span>Tier {tier} Minimum {requiredPts.toLocaleString()} PTS ({requiredGram} $GRAM) (Current: {conditions.currentBalance.toLocaleString()} PTS)</span>
+                  <span>Tier {tier} Minimum {requiredPts.toLocaleString()} PTS ({requiredGram} $GRAM)</span>
                 </div>
                 <div className={`flex items-center gap-2 ${conditions.hasStreak ? 'text-emerald-600 font-bold' : 'text-red-600 font-medium'}`}>
                   {conditions.hasStreak ? <Icons.Check className="w-4 h-4 shrink-0" /> : <Icons.X className="w-4 h-4 shrink-0" />}
@@ -1614,9 +1550,7 @@
         );
       };
 
-      // ==========================================
-      // DailyCheckInModal (Streak Resets on Missed Day)
-      // ==========================================
+      // DailyCheckInModal
       const DailyCheckInModal = ({ isOpen, onClose, currentStreak, hasCheckedInToday, onClaimToday }) => {
         if (!isOpen) return null;
 
@@ -1697,9 +1631,7 @@
         );
       };
 
-      // ==========================================
       // BoostView Component
-      // ==========================================
       const BoostView = ({ starBalance, energy, maxEnergy, multiplier, onUpgradeBoost, onTapToBoost }) => {
         const [tapEffect, setTapEffect] = useState(false);
         const [floatingPoints, setFloatingPoints] = useState([]);
@@ -1767,7 +1699,6 @@
                 <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden p-0.5">
                   <div className="bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-600 h-full rounded-full transition-all duration-300" style={{ width: `${energyPercent}%` }} />
                 </div>
-                <p className="text-[10.5px] text-slate-400 font-medium">Tap the sapphire coin for instant bonus energy!</p>
               </div>
             </div>
 
@@ -1808,14 +1739,11 @@
         );
       };
 
-      // ==========================================
-      // FrensView (Direct startapp Referral Link)
-      // ==========================================
+      // FrensView
       const FrensView = ({ currentInvites, dict }) => {
         const [copied, setCopied] = useState(false);
         const botUsername = 'ToFarmsAi_Bot';
         const userId = tg?.initDataUnsafe?.user?.id || '';
-
         const inviteUrl = `https://t.me/${botUsername}?startapp=ref_${userId}`;
 
         const handleCopy = () => {
@@ -1838,7 +1766,7 @@
                   <span>Referral Rewards</span>
                 </div>
                 <h2 className="font-display font-black text-xl tracking-tight leading-tight">{dict.inviteFrens}</h2>
-                <p className="text-[11px] text-indigo-100 mt-1 max-w-xs">
+                <p className="text-[12px] text-indigo-100 mt-1 max-w-xs">
                   Earn +100 PTS per fren and unlock higher daily tasks (5, 10, 15 up to 20 daily tasks)!
                 </p>
 
@@ -1867,9 +1795,7 @@
         );
       };
 
-      // ==========================================
-      // WalletView (With Escalating Tiers: 10k, 20k, 30k, 40k...)
-      // ==========================================
+      // WalletView ($TON completely removed, only $GRAM token)
       const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, withdrawCount = 0, onConnectWallet, onDisconnectWallet, onConvertStars, onShowAlert }) => {
         const tier = withdrawCount + 1;
         const minRequiredPts = tier * 10000;
@@ -1933,8 +1859,8 @@
                     <Icons.Wallet className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="font-display font-bold text-slate-900 text-xs sm:text-sm">TON Blockchain Wallet</h3>
-                    <p className="text-[10px] text-slate-400">{walletAddress ? 'Connected to TON Wallet' : 'Connect for $GRAM token withdrawal'}</p>
+                    <h3 className="font-display font-bold text-slate-900 text-xs sm:text-sm">Web3 Wallet</h3>
+                    <p className="text-[10px] text-slate-400">{walletAddress ? 'Connected' : 'Connect for $GRAM token withdrawal'}</p>
                   </div>
                 </div>
                 {walletAddress ? (
@@ -1957,7 +1883,7 @@
                   className="w-full py-2.5 bg-gradient-to-r from-[#0088CC] to-[#0077B5] text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer flex items-center justify-center gap-1.5 active:scale-98 transition"
                 >
                   <Icons.Wallet className="w-3.5 h-3.5" />
-                  <span>Connect TON Wallet</span>
+                  <span>Connect Wallet</span>
                 </button>
               )}
             </div>
@@ -2014,7 +1940,7 @@
                     </span>
                   </div>
                   <div className="text-[10px] leading-relaxed">
-                    • Minimum: {minRequiredPts.toLocaleString()} PTS = {minGramTokens} $GRAM (Next tier: +10,000 PTS)<br />
+                    • Minimum: {minRequiredPts.toLocaleString()} PTS = {minGramTokens} $GRAM<br />
                     • 7-Day Streak ({streakDays}/7) • 10 Daily Ads ({adsWatchedToday}/10)
                   </div>
                 </div>
@@ -2032,9 +1958,7 @@
         );
       };
 
-      // ==========================================
-      // REACT ERROR BOUNDARY (Prevents White-Screen Crash)
-      // ==========================================
+      // REACT ERROR BOUNDARY
       class ErrorBoundary extends Component {
         constructor(props) {
           super(props);
@@ -2068,9 +1992,7 @@
         }
       }
 
-      // ==========================================
-      // ROOT APP COMPONENT (Fixed 50-50 Screen Division)
-      // ==========================================
+      // ROOT APP COMPONENT
       const INITIAL_TASKS = [
         { id: 't-1', title: 'Subscribe to @ToBOOST_Ai Channel', category: 'Social', reward: 200, actionText: 'Join Channel', actionUrl: 'https://t.me/ToBOOST_Ai', status: 'active', iconType: 'telegram', partnerName: 'ToBOOST Official' },
         { id: 't-2', title: 'Follow ToBOOSTAi on X / Twitter', category: 'Social', reward: 200, actionText: 'Follow @ToBOOST', actionUrl: 'https://x.com/toboostapp', status: 'active', iconType: 'twitter', partnerName: 'Twitter Drop' },
@@ -2079,12 +2001,13 @@
       ];
 
       function App() {
+        const currentUserId = tg?.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : 'guest';
+
         const [stats, setStats] = useState({
           username: tg?.initDataUnsafe?.user?.first_name || 'User',
           userLevel: 1,
           starBalance: 0,
           tokenBalance: 0,
-          tonEquivalent: 0,
           streakDays: 0,
           hasCheckedInToday: false,
           completedTasksToday: 0,
@@ -2096,8 +2019,8 @@
           multiplier: 1.0,
           energy: 950,
           maxEnergy: 1000,
-          adsWatchedToday: getStoredAdCount(),
-          withdrawCount: getStoredWithdrawCount(),
+          adsWatchedToday: getStoredAdCount(currentUserId),
+          withdrawCount: getStoredWithdrawCount(currentUserId),
           avatarUrl: tg?.initDataUnsafe?.user?.photo_url || null,
         });
 
@@ -2135,16 +2058,13 @@
         const updateBalance = (newStarBalance) => {
           const stars = Math.max(0, newStarBalance);
           const gramTokens = Number((stars / 10000).toFixed(4));
-          const ton = Number((gramTokens * 0.0035).toFixed(4));
           setStats((prev) => ({
             ...prev,
             starBalance: stars,
             tokenBalance: gramTokens,
-            tonEquivalent: ton,
           }));
         };
 
-        // TON Connect UI Initialization (Using tonconnect-manifest.json)
         useEffect(() => {
           try {
             if (window.TON_CONNECT_UI) {
@@ -2162,16 +2082,14 @@
 
               window.tonConnectUIInstance = tonConnectUI;
             }
-          } catch (e) {
-            console.warn('TonConnect UI init skipped:', e);
-          }
+          } catch (e) {}
         }, []);
 
-        // 1. Initial Load: Fetch Live User from Firestore & Check Daily UTC Resets
+        // Firestore Multi-User Sync
         useEffect(() => {
           const todayUtc = getTodayUtc();
-          const storedAdCount = getStoredAdCount();
-          const storedDailyTaskData = getStoredDailyTaskData();
+          const storedAdCount = getStoredAdCount(currentUserId);
+          const storedDailyTaskData = getStoredDailyTaskData(currentUserId);
 
           setStats(p => ({
             ...p,
@@ -2208,11 +2126,9 @@
                 const todayTime = Date.parse(todayUtc);
                 const diffDays = Math.floor((todayTime - lastCheckTime) / (1000 * 60 * 60 * 24));
 
-                if (diffDays === 0) {
-                  checkedToday = true;
-                } else if (diffDays === 1) {
-                  checkedToday = false;
-                } else {
+                if (diffDays === 0) checkedToday = true;
+                else if (diffDays === 1) checkedToday = false;
+                else {
                   validStreak = 0;
                   checkedToday = false;
                 }
@@ -2226,15 +2142,15 @@
                 username: u.name || prev.username,
                 starBalance: u.points || 0,
                 tokenBalance: (u.points || 0) / 10000,
-                tonEquivalent: ((u.points || 0) / 10000) * 0.0035,
                 streakDays: validStreak,
                 hasCheckedInToday: checkedToday,
                 userLevel: u.level || 1,
                 currentInvites: u.referralsCount || 0,
+                adsWatchedToday: typeof u.adsWatchedToday === 'number' ? u.adsWatchedToday : prev.adsWatchedToday
               }));
 
               setCompletedTasksList(mergedCompleted);
-              saveStoredDailyTaskData(storedDailyTaskData.count, mergedCompleted);
+              saveStoredDailyTaskData(currentUserId, storedDailyTaskData.count, mergedCompleted);
             }
           })
           .catch(err => console.error('Error loading user profile:', err));
@@ -2247,7 +2163,7 @@
               }
             })
             .catch(err => console.error('Error loading tasks:', err));
-        }, []);
+        }, [currentUserId]);
 
         // Passive Energy Regeneration
         useEffect(() => {
@@ -2262,7 +2178,7 @@
           return () => clearInterval(timer);
         }, []);
 
-        // 2. Monetag Ad Trigger: Zone 11923110 with Daily UTC Persistence
+        // Monetag Ad Trigger (Tracked per Telegram User ID)
         const handleWatchAd = async () => {
           if (isAdLoading) return;
 
@@ -2322,9 +2238,9 @@
 
               const nextCount = Math.min(10, stats.adsWatchedToday + 1);
               setStats(p => ({ ...p, adsWatchedToday: nextCount }));
-              saveStoredAdCount(nextCount);
+              saveStoredAdCount(currentUserId, nextCount);
 
-              showToast(`🎉 +${earnedReward} PTS successfully credited! (${nextCount}/10 today)`);
+              showToast(`🎉 +${earnedReward} PTS credited! (${nextCount}/10 Watched)`);
               if (typeof confetti === 'function') {
                 try { confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } }); } catch (e) {}
               }
@@ -2332,14 +2248,13 @@
               showToast(rewardData.error || rewardData.message || 'Reward verification failed');
             }
           } catch (err) {
-            console.error('Ad Error:', err);
             showToast(err.message || 'Ad stream could not load');
           } finally {
             setIsAdLoading(false);
           }
         };
 
-        // 3. Daily Check-in Trigger (Restarts on Missed Day)
+        // Daily Check-in Claim
         const handleClaimCheckIn = async () => {
           const initData = tg?.initData || '';
           showToast('Processing daily bonus...');
@@ -2380,12 +2295,11 @@
               showToast(data.error || data.message || 'Check-in failed');
             }
           } catch (err) {
-            console.error('Daily Check-in Error:', err);
             showToast('Server error on check-in');
           }
         };
 
-        // 4. Task Completion: Vanishing upon completion + Smooth return (No White-Screen)
+        // Bounty Task Handler (Smooth vanishing with no white-screen bug)
         const handleStartTask = async (taskId, url) => {
           if (stats.completedTasksToday >= dailyTaskLimit) {
             setIsTaskLimitModalOpen(true);
@@ -2420,7 +2334,7 @@
 
                 setCompletedTasksList(updatedList);
                 setStats((p) => ({ ...p, completedTasksToday: newCount }));
-                saveStoredDailyTaskData(newCount, updatedList);
+                saveStoredDailyTaskData(currentUserId, newCount, updatedList);
 
                 showToast('🎉 Task completed! +200 PTS');
                 if (typeof confetti === 'function') {
@@ -2429,11 +2343,10 @@
               } else {
                 const updatedList = completedTasksList.includes(taskId) ? completedTasksList : [...completedTasksList, taskId];
                 setCompletedTasksList(updatedList);
-                saveStoredDailyTaskData(stats.completedTasksToday, updatedList);
+                saveStoredDailyTaskData(currentUserId, stats.completedTasksToday, updatedList);
                 showToast(data.message || 'Task already completed!');
               }
             } catch (err) {
-              console.error('Task save error:', err);
               setTasks((prev) =>
                 prev.map((t) => (t.id === taskId ? { ...t, status: 'active' } : t))
               );
@@ -2442,7 +2355,7 @@
           }, 3000);
         };
 
-        // 5. Publish New Bounty Task: Saves permanently to Firestore via /api/tasks
+        // Add Bounty Task
         const handleAddBounty = async (newBounty) => {
           const initData = tg?.initData || '';
           try {
@@ -2456,7 +2369,8 @@
                 title: newBounty.title,
                 url: newBounty.actionUrl,
                 category: newBounty.category,
-                reward: newBounty.reward || 200
+                reward: newBounty.reward || 200,
+                iconType: newBounty.iconType
               })
             });
 
@@ -2468,28 +2382,25 @@
                 status: 'active',
               };
               setTasks((prev) => [taskObj, ...prev]);
-              showToast('✅ Bounty task successfully published and saved!');
+              showToast('✅ Bounty task published & saved to Firestore!');
             } else {
               showToast(data.error || 'Failed to save bounty task');
             }
           } catch (e) {
-            console.error('Error posting task:', e);
             showToast('Network error publishing task.');
           }
         };
 
-        // 6. Withdrawal Process with Escalating Tiers
         const handleConvertStars = (amount) => {
           updateBalance(stats.starBalance - amount);
           const nextWithdrawCount = (stats.withdrawCount || 0) + 1;
           setStats((p) => ({ ...p, withdrawCount: nextWithdrawCount }));
-          saveStoredWithdrawCount(nextWithdrawCount);
+          saveStoredWithdrawCount(currentUserId, nextWithdrawCount);
           showToast(`✅ Withdrawal #${nextWithdrawCount} submitted! Next tier requires ${((nextWithdrawCount + 1) * 10000).toLocaleString()} PTS.`);
         };
 
         return (
           <div className="h-full w-full max-w-md mx-auto bg-[#dcf0fb] text-slate-800 flex flex-col overflow-hidden relative select-none">
-            {/* STICKY TOP HEADER */}
             <TopVerifiedBanner />
             <UserHeaderSection
               username={stats.username}
@@ -2503,23 +2414,13 @@
               dict={dict}
             />
 
-            {/* MAIN CONTENT AREA */}
             <div className="flex-1 min-h-0 w-full overflow-hidden flex flex-col">
-              
-              {/* ======================================================== */}
-              {/* HOME TAB: STRICT 50-50 SCREEN DIVISION */}
-              {/* Top 50% = Stationary Controls | Bottom 50% = Sliding Bounties */}
-              {/* ======================================================== */}
               {activeTab === 'home' && (
                 <div className="flex-1 min-h-0 w-full flex flex-col overflow-hidden tab-enter">
-                  
-                  {/* TOP 50% CONTAINER: NEVER SCROLLS AWAY */}
-                  <div className="h-[48%] shrink-0 w-full flex flex-col justify-between px-3 pt-1 pb-1 overflow-hidden">
+                  <div className="shrink-0 w-full flex flex-col gap-1.5 px-3 pt-1 pb-1 overflow-hidden">
                     <DynamicBalanceCard
                       starBalance={stats.starBalance}
                       tokenBalance={stats.tokenBalance}
-                      tonEquivalent={stats.tonEquivalent}
-                      onBoostClick={() => setActiveTab('boost')}
                       onSwapClick={() => setActiveTab('wallet')}
                       dict={dict}
                     />
@@ -2546,19 +2447,17 @@
                     />
                   </div>
 
-                  {/* VISUAL SEPARATOR / DIVIDER */}
-                  <div className="w-full px-4 py-0.5 shrink-0 flex items-center justify-between">
+                  <div className="w-full px-4 py-1 shrink-0 flex items-center justify-between">
                     <span className="h-[1px] flex-1 bg-sky-200/60"></span>
-                    <span className="px-2 text-[9px] font-extrabold uppercase tracking-wider text-sky-600/80">
+                    <span className="px-2 text-[10px] font-extrabold uppercase tracking-wider text-sky-600/80">
                       Missions & Bounties
                     </span>
                     <span className="h-[1px] flex-1 bg-sky-200/60"></span>
                   </div>
 
-                  {/* BOTTOM 50% CONTAINER: ONLY BOUNTY TASKS SCROLL / SLIDE */}
                   <div
                     id="bounty-scroll-container"
-                    className="h-[52%] flex-1 min-h-0 w-full overflow-y-auto overflow-x-hidden no-scrollbar px-3 pb-16 touch-pan-y"
+                    className="flex-1 min-h-0 w-full overflow-y-auto overflow-x-hidden no-scrollbar px-3 pb-16 touch-pan-y"
                     style={{ WebkitOverflowScrolling: 'touch' }}
                   >
                     <BountyTasksSection
@@ -2572,7 +2471,6 @@
                 </div>
               )}
 
-              {/* BOOST VIEW (FULL SCROLL) */}
               {activeTab === 'boost' && (
                 <div className="flex-1 min-h-0 w-full overflow-y-auto no-scrollbar touch-pan-y" style={{ WebkitOverflowScrolling: 'touch' }}>
                   <BoostView
@@ -2594,7 +2492,6 @@
                 </div>
               )}
 
-              {/* FRENS VIEW (FULL SCROLL) */}
               {activeTab === 'frens' && (
                 <div className="flex-1 min-h-0 w-full overflow-y-auto no-scrollbar touch-pan-y" style={{ WebkitOverflowScrolling: 'touch' }}>
                   <FrensView
@@ -2604,7 +2501,6 @@
                 </div>
               )}
 
-              {/* WALLET VIEW (FULL SCROLL) */}
               {activeTab === 'wallet' && (
                 <div className="flex-1 min-h-0 w-full overflow-y-auto no-scrollbar touch-pan-y" style={{ WebkitOverflowScrolling: 'touch' }}>
                   <WalletView
@@ -2622,7 +2518,6 @@
               )}
             </div>
 
-            {/* FIXED BOTTOM NAVIGATION */}
             <BottomNavBar
               activeTab={activeTab}
               onSelectTab={(tab) => {
@@ -2632,14 +2527,12 @@
               hasCheckedInToday={stats.hasCheckedInToday}
             />
 
-            {/* Toast Notifications */}
             {statusToast && (
-              <div className="fixed top-12 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 backdrop-blur-md text-white px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-lg">
+              <div className="fixed top-12 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 backdrop-blur-md text-white px-4 py-2 rounded-full text-[12px] font-semibold shadow-lg">
                 {statusToast}
               </div>
             )}
 
-            {/* MODALS */}
             <DailyCheckInModal
               isOpen={isCheckInModalOpen}
               onClose={() => setIsCheckInModalOpen(false)}
@@ -2696,7 +2589,6 @@
         );
       }
 
-      // Root Render Wrapped in Error Boundary
       const root = ReactDOM.createRoot(document.getElementById('root'));
       root.render(
         <ErrorBoundary>
