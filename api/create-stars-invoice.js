@@ -1,43 +1,52 @@
 // api/create-stars-invoice.js
 
 export default async function handler(req, res) {
+  // CORS Headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-telegram-init-data');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { title, starsCost, impressions, actionUrl } = req.body;
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const { title, starsCost, impressions } = body || {};
 
-    // আপনার টেলিগ্রাম বটের টোকেন দিন (BotFather থেকে পাওয়া)
-    // এটি Environment Variable (process.env.BOT_TOKEN) হিসেবে রাখাই সবচেয়ে নিরাপদ
-    const BOT_TOKEN = process.env.BOT_TOKEN || 'আপনার_বট_টোকেন_এখানে_দিন';
+    const BOT_TOKEN = process.env.BOT_TOKEN;
 
-    if (!starsCost || starsCost <= 0) {
+    if (!BOT_TOKEN) {
+      console.error('Missing BOT_TOKEN in Environment Variables');
+      return res.status(500).json({ error: 'Server configuration error: BOT_TOKEN is missing' });
+    }
+
+    const amount = parseInt(starsCost, 10);
+    if (!amount || amount <= 0) {
       return res.status(400).json({ error: 'Invalid Stars cost' });
     }
 
-    const payload = JSON.stringify({
-      taskTitle: title,
-      stars: starsCost,
-      impressions: impressions,
-      url: actionUrl,
-      timestamp: Date.now()
-    });
+    // Telegram Payload Limit: সর্বোচ্চ ১২৮ বাইট হতে পারে
+    // তাই পেলোডকে সংক্ষেপিত এবং নিরাপদ ফরম্যাটে রাখা হলো
+    const safePayload = `task_${Date.now()}_${amount}`;
 
-    // টেলিগ্রাম বট API-এর createInvoiceLink মেথড কল করা
-    // টেলিগ্রাম স্টারসের অফিসিয়াল কারেন্সি কোড হলো "XTR"
+    // Telegram Stars API Call (XTR কারেন্সিতে provider_token দরকার হয় না)
     const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/createInvoiceLink`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        title: `Promote: ${title.slice(0, 30)}`,
-        description: `Bounty Campaign for ${impressions} Views on ToBOOSTAi`,
-        payload: payload,
-        currency: 'XTR', // XTR = Telegram Stars
+        title: (title || 'Bounty Task').slice(0, 30), // Title max 32 chars
+        description: `Promote task for ${impressions || 100} views on ToBOOSTAi`, // Desc max 255 chars
+        payload: safePayload, // Safe under 128 bytes
+        currency: 'XTR',      // XTR = Official Telegram Stars ISO
         prices: [
           {
-            label: `${impressions} Views Campaign`,
-            amount: parseInt(starsCost, 10) // স্টারসের পরিমাণ
+            label: `${impressions || 100} Views Campaign`,
+            amount: amount    // 1 Star = 1 Unit
           }
         ]
       })
@@ -46,12 +55,12 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     if (data.ok && data.result) {
-      // সফলভাবে তৈরি হওয়া ইনভয়েস লিংক ফ্রন্টএন্ডে পাঠানো
+      // টেলিগ্রাম থেকে পাওয়া আসল ইনভয়েস লিংক
       return res.status(200).json({ success: true, invoiceLink: data.result });
     } else {
       console.error('Telegram Stars Invoice Error:', data);
       return res.status(400).json({
-        error: data.description || 'Could not generate Stars invoice'
+        error: data.description || 'Could not generate Stars invoice from Telegram'
       });
     }
   } catch (error) {
