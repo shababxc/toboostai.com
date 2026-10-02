@@ -2,32 +2,49 @@
 const { admin, db } = require('./_firebase');
 const { verifyTelegramWebAppData } = require('./_telegram');
 
-// আপনার দেওয়া অফিশিয়াল $GRAM রিসিভার অ্যাড্রেস (সরাসরি API ফোল্ডারে সুরক্ষিত)
+// আপনার দেওয়া অফিশিয়াল $GRAM রিসিভার অ্যাড্রেস
 const RECEIVER_ADDRESS = 'UQC_uwp-fGIO5qwRgGKe0ymORn-Cd-pW_HtBVbHD-NPzIVfq';
 
+// ক্যাটাগরি ও আইকন নিখুঁতভাবে ফ্রন্টএন্ডের সাথে মিলানো হলো
 const DEFAULT_TASKS = [
   {
     id: 'tg_channel_join',
-    title: 'Join Official Channel',
-    url: 'https://t.me/ToFarmsAi_Bot',
+    title: 'Subscribe to @ToBOOST_Ai Channel',
+    url: 'https://t.me/ToBOOST_Ai',
     reward: 200,
-    category: 'Telegram',
-    active: true
-  },
-  {
-    id: 'tg_group_join',
-    title: 'Join Community Group',
-    url: 'https://t.me/ToFarmsAi_Bot',
-    reward: 200,
-    category: 'Telegram',
+    category: 'Social',
+    iconType: 'telegram',
+    actionText: 'Join Channel',
     active: true
   },
   {
     id: 'x_follow',
-    title: 'Follow Official X (Twitter)',
-    url: 'https://x.com',
+    title: 'Follow ToBOOSTAi on X / Twitter',
+    url: 'https://x.com/toboostapp',
     reward: 200,
-    category: 'Twitter',
+    category: 'Social',
+    iconType: 'twitter',
+    actionText: 'Follow @ToBOOST',
+    active: true
+  },
+  {
+    id: 'partner_station',
+    title: 'Join Partner Community',
+    url: 'https://t.me/ToBOOST_Ai',
+    reward: 200,
+    category: 'Partners',
+    iconType: 'telegram',
+    actionText: 'Join Station',
+    active: true
+  },
+  {
+    id: 'web3_showcase',
+    title: 'Visit Web3 Showcase',
+    url: 'https://t.me/ToBOOST_Ai',
+    reward: 200,
+    category: 'Web3',
+    iconType: 'bot',
+    actionText: 'Explore',
     active: true
   }
 ];
@@ -57,8 +74,21 @@ module.exports = async function handler(req, res) {
       if (snapshot.empty) {
         return res.status(200).json({ tasks: DEFAULT_TASKS });
       }
+      
       const tasks = [];
-      snapshot.forEach(doc => tasks.push({ id: doc.id, ...doc.data() }));
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        tasks.push({
+          id: doc.id,
+          ...data,
+          // টাইমস্ট্যাম্প সেফলি মিলিসেকেন্ডে নেওয়া
+          _time: data.createdAt ? (data.createdAt.toMillis ? data.createdAt.toMillis() : Date.now()) : 0
+        });
+      });
+
+      // নতুন পোস্ট করা টাস্কগুলো যেন সবার উপরে থাকে
+      tasks.sort((a, b) => b._time - a._time);
+
       return res.status(200).json({ tasks });
     } catch (error) {
       console.error('Error fetching tasks:', error);
@@ -66,7 +96,7 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // ২. POST রিকোয়েস্ট: ক্লায়েন্ট নতুন টাস্ক সাবমিট করলে সেভ করা
+  // ২. POST রিকোয়েস্ট: ক্লায়েন্ট নতুন টাস্ক সাবমিট করলে ফায়ারস্টোরে সেভ করা
   if (req.method === 'POST') {
     try {
       const initData = req.headers['x-telegram-init-data'];
@@ -75,16 +105,31 @@ module.exports = async function handler(req, res) {
         return res.status(401).json({ error: 'Unauthorized Telegram user' });
       }
 
-      const { title, url, reward, category } = req.body || {};
+      const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+      const { title, url, reward, category, iconType, actionText } = body;
+      
       if (!title || !url) {
         return res.status(400).json({ error: 'Title and URL are required' });
+      }
+
+      // অটো আইকন ডিটেকশন ফলব্যাক
+      let safeIcon = iconType;
+      if (!safeIcon) {
+        if (url.includes('t.me')) safeIcon = 'telegram';
+        else if (url.includes('x.com') || url.includes('twitter.com')) safeIcon = 'twitter';
+        else if (url.includes('youtube.com') || url.includes('youtu.be')) safeIcon = 'youtube';
+        else if (url.includes('facebook.com')) safeIcon = 'facebook';
+        else if (url.includes('instagram.com')) safeIcon = 'instagram';
+        else safeIcon = 'others';
       }
 
       const taskData = {
         title: String(title).trim(),
         url: String(url).trim(),
         reward: Number(reward) || 200,
-        category: category || 'Telegram',
+        category: category || 'Social',
+        iconType: safeIcon, // আইকন ফায়ারস্টোরে সেভ হবে
+        actionText: actionText || 'Start',
         active: true,
         createdBy: String(verified.user.id),
         createdAt: admin.firestore.FieldValue.serverTimestamp()
