@@ -46,13 +46,13 @@ module.exports = async (req, res) => {
       const currentPoints = userDoc.exists ? (userDoc.data().points || 0) : 0;
       updatedPoints = currentPoints + REWARD_POINTS;
 
-   transaction.set(sessionRef, {
+      transaction.set(sessionRef, {
         status: 'completed',
         rewardAmount: REWARD_POINTS,
         completedAt: admin.firestore.FieldValue.serverTimestamp()
       }, { merge: true });
-      const todayUtc = new Date().toISOString().split('T')[0];
 
+      const todayUtc = new Date().toISOString().split('T')[0];
 
       transaction.set(userRef, {
         userId,
@@ -61,6 +61,7 @@ module.exports = async (req, res) => {
         lastAdDate: todayUtc,
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
       }, { merge: true });
+    }); // <--- এই ব্র্যাকেটটি ঠিক করে দেওয়া হয়েছে
 
     return res.status(200).json({
       success: true,
