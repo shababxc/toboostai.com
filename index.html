@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
   <head>
@@ -112,18 +111,16 @@
     <script type="text/babel">
       const { useState, useEffect, Component } = React;
 
-      // Initialize Telegram WebApp
       const tg = window.Telegram?.WebApp;
       if (tg) {
         try {
           tg.ready();
           tg.expand();
         } catch (e) {
-          console.warn('Telegram WebApp init notice:', e);
+          console.warn('Telegram init:', e);
         }
       }
 
-      // Safe External Link Opener
       const openSafeLink = (url) => {
         if (!url || url === '#') return;
         try {
@@ -145,7 +142,6 @@
 
       const getTodayUtc = () => new Date().toISOString().split('T')[0];
 
-      // Multi-Account Isolated Storage (Scoped to Telegram User ID)
       const getStoredAdCount = (uid) => {
         try {
           const raw = localStorage.getItem(`toboost_ad_stats_${uid || 'guest'}`);
@@ -209,7 +205,6 @@
         } catch (e) {}
       };
 
-      // Multi-Language Dictionary
       const DICTIONARY = {
         EN: {
           welcome: 'Welcome back,',
@@ -274,9 +269,15 @@
       };
 
       // ==========================================
-      // OFFICIAL SOCIAL MEDIA VECTOR SVGS
+      // COMPLETE ICONS (INCLUDING ICONS.X TO PREVENT CRASH)
       // ==========================================
       const Icons = {
+        X: ({ className }) => (
+          <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        ),
         Telegram: ({ className = "w-6 h-6" }) => (
           <svg className={className} viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="12" fill="#24A1DE" />
@@ -365,7 +366,6 @@
         ArrowDownUp: ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 16 4 4 4-4"></path><path d="M7 20V4"></path><path d="m21 8-4-4-4 4"></path><path d="M17 4v16"></path></svg>,
       };
 
-      // 3D Sapphire Blue Coin Component
       const Coin3DIcon = ({
         size = 36,
         className = '',
@@ -443,7 +443,6 @@
         );
       };
 
-      // TopVerifiedBanner
       const TopVerifiedBanner = () => (
         <header className="sticky top-0 z-30 w-full bg-white/95 backdrop-blur-md border-b border-sky-100 shadow-[0_1px_8px_rgba(56,189,248,0.06)] px-3.5 py-1.5 shrink-0 transition-all">
           <div className="max-w-md mx-auto flex items-center justify-between">
@@ -473,7 +472,6 @@
         </header>
       );
 
-      // UserHeaderSection
       const UserHeaderSection = ({
         username,
         userLevel,
@@ -540,7 +538,7 @@
                     onClick={() => setLangMenuOpen(!langMenuOpen)}
                     className="h-7 px-2 rounded-full bg-white/90 border border-slate-200/80 text-slate-700 hover:text-sky-600 flex items-center gap-1 text-[11px] font-bold transition-all shadow-xs active:scale-95 cursor-pointer"
                   >
-                    <Icons.Globe className="w-3.5 h-3.5 text-slate-500" />
+                    <Icons.Globe className="w-3 h-3 text-slate-500" />
                     <span>{currentLanguage}</span>
                     <Icons.ChevronDown className="w-3 h-3 text-slate-400" />
                   </button>
@@ -574,7 +572,7 @@
         );
       };
 
-      // Slim Dynamic Balance Card (20% Slimmer, Verified Top Right, Clean $GRAM)
+      // Slim Dynamic Balance Card ($GRAM Pill Text Smaller)
       const DynamicBalanceCard = ({ starBalance, tokenBalance, dict }) => {
         const formattedStars = starBalance.toLocaleString();
         const displayGram = tokenBalance.toFixed(3);
@@ -598,13 +596,14 @@
                   <div className="relative flex items-center justify-center shrink-0">
                     <Coin3DIcon size={36} idPrefix="balance-main" floating={true} glow={true} />
                   </div>
-                  <div className="flex items-baseline gap-1.5 flex-wrap">
+                  <div className="flex items-baseline gap-1 flex-wrap">
                     <span className="font-display font-extrabold text-[23px] text-slate-900 tracking-tight tabular-nums leading-none">
                       {formattedStars}
                     </span>
                     <span className="text-[12px] font-extrabold text-sky-600">PTS</span>
                     
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-sky-100/90 text-sky-800 text-[11px] font-bold border border-sky-200/70 ml-1">
+                    {/* Small Elegant $GRAM Badge */}
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-sky-100/90 text-sky-800 text-[9.5px] font-extrabold border border-sky-200/70 ml-1">
                       ≈ {displayGram} $GRAM
                     </span>
                   </div>
@@ -621,7 +620,6 @@
         );
       };
 
-      // BottomNavBar (4 Clean Tabs - Booster Button Removed)
       const BottomNavBar = ({ activeTab, onSelectTab, hasCheckedInToday }) => {
         const tabs = [
           { id: 'home', label: 'Home', icon: Icons.Home },
@@ -675,7 +673,6 @@
         );
       };
 
-      // QuickActionsGrid (With '0/10 Watched' Badge)
       const QuickActionsGrid = ({
         adReward,
         checkInReward,
@@ -799,7 +796,6 @@
         );
       };
 
-      // BountyTasksSection (With Official Social SVGs)
       const BountyTasksSection = ({ tasks, completedTasksList = [], onStartTask, onPostBountyClick, dict }) => {
         const [selectedCategory, setSelectedCategory] = useState('All');
         const categories = ['All', 'Partners', 'Social', 'Web3', 'Daily'];
@@ -910,7 +906,6 @@
         );
       };
 
-      // PostBountyModal (Requires Wallet for $GRAM & Enforces Stars Payment)
       const PostBountyModal = ({ isOpen, onClose, starBalance, walletAddress, onDeductPts, onSubmitBounty, showToast }) => {
         const [title, setTitle] = useState('');
         const [category, setCategory] = useState('Social');
@@ -947,7 +942,6 @@
 
           const cost = calcCostValue();
 
-          // 1. $GRAM Payment: Enforce Connected Wallet
           if (currency === 'GRAM') {
             if (!walletAddress) {
               showToast('⚠️ Please connect your TON wallet to pay $GRAM!');
@@ -997,7 +991,6 @@
             return;
           }
 
-          // 2. Free PTS Boost
           else if (currency === 'PTS') {
             if (starBalance < cost) {
               showToast(`❌ Insufficient PTS! You need ${cost.toLocaleString()} PTS.`);
@@ -1029,7 +1022,6 @@
             return;
           }
 
-          // 3. Telegram Stars In-App Sheet Payment
           else if (currency === 'STARS') {
             setIsSubmitting(true);
             showToast('Opening Stars Payment Sheet...');
@@ -1259,7 +1251,6 @@
         );
       };
 
-      // LevelPerksModal Component
       const LevelPerksModal = ({ isOpen, onClose, userLevel, currentInvites, requiredInvites, multiplier }) => {
         if (!isOpen) return null;
 
@@ -1327,7 +1318,6 @@
         );
       };
 
-      // HelpModal
       const HelpModal = ({ isOpen, onClose }) => {
         if (!isOpen) return null;
         const faqs = [
@@ -1369,7 +1359,6 @@
         );
       };
 
-      // SettingsModal
       const SettingsModal = ({ isOpen, onClose, username, onUpdateUsername }) => {
         const [editingName, setEditingName] = useState(username);
         const [soundEnabled, setSoundEnabled] = useState(true);
@@ -1496,7 +1485,6 @@
         );
       };
 
-      // Notification & Rule Modals
       const TaskLimitModal = ({ isOpen, onClose, dailyLimit, invites, onGoToFrens }) => {
         if (!isOpen) return null;
         return (
@@ -1529,7 +1517,6 @@
         );
       };
 
-      // Strict Withdraw Alert Modal (Checks Balance, Streak, Ads & Wallet)
       const WithdrawAlertModal = ({ isOpen, onClose, conditions }) => {
         if (!isOpen || !conditions) return null;
         const tier = conditions.tier || 1;
@@ -1574,7 +1561,6 @@
         );
       };
 
-      // DailyCheckInModal
       const DailyCheckInModal = ({ isOpen, onClose, currentStreak, hasCheckedInToday, onClaimToday }) => {
         if (!isOpen) return null;
 
@@ -1655,7 +1641,6 @@
         );
       };
 
-      // FrensView
       const FrensView = ({ currentInvites, dict }) => {
         const [copied, setCopied] = useState(false);
         const botUsername = 'ToFarmsAi_Bot';
@@ -1711,7 +1696,6 @@
         );
       };
 
-      // WalletView (Strict TON Wallet Requirement for Withdrawal)
       const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, withdrawCount = 0, onConnectWallet, onDisconnectWallet, onConvertStars, onShowAlert }) => {
         const tier = withdrawCount + 1;
         const minRequiredPts = tier * 10000;
@@ -1746,7 +1730,6 @@
           const hasStreak = streakDays >= 7;
           const hasAds = adsWatchedToday >= 10;
 
-          // Strictly enforce connected wallet along with balance, streak and ads
           if (!hasWallet || !hasMinBalance || !hasStreak || !hasAds) {
             onShowAlert({
               tier,
@@ -1881,7 +1864,6 @@
         );
       };
 
-      // ErrorBoundary
       class ErrorBoundary extends Component {
         constructor(props) {
           super(props);
@@ -1915,7 +1897,6 @@
         }
       }
 
-      // ROOT APP COMPONENT
       const INITIAL_TASKS = [
         { id: 't-1', title: 'Subscribe to @ToBOOST_Ai Channel', category: 'Social', reward: 200, actionText: 'Join Channel', actionUrl: 'https://t.me/ToBOOST_Ai', status: 'active', iconType: 'telegram', partnerName: 'ToBOOST Official' },
         { id: 't-2', title: 'Follow ToBOOSTAi on X / Twitter', category: 'Social', reward: 200, actionText: 'Follow @ToBOOST', actionUrl: 'https://x.com/toboostapp', status: 'active', iconType: 'twitter', partnerName: 'Twitter Drop' },
@@ -1985,7 +1966,6 @@
           }));
         };
 
-        // TON Connect UI Initialization
         useEffect(() => {
           try {
             if (window.TON_CONNECT_UI) {
@@ -1998,7 +1978,6 @@
                   const rawAddr = wallet.account.address;
                   setStats(p => ({ ...p, walletAddress: rawAddr }));
                   
-                  // Silently save connected wallet to Firestore
                   const initData = tg?.initData || '';
                   if (initData) {
                     fetch('/api/user', {
@@ -2017,7 +1996,6 @@
           } catch (e) {}
         }, []);
 
-        // Firestore Multi-User Sync
         useEffect(() => {
           const todayUtc = getTodayUtc();
           const storedAdCount = getStoredAdCount(currentUserId);
@@ -2098,7 +2076,6 @@
             .catch(err => console.error('Error loading tasks:', err));
         }, [currentUserId]);
 
-        // Monetag Ad Trigger (Tracked per Telegram User ID)
         const handleWatchAd = async () => {
           if (isAdLoading) return;
 
@@ -2174,7 +2151,6 @@
           }
         };
 
-        // Daily Check-in Claim
         const handleClaimCheckIn = async () => {
           const initData = tg?.initData || '';
           showToast('Processing daily bonus...');
@@ -2219,7 +2195,6 @@
           }
         };
 
-        // Bounty Task Handler
         const handleStartTask = async (taskId, url) => {
           if (stats.completedTasksToday >= dailyTaskLimit) {
             setIsTaskLimitModalOpen(true);
@@ -2275,7 +2250,6 @@
           }, 3000);
         };
 
-        // Add Bounty Task
         const handleAddBounty = async (newBounty) => {
           const initData = tg?.initData || '';
           try {
@@ -2390,7 +2364,6 @@
                 </div>
               )}
 
-              {/* FRENS VIEW */}
               {activeTab === 'frens' && (
                 <div className="flex-1 min-h-0 w-full overflow-y-auto no-scrollbar touch-pan-y" style={{ WebkitOverflowScrolling: 'touch' }}>
                   <FrensView
@@ -2400,7 +2373,6 @@
                 </div>
               )}
 
-              {/* WALLET VIEW */}
               {activeTab === 'wallet' && (
                 <div className="flex-1 min-h-0 w-full overflow-y-auto no-scrollbar touch-pan-y" style={{ WebkitOverflowScrolling: 'touch' }}>
                   <WalletView
@@ -2498,3 +2470,4 @@
     </script>
   </body>
 </html>
+
