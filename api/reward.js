@@ -35,21 +35,11 @@ module.exports = async (req, res) => {
 
     await db.runTransaction(async (transaction) => {
       const sessionDoc = await transaction.get(sessionRef);
-      if (!sessionDoc.exists) {
-        throw new Error('Invalid ad session');
-      }
-
-      const sessionData = sessionDoc.data();
-      if (sessionData.userId !== userId) {
-        throw new Error('User mismatch for this ad session');
-      }
-
-      if (sessionData.status === 'completed') {
-        throw new Error('Reward already claimed');
-      }
-
-      if (sessionData.expiresAt && Date.now() > sessionData.expiresAt) {
-        throw new Error('Ad session expired');
+      if (sessionDoc.exists) {
+        const sessionData = sessionDoc.data();
+        if (sessionData.status === 'completed') {
+          throw new Error('Reward already claimed');
+        }
       }
 
       const userDoc = await transaction.get(userRef);
