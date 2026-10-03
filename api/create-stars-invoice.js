@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
     const { title, starsCost, impressions } = body || {};
 
-    const BOT_TOKEN = process.env.BOT_TOKEN;
+    const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || process.env.BOT_TOKEN;
 
     if (!BOT_TOKEN) {
       console.error('Missing BOT_TOKEN in Environment Variables');
