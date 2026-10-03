@@ -61,14 +61,15 @@ module.exports = async (req, res) => {
         rewardAmount: REWARD_POINTS,
         completedAt: admin.firestore.FieldValue.serverTimestamp()
       });
+const todayUtc = new Date().toISOString().split('T')[0];
 
       transaction.set(userRef, {
         userId,
         points: admin.firestore.FieldValue.increment(REWARD_POINTS),
-        adsWatched: admin.firestore.FieldValue.increment(1),
+        adsWatchedToday: admin.firestore.FieldValue.increment(1),
+        lastAdDate: todayUtc,
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
       }, { merge: true });
-    });
 
     return res.status(200).json({
       success: true,
