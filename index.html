@@ -2052,12 +2052,12 @@
               setStats(prev => ({
                 ...prev,
                 username: u.name || prev.username,
-                starBalance: u.points || 0,
-                tokenBalance: (u.points || 0) / 10000,
+                starBalance: Number(u.points ?? u.balance ?? 0),
+                tokenBalance: Number(u.points ?? u.balance ?? 0) / 10000,
                 streakDays: validStreak,
                 hasCheckedInToday: checkedToday,
                 userLevel: u.level || 1,
-                currentInvites: u.referralsCount || 0,
+                currentInvites: Number(u.referralsCount ?? u.referrals ?? u.referralCount ?? 0),
                 adsWatchedToday: typeof u.adsWatchedToday === 'number' ? u.adsWatchedToday : prev.adsWatchedToday,
                 walletAddress: u.walletAddress || prev.walletAddress
               }));
