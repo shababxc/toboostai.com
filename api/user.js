@@ -44,11 +44,14 @@ module.exports = async (req, res) => {
     // ১. সম্পূর্ণ নতুন ইউজার হলে (New User Registration)
     // ========================================================
     if (!doc.exists) {
-      const rawParam = body.startParam || '';
-      let referrerId = '';
-      if (rawParam) {
-        referrerId = String(rawParam).replace('ref_', '').trim();
+      let rawParam = body.startParam || '';
+      if (!rawParam && initData) {
+        try {
+          const p = new URLSearchParams(initData);
+          rawParam = p.get('start_param') || '';
+        } catch (e) {}
       }
+      const referrerId = rawParam ? String(rawParam).replace(/^ref_/, '').trim() : '';
 
       const newUser = {
         userId,
@@ -56,13 +59,12 @@ module.exports = async (req, res) => {
         points: 0,
         level: 1,
         referralsCount: 0,
+        referrals: 0, // উভয় নামের সাপোর্ট
         referredBy: (referrerId && referrerId !== userId) ? referrerId : null,
-        // প্রতিদিনের অ্যাড ও টাস্ক কাউন্ট ফায়ারস্টোরে আলাদা সেভ
         adsWatchedToday: 0,
         lastAdDate: todayUtc,
         dailyTasksCompletedToday: 0,
         lastTaskDate: todayUtc,
-        // চেক-ইন স্ট্রিক
         checkInStreak: 0,
         lastCheckInDate: null,
         completedTasks: [],
@@ -72,13 +74,14 @@ module.exports = async (req, res) => {
 
       await userRef.set(newUser);
 
-      // রেফারারকে সাথে সাথে +১০০ পয়েন্ট এবং +১ Fren যোগ করা
+      // রেফারারকে সাথে সাথে +১০০ পয়েন্ট এবং +১ রেফারেল যোগ করা
       if (referrerId && referrerId !== userId) {
         try {
           const referrerRef = db.collection('users').doc(referrerId);
           await referrerRef.set({
             points: admin.firestore.FieldValue.increment(100),
             referralsCount: admin.firestore.FieldValue.increment(1),
+            referrals: admin.firestore.FieldValue.increment(1),
             updatedAt: admin.firestore.FieldValue.serverTimestamp()
           }, { merge: true });
         } catch (refErr) {
@@ -90,12 +93,35 @@ module.exports = async (req, res) => {
     }
 
     // ========================================================
-    // ২. পুরাতন ইউজার হলে (Existing User Login)
+    // ২. পুরাতন ইউজার হলে (Existing User Login & Auto-Recovery)
     // ========================================================
     let userData = doc.data();
     let updatesNeeded = {};
 
-    // ক) নতুন দিন শুরু হলে অ্যাড কাউন্ট স্বয়ংক্রিয়ভাবে ০ (রিসেট) হবে
+    // ক) আগের ৮টি রেফারেল যেকোনো ফিল্ড বা নাম থেকে স্বয়ংক্রিয় রিকভার করা
+    let currentReferrals = Number(
+      userData.referralsCount ??
+      userData.referrals ??
+      userData.referralCount ??
+      (Array.isArray(userData.referrals) ? userData.referrals.length : 0) ??
+      0
+    );
+
+    // খ) ডাটাবেজে আপনার রেফারেল করা অ্যাকাউন্টগুলো সরাসরি খুঁজে বের করা
+    try {
+      const refSnapshot = await db.collection('users').where('referredBy', '==', userId).get();
+      if (!refSnapshot.empty && refSnapshot.size > currentReferrals) {
+        currentReferrals = refSnapshot.size;
+        updatesNeeded.referralsCount = currentReferrals;
+        updatesNeeded.referrals = currentReferrals;
+        userData.referralsCount = currentReferrals;
+        userData.referrals = currentReferrals;
+      }
+    } catch (e) {
+      console.warn('Referral recovery check skipped:', e);
+    }
+
+    // গ) নতুন দিন শুরু হলে অ্যাড কাউন্ট স্বয়ংক্রিয়ভাবে ০ (রিসেট) হওয়া
     if (userData.lastAdDate !== todayUtc) {
       updatesNeeded.adsWatchedToday = 0;
       updatesNeeded.lastAdDate = todayUtc;
@@ -103,7 +129,7 @@ module.exports = async (req, res) => {
       userData.lastAdDate = todayUtc;
     }
 
-    // খ) নতুন দিন শুরু হলে ডেইলি টাস্ক কাউন্ট ০ (রিসেট) হবে
+    // ঘ) নতুন দিন শুরু হলে ডেইলি টাস্ক কাউন্ট ০ (রিসেট) হওয়া
     if (userData.lastTaskDate !== todayUtc) {
       updatesNeeded.dailyTasksCompletedToday = 0;
       updatesNeeded.lastTaskDate = todayUtc;
@@ -111,26 +137,34 @@ module.exports = async (req, res) => {
       userData.lastTaskDate = todayUtc;
     }
 
-    // গ) রেফারেল অনুযায়ী অটো লেভেল আপডেট
-    const currentLevel = calculateLevel(userData.referralsCount || 0);
+    // ঙ) রেফারেল সংখ্যা অনুযায়ী অটো লেভেল আপডেট (যেমন: ৫ বা ততোধিক হলে Lv.2)
+    const currentLevel = calculateLevel(currentReferrals);
     if (userData.level !== currentLevel) {
       updatesNeeded.level = currentLevel;
       userData.level = currentLevel;
     }
 
-    // ঘ) ইউজারের নাম টেলিগ্রামে পরিবর্তন হলে আপডেট করা
+    // চ) ইউজারের নাম টেলিগ্রামে পরিবর্তন হলে আপডেট করা
     if (auth.user.first_name && userData.name !== auth.user.first_name) {
       updatesNeeded.name = auth.user.first_name;
       userData.name = auth.user.first_name;
     }
 
-    // কোনো আপডেট থাকলে ফায়ারস্টোরে একবারে সেভ করা
+    // ছ) কোনো আপডেট থাকলে ফায়ারস্টোরে সেভ করা
     if (Object.keys(updatesNeeded).length > 0) {
       updatesNeeded.updatedAt = admin.firestore.FieldValue.serverTimestamp();
       await userRef.set(updatesNeeded, { merge: true });
     }
 
-    return res.status(200).json({ success: true, user: userData, ...userData });
+    // ফ্রন্টএন্ডে উভয় ফিল্ডই নিশ্চিত পাঠানো
+    const finalResponse = {
+      ...userData,
+      referralsCount: currentReferrals,
+      referrals: currentReferrals,
+      level: currentLevel
+    };
+
+    return res.status(200).json({ success: true, user: finalResponse, ...finalResponse });
 
   } catch (error) {
     console.error('User API Error:', error);
