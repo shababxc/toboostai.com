@@ -911,7 +911,7 @@
         const [category, setCategory] = useState('Social');
         const [iconType, setIconType] = useState('telegram');
         const [actionText, setActionText] = useState('Join Channel');
-        const [actionUrl, setActionUrl] = useState('https://t.me/ToBOOST_Ai');
+        const [actionUrl, setActionUrl] = useState('');
         const [currency, setCurrency] = useState('STARS');
         const [impressions, setImpressions] = useState(100);
         const [isSubmitting, setIsSubmitting] = useState(false);
@@ -1200,7 +1200,8 @@
 
                     <div className="text-right">
                       <span className="text-[11px] text-emerald-600 font-bold block">Cost</span>
-                      <span className="font-display font-black text-base text-slate-900">{calcDisplayPrice()}</span>
+                      
+<span className="font-display font-extrabold text-[12px] whitespace-nowrap text-slate-900 block">{calcDisplayPrice()}</span>
                     </div>
                   </div>
 
@@ -2471,4 +2472,3 @@
     </script>
   </body>
 </html>
-
