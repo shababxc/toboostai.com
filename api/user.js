@@ -156,14 +156,14 @@ module.exports = async (req, res) => {
       await userRef.set(updatesNeeded, { merge: true });
     }
 
-    // ফ্রন্টএন্ডে উভয় ফিল্ডই নিশ্চিত পাঠানো
+    // ফ্রন্টএন্ডে ডেটা পাঠানোর সময় withdrawCount যুক্ত করা হলো
     const finalResponse = {
       ...userData,
       referralsCount: currentReferrals,
       referrals: currentReferrals,
-      level: currentLevel
+      level: currentLevel,
+      withdrawCount: userData.withdrawCount || 0
     };
-
     return res.status(200).json({ success: true, user: finalResponse, ...finalResponse });
 
   } catch (error) {
