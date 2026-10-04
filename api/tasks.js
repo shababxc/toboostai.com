@@ -106,7 +106,7 @@ module.exports = async function handler(req, res) {
       }
 
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
-      const { title, url, reward, category, iconType, actionText } = body;
+      const { title, url, reward, category, iconType, actionText, impressions } = body;
       
       if (!title || !url) {
         return res.status(400).json({ error: 'Title and URL are required' });
