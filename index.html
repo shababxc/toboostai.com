@@ -1980,15 +1980,16 @@
 
               tonConnectUI.onStatusChange((wallet) => {
                 if (wallet && wallet.account) {
-                  const rawAddr = wallet.account.address;
-                  setStats(p => ({ ...p, walletAddress: rawAddr }));
+                  // Raw অ্যাড্রেসকে সরাসরি UQ/EQ ফরম্যাটে কনভার্ট করা
+                  const friendlyAddr = window.TON_CONNECT_UI ? window.TON_CONNECT_UI.toUserFriendlyAddress(wallet.account.address) : wallet.account.address;
+                  setStats(p => ({ ...p, walletAddress: friendlyAddr }));
                   
                   const initData = tg?.initData || '';
                   if (initData) {
                     fetch('/api/user', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json', 'x-telegram-init-data': initData },
-                      body: JSON.stringify({ walletAddress: rawAddr })
+                      body: JSON.stringify({ walletAddress: friendlyAddr })
                     }).catch(() => {});
                   }
                 } else {
