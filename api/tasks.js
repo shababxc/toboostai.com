@@ -131,6 +131,8 @@ module.exports = async function handler(req, res) {
         iconType: safeIcon, // আইকন ফায়ারস্টোরে সেভ হবে
         actionText: actionText || 'Start',
         active: true,
+        targetViews: Number(impressions) || 100, // <--- এই লাইনটি যোগ হয়েছে
+        currentViews: 0,                         // <--- এই লাইনটি যোগ হয়েছে
         createdBy: String(verified.user.id),
         createdAt: admin.firestore.FieldValue.serverTimestamp()
       };
