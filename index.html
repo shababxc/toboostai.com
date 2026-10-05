@@ -1729,8 +1729,8 @@ const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, s
         const handleWithdrawClick = () => {
           const hasWallet = !!walletAddress;
           const hasMinBalance = starBalance >= minRequiredPts && parsedSwap >= minRequiredPts && parsedSwap <= starBalance;
-          const hasStreak = streakDays >= 7;
-          const hasAds = adsWatchedToday >= 10;
+          const hasStreak = (savedStreaks > 0) || (streakDays >= 7);
+          const hasAds = (savedAdDays >= 7);
 
           if (!hasWallet || !hasMinBalance || !hasStreak || !hasAds) {
             onShowAlert({
