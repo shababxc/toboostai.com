@@ -11,6 +11,9 @@ module.exports = async (req, res) => {
   try {
     const adminKey = req.headers['x-admin-key'] || req.query.adminKey || (req.body && req.body.adminKey);
     const EXPECTED_KEY = process.env.ADMIN_SECRET_KEY;
+    
+    // টেলিগ্রাম বট টোকেন (যেকোনো একটি নামেই কাজ করবে)
+    const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || process.env.BOT_TOKEN;
 
     if (!EXPECTED_KEY) {
       console.error('ADMIN_SECRET_KEY is missing in Vercel Environment Variables');
@@ -58,12 +61,11 @@ module.exports = async (req, res) => {
         });
       });
 
-      // নতুন রিকোয়েস্টগুলো সবার উপরে থাকবে
       withdrawals.sort((a, b) => b.createdAt - a.createdAt);
       return res.status(200).json({ success: true, withdrawals });
     }
 
-    // ৪. উইথড্রল অনুমোদন বা রিজেক্ট (Approve / Reject)
+    // ৪. উইথড্রল অনুমোদন বা রিজেক্ট (Approve / Reject + বটের মেসেজ)
     if (action === 'update_withdrawal' && req.method === 'POST') {
       const { withdrawalId, status, shouldRefund } = body;
       if (!withdrawalId || !status) {
@@ -79,29 +81,58 @@ module.exports = async (req, res) => {
       const wData = withdrawDoc.data();
       const userId = String(wData.userId);
       const refundPoints = Number(wData.amountPts) || 0;
+      const amountGram = wData.amountGram || (refundPoints / 10000);
 
       await db.runTransaction(async (transaction) => {
-        // উইথড্রল স্ট্যাটাস আপডেট
         transaction.update(withdrawRef, {
-          status: status, // 'approved' বা 'rejected'
+          status: status,
           processedAt: admin.firestore.FieldValue.serverTimestamp()
         });
 
-        // যদি রিজেক্ট করা হয় এবং রিফান্ড এনাবল থাকে, তবে পয়েন্ট ফেরত দেওয়া
+        // রিজেক্ট হলে ইউজারের পয়েন্ট ফেরত দেওয়া
         if (status === 'rejected' && shouldRefund && refundPoints > 0) {
           const userRef = db.collection('users').doc(userId);
           transaction.set(userRef, {
             points: admin.firestore.FieldValue.increment(refundPoints),
-            withdrawCount: admin.firestore.FieldValue.increment(-1), // টায়ার লিমিট ১ পিছিয়ে দেওয়া
+            withdrawCount: admin.firestore.FieldValue.increment(-1),
             updatedAt: admin.firestore.FieldValue.serverTimestamp()
           }, { merge: true });
         }
       });
 
-      return res.status(200).json({ success: true, message: `Withdrawal marked as ${status}` });
+      // ========================================================
+      // 🚀 টেলিগ্রাম বটের মাধ্যমে ইউজারকে ইংরেজিতে মেসেজ পাঠানো
+      // ========================================================
+      if (BOT_TOKEN && userId) {
+        try {
+          let notifyText = '';
+          
+          if (status === 'approved') {
+            notifyText = `🎉 *Withdrawal Approved!*\n\nYour payout of *${amountGram} $GRAM* (${refundPoints.toLocaleString()} PTS) has been processed and sent to your TON Wallet:\n\`${wData.walletAddress || ''}\`\n\nThank you for being part of *ToBOOSTAi*! 🚀`;
+          } else if (status === 'rejected') {
+            notifyText = `⚠️ *Withdrawal Update*\n\nYour withdrawal request for *${amountGram} $GRAM* has been rejected.\n\n*${refundPoints.toLocaleString()} PTS* have been refunded back to your account balance.\n\nIf you have any questions, please contact Support.`;
+          }
+
+          if (notifyText) {
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                chat_id: userId,
+                text: notifyText,
+                parse_mode: 'Markdown'
+              })
+            });
+          }
+        } catch (botErr) {
+          console.warn('Bot notification message error:', botErr);
+        }
+      }
+
+      return res.status(200).json({ success: true, message: `Withdrawal marked as ${status} & User notified via Bot!` });
     }
 
-    // ৫. টাস্ক বা ক্যাম্পেইন লিস্ট (Get Tasks)
+    // ৫. টাস্ক লিস্ট (Get Tasks)
     if (action === 'get_tasks') {
       const snapshot = await db.collection('tasks').get();
       const tasks = [];
@@ -118,7 +149,7 @@ module.exports = async (req, res) => {
       return res.status(200).json({ success: true, tasks });
     }
 
-    // ৬. টাস্ক একটিভ/পজ টগল (Toggle Task Active)
+    // ৬. টাস্ক একটিভ/পজ (Toggle Task)
     if (action === 'toggle_task' && req.method === 'POST') {
       const { taskId, active } = body;
       await db.collection('tasks').doc(taskId).update({
@@ -128,14 +159,14 @@ module.exports = async (req, res) => {
       return res.status(200).json({ success: true, message: `Task ${active ? 'activated' : 'paused'}` });
     }
 
-    // ৭. টাস্ক ডিলিট (Delete Spam Task)
+    // ৭. টাস্ক ডিলিট (Delete Task)
     if (action === 'delete_task' && req.method === 'POST') {
       const { taskId } = body;
       await db.collection('tasks').doc(taskId).delete();
       return res.status(200).json({ success: true, message: 'Task deleted permanently' });
     }
 
-    // ৮. ইউজার লুকআপ (Search User by ID)
+    // ৮. ইউজার সার্চ (User Search)
     if (action === 'get_user') {
       const targetUserId = String(req.query.userId || '').trim();
       if (!targetUserId) {
@@ -150,7 +181,7 @@ module.exports = async (req, res) => {
       return res.status(200).json({ success: true, user: userDoc.data() });
     }
 
-    // ৯. পয়েন্ট বাড়ানো বা কমানো (Adjust Points)
+    // ৯. পয়েন্ট বাড়ানো/কমানো (Adjust Points)
     if (action === 'adjust_points' && req.method === 'POST') {
       const { userId, pointsDelta } = body;
       const delta = parseInt(pointsDelta, 10);
