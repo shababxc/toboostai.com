@@ -1928,6 +1928,8 @@
           adsWatchedToday: getStoredAdCount(currentUserId),
           withdrawCount: getStoredWithdrawCount(currentUserId),
           avatarUrl: tg?.initDataUnsafe?.user?.photo_url || null,
+          savedStreaks: 0,
+          savedAdDays: 0,
         });
 
         const [activeTab, setActiveTab] = useState('home');
