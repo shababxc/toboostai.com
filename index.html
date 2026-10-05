@@ -2418,11 +2418,13 @@
               {activeTab === 'wallet' && (
                 <div className="flex-1 min-h-0 w-full overflow-y-auto no-scrollbar touch-pan-y" style={{ WebkitOverflowScrolling: 'touch' }}>
                   <WalletView
-                    starBalance={stats.starBalance}
-                    walletAddress={stats.walletAddress}
-                    streakDays={stats.streakDays}
-                    adsWatchedToday={stats.adsWatchedToday}
-                    withdrawCount={stats.withdrawCount}
+                  starBalance={stats.starBalance}
+                  walletAddress={stats.walletAddress}
+                  streakDays={stats.streakDays}
+                  adsWatchedToday={stats.adsWatchedToday}
+                  savedStreaks={stats.savedStreaks}
+                  savedAdDays={stats.savedAdDays}
+                  withdrawCount={stats.withdrawCount}
                     onConnectWallet={(addr) => setStats((p) => ({ ...p, walletAddress: addr }))}
                     onDisconnectWallet={() => setStats((p) => ({ ...p, walletAddress: null }))}
                     onConvertStars={handleConvertStars}
