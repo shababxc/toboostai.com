@@ -2065,7 +2065,9 @@
                 userLevel: u.level || 1,
                 currentInvites: Number(u.referralsCount ?? u.referrals ?? u.referralCount ?? 0),
                 adsWatchedToday: typeof u.adsWatchedToday === 'number' ? u.adsWatchedToday : prev.adsWatchedToday,
-                walletAddress: u.walletAddress || prev.walletAddress
+                walletAddress: u.walletAddress || prev.walletAddress,
+                savedStreaks: u.savedStreaks || 0,
+                savedAdDays: u.savedAdDays || 0
               }));
 
               setCompletedTasksList(mergedCompleted);
