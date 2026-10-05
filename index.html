@@ -1698,8 +1698,7 @@
           </div>
         );
       };
-
-      const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, withdrawCount = 0, onConnectWallet, onDisconnectWallet, onConvertStars, onShowAlert }) => {
+const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, savedStreaks, savedAdDays, withdrawCount = 0, onConnectWallet, onDisconnectWallet, onConvertStars, onShowAlert }) => {
         const tier = withdrawCount + 1;
         const minRequiredPts = tier * 10000;
         const minGramTokens = tier;
