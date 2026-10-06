@@ -62,21 +62,21 @@ export default async function handler(req, res) {
     }
 
     // ========================================================
-    // ৩. /start কমান্ড হ্যান্ডলিং
+    // ৩. /start কমান্ড হ্যান্ডলিং (ওয়েলকাম মেসেজ ও 👉WORK NOW👈 বাটন)
     // ========================================================
     if (update.message && update.message.text && update.message.text.startsWith('/start')) {
-      const { chat, text, from } = update.message;
+      const { chat, text } = update.message;
       const parts = text.trim().split(/\s+/);
       const startParam = parts[1] || ''; // e.g. "ref_12345678"
 
-      // App launch link with referral
-      const appUrl = startParam 
-        ? `https://t.me/ToFarmsAi_Bot?startapp=${encodeURIComponent(startParam)}`
-        : `https://t.me/ToFarmsAi_Bot?startapp=app`;
+      // আপনার নতুন Vercel সাইট ও রেফারেল ট্র্যাকিং লিঙ্ক
+      const webAppBaseUrl = 'https://toboostaicom-web3.vercel.app';
+      const webAppUrl = startParam 
+        ? `${webAppBaseUrl}?tgWebAppStartParam=${encodeURIComponent(startParam)}`
+        : webAppBaseUrl;
 
-      const safeName = (from && from.first_name) ? from.first_name.replace(/[_*[\]()~`>#+\-=|{}.!]/g, '') : 'Friend';
-
-      const welcomeText = `👋 Hello *${safeName}*!\n\nWelcome to *ToBOOSTAi* 🚀\n\nEarn points, complete bounties, watch ads, and invite friends to boost your rewards.\n\n👇 Click the button below to launch the app:`;
+      // আপনার দেওয়া হুবহু টেক্সট
+      const welcomeText = `🎉Welcome to ToBOOSTAi!🎉\nDon't waste time! ToBOOSTAi \nStart completing tasks to earn points!\nOr publish your tasks to gain exposure!\nReady? Then let’s get started!`;
 
       await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: 'POST',
@@ -84,19 +84,20 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           chat_id: chat.id,
           text: welcomeText,
-          parse_mode: 'Markdown',
           reply_markup: {
             inline_keyboard: [
               [
                 {
-                  text: '🚀 Launch App',
-                  url: appUrl
+                  text: '👉WORK NOW👈',
+                  web_app: { url: webAppUrl }
                 }
               ]
             ]
           }
         })
       });
+
+      return res.status(200).json({ ok: true });
     }
 
     return res.status(200).json({ ok: true });
