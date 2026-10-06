@@ -2278,7 +2278,9 @@ const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, s
                 category: newBounty.category,
                 reward: newBounty.reward || 200,
                 iconType: newBounty.iconType,
-                impressions: newBounty.impressions || newBounty.cost || 100
+                impressions: newBounty.impressions || 100,
+                cost: newBounty.cost || 0,
+                paidWith: newBounty.paidWith || 'PTS'
               })
             });
 
