@@ -1994,7 +1994,7 @@ const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, s
                     fetch('/api/user', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json', 'x-telegram-init-data': initData },
-                      body: JSON.stringify({ walletAddress: friendlyAddr })
+                      body: JSON.stringify({ initData, walletAddress: friendlyAddr })
                     }).catch(() => {});
                   }
                 } else {
