@@ -158,12 +158,14 @@ module.exports = async (req, res) => {
 
     // ফ্রন্টএন্ডে ডেটা পাঠানোর সময় withdrawCount যুক্ত করা হলো
     const finalResponse = {
-      ...userData,
-      referralsCount: currentReferrals,
-      referrals: currentReferrals,
-      level: currentLevel,
-      withdrawCount: userData.withdrawCount || 0
-    };
+          ...userData,
+          referralsCount: currentReferrals,
+          referrals: currentReferrals,
+          level: currentLevel,
+          withdrawCount: userData.withdrawCount || 0,
+          savedStreaks: userData.savedStreaks || 0,
+          savedAdDays: userData.savedAdDays || 0
+        };
     return res.status(200).json({ success: true, user: finalResponse, ...finalResponse });
 
   } catch (error) {
