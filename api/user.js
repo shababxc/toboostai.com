@@ -145,16 +145,22 @@ module.exports = async (req, res) => {
     }
 
     // চ) ইউজারের নাম টেলিগ্রামে পরিবর্তন হলে আপডেট করা
-    if (auth.user.first_name && userData.name !== auth.user.first_name) {
-      updatesNeeded.name = auth.user.first_name;
-      userData.name = auth.user.first_name;
-    }
+        if (auth.user.first_name && userData.name !== auth.user.first_name) {
+          updatesNeeded.name = auth.user.first_name;
+          userData.name = auth.user.first_name;
+        }
 
-    // ছ) কোনো আপডেট থাকলে ফায়ারস্টোরে সেভ করা
-    if (Object.keys(updatesNeeded).length > 0) {
-      updatesNeeded.updatedAt = admin.firestore.FieldValue.serverTimestamp();
-      await userRef.set(updatesNeeded, { merge: true });
-    }
+        // ছ) ইউজার ওয়ালেট কানেক্ট করলে ডাটাবেসে সেভ করা
+        if (body.walletAddress && userData.walletAddress !== body.walletAddress) {
+          updatesNeeded.walletAddress = body.walletAddress;
+          userData.walletAddress = body.walletAddress;
+        }
+
+        // জ) কোনো আপডেট থাকলে ফায়ারস্টোরে সেভ করা
+        if (Object.keys(updatesNeeded).length > 0) {
+          updatesNeeded.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+          await userRef.set(updatesNeeded, { merge: true });
+        }
 
     // ফ্রন্টএন্ডে ডেটা পাঠানোর সময় withdrawCount যুক্ত করা হলো
     const finalResponse = {
