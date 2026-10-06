@@ -1549,11 +1549,11 @@
                 </div>
                 <div className={`flex items-center gap-2 ${conditions.hasStreak ? 'text-emerald-600 font-bold' : 'text-red-600 font-medium'}`}>
                   {conditions.hasStreak ? <Icons.Check className="w-4 h-4 shrink-0" /> : <Icons.X className="w-4 h-4 shrink-0" />}
-                  <span>7 Consecutive Daily Check-ins (Current: {conditions.currentStreak}/7 days)</span>
+                  <span>7 Consecutive Daily Check-ins (Completed: {conditions.savedStreaks > 0 || conditions.currentStreak >= 7 ? 'Yes' : 'No'})</span>
                 </div>
                 <div className={`flex items-center gap-2 ${conditions.hasAds ? 'text-emerald-600 font-bold' : 'text-red-600 font-medium'}`}>
                   {conditions.hasAds ? <Icons.Check className="w-4 h-4 shrink-0" /> : <Icons.X className="w-4 h-4 shrink-0" />}
-                  <span>Watch at least 10 sponsor ads today (Current: {conditions.currentAds}/10)</span>
+                  <span>Watch 10 sponsor ads daily for 7 days (Current: {conditions.savedAdDays || 0}/7 days)</span>
                 </div>
               </div>
               <button onClick={onClose} className="w-full py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold cursor-pointer">
