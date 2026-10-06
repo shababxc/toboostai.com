@@ -38,19 +38,40 @@ module.exports = async (req, res) => {
       const currentTier = currentWithdrawCount + 1;
       requiredPts = currentTier * 10000;
 
+      const savedStreaks = userData.savedStreaks || 0;
+      const currentStreak = userData.checkInStreak || 0;
+      const savedAdDays = userData.savedAdDays || 0;
+
+      // ১. পয়েন্ট ব্যালেন্স চেক
       if ((userData.points || 0) < requiredPts) {
         throw new Error(`Insufficient points! You need ${requiredPts.toLocaleString()} PTS.`);
       }
 
+      // ২. ৭ দিনের চেক-ইন শর্ত যাচাই
+      if (savedStreaks < 1 && currentStreak < 7) {
+        throw new Error('Withdrawal locked! You must complete a 7-Day Check-in Streak.');
+      }
+
+      // ৩. ৭ দিনের (৭০টি) অ্যাড দেখার শর্ত যাচাই
+      if (savedAdDays < 7) {
+        throw new Error(`Withdrawal locked! You must watch 10 Ads daily for 7 days (Completed: ${savedAdDays}/7 days).`);
+      }
+
       nextWithdrawCount = currentWithdrawCount + 1;
 
-      // ১. ইউজারের পয়েন্ট কাটা এবং লিমিট +১ করা
+      // ৪. পয়েন্ট কাটা, উইথড্র কাউন্ট +১ এবং পরবর্তী উইথড্রর জন্য ১টি স্ট্রিক ও ৭ দিনের অ্যাড মাইনাস করা
+      const updatedStreaks = savedStreaks > 0 ? savedStreaks - 1 : 0;
+      const updatedStreakDays = savedStreaks > 0 ? currentStreak : 0;
+      const updatedAdDays = Math.max(0, savedAdDays - 7);
+
       transaction.set(userRef, {
         points: admin.firestore.FieldValue.increment(-requiredPts),
         withdrawCount: admin.firestore.FieldValue.increment(1),
+        savedStreaks: updatedStreaks,
+        checkInStreak: updatedStreakDays,
+        savedAdDays: updatedAdDays,
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
       }, { merge: true });
-
       // ২. উইথড্র রিকোয়েস্টটি ডাটাবেজে সেভ করে রাখা (যাতে আপনি পরে পেমেন্ট দিতে পারেন)
       const withdrawRef = db.collection('withdrawals').doc();
       transaction.set(withdrawRef, {
