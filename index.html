@@ -1982,7 +1982,7 @@ const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, s
           try {
             if (window.TON_CONNECT_UI) {
               const tonConnectUI = new window.TON_CONNECT_UI.TonConnectUI({
-                manifestUrl: 'https://toboostaicom-lihr.vercel.app/tonconnect-manifest.json',
+                manifestUrl: window.location.origin + '/tonconnect-manifest.json',
               });
 
               tonConnectUI.onStatusChange((wallet) => {
