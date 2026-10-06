@@ -81,7 +81,6 @@ module.exports = async function handler(req, res) {
         tasks.push({
           id: doc.id,
           ...data,
-          // টাইমস্ট্যাম্প সেফলি মিলিসেকেন্ডে নেওয়া
           _time: data.createdAt ? (data.createdAt.toMillis ? data.createdAt.toMillis() : Date.now()) : 0
         });
       });
@@ -96,7 +95,7 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // ২. POST রিকোয়েস্ট: ক্লায়েন্ট নতুন টাস্ক সাবমিট করলে ফায়ারস্টোরে সেভ করা
+  // ২. POST রিকোয়েস্ট: ক্লায়েন্ট নতুন টাস্ক সাবমিট করলে ফায়ারস্টোরে সেভ ও পয়েন্ট কাটা
   if (req.method === 'POST') {
     try {
       const initData = req.headers['x-telegram-init-data'];
@@ -105,11 +104,36 @@ module.exports = async function handler(req, res) {
         return res.status(401).json({ error: 'Unauthorized Telegram user' });
       }
 
+      const userId = String(verified.user.id);
+      const userRef = db.collection('users').doc(userId);
+
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
       const { title, url, reward, category, iconType, actionText, impressions, cost, paidWith } = body;
       
       if (!title || !url) {
         return res.status(400).json({ error: 'Title and URL are required' });
+      }
+
+      const taskCost = Number(cost) || 0;
+      const paymentMethod = String(paidWith || 'PTS');
+
+      // 🔥 PTS দিয়ে টাস্ক পোস্ট করলে ডাটাবেস থেকে পয়েন্ট পার্মানেন্টলি কেটে নেওয়া
+      if (paymentMethod === 'PTS' && taskCost > 0) {
+        const userSnap = await userRef.get();
+        if (!userSnap.exists) {
+          return res.status(404).json({ error: 'User profile not found in database' });
+        }
+
+        const currentPts = userSnap.data().points || 0;
+        if (currentPts < taskCost) {
+          return res.status(400).json({ error: `Insufficient PTS balance! You need ${taskCost.toLocaleString()} PTS.` });
+        }
+
+        // ফায়ারস্টোর ডাটাবেস থেকে পয়েন্ট মাইনাস করা
+        await userRef.update({
+          points: admin.firestore.FieldValue.increment(-taskCost),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
       }
 
       // অটো আইকন ডিটেকশন ফলব্যাক
@@ -128,14 +152,14 @@ module.exports = async function handler(req, res) {
         url: String(url).trim(),
         reward: Number(reward) || 200,
         category: category || 'Social',
-        iconType: safeIcon, // আইকন ফায়ারস্টোরে সেভ হবে
+        iconType: safeIcon,
         actionText: actionText || 'Start',
         active: true,
-        targetViews: Number(impressions) || 100, // সঠিক ইমপ্রেশন সংখ্যা (যেমন: ১০,০০০)
+        targetViews: Number(impressions) || 100, // সঠিক ইমপ্রেশন টার্গেট (যেমন: ১০,০০০)
         currentViews: 0,
-        cost: Number(cost) || 0,                 // পোস্ট করতে কত খরচ হয়েছে (যেমন: ২,০০,০০০ PTS বা Stars বা $GRAM)
-        paidWith: String(paidWith || 'PTS'),     // পেমেন্ট মাধ্যম
-        createdBy: String(verified.user.id),
+        cost: taskCost,                         // আসল কস্ট (যেমন: ২,০০,০০০ PTS)
+        paidWith: paymentMethod,                // পেমেন্ট মাধ্যম
+        createdBy: userId,
         createdAt: admin.firestore.FieldValue.serverTimestamp()
       };
 
