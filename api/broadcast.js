@@ -5,7 +5,7 @@ const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const WEB_APP_URL = 'https://toboostaicom-web3.vercel.app';
 
 // 🔥 আপনার এই নতুন এডিটেড ছবির ডিরেক্ট লিঙ্কটি এখানে বসাবেন
-const PHOTO_URL = 'https://i.postimg.cc/s2q0bhg9/20261006-192711.jpg';
+const PHOTO_URL = 'https://i.postimg.cc/1zLcPxN9/In-Shot-20260918-114513620.jpg';
 
 // আপনার দেওয়া হুবহু টেক্সট
 const BROADCAST_CAPTION = `⚡️Don’t miss out — fresh sponsors just arrived, and new rewards are already live! 
