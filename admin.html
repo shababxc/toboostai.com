@@ -747,12 +747,12 @@
                           <span className="text-sm font-bold text-white font-mono">{lookedUpUser.referralsCount || lookedUpUser.referrals || 0} Frens</span>
                         </div>
                         <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80">
-                          <span className="text-slate-400 block text-[10px]">Today Ads Watched</span>
-                          <span className="text-sm font-bold text-cyan-400 font-mono">{lookedUpUser.adsWatchedToday || 0} / 10</span>
+                          <span className="text-slate-400 block text-[10px]">Ads ({lookedUpUser.adsWatchedToday || 0}/10 Today)</span>
+                          <span className="text-sm font-bold text-cyan-400 font-mono">Saved Days: {lookedUpUser.savedAdDays || 0}</span>
                         </div>
                         <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80">
-                          <span className="text-slate-400 block text-[10px]">Check-in Streak</span>
-                          <span className="text-sm font-bold text-emerald-400 font-mono">{lookedUpUser.checkInStreak || 0} Days</span>
+                          <span className="text-slate-400 block text-[10px]">Streak ({lookedUpUser.checkInStreak || 0}/7 Today)</span>
+                          <span className="text-sm font-bold text-emerald-400 font-mono">Saved Streaks: {lookedUpUser.savedStreaks || 0}</span>
                         </div>
                       </div>
 
