@@ -43,25 +43,36 @@ module.exports = async (req, res) => {
       }
 
       const userDoc = await transaction.get(userRef);
-      const currentPoints = userDoc.exists ? (userDoc.data().points || 0) : 0;
-      updatedPoints = currentPoints + REWARD_POINTS;
+    const userData = userDoc.exists ? (userDoc.data() || {}) : {};
+    const currentPoints = userData.points || 0;
+    updatedPoints = currentPoints + REWARD_POINTS;
 
-      transaction.set(sessionRef, {
-        status: 'completed',
-        rewardAmount: REWARD_POINTS,
-        completedAt: admin.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
+    transaction.set(sessionRef, {
+      status: 'completed',
+      rewardAmount: REWARD_POINTS,
+      completedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
 
-      const todayUtc = new Date().toISOString().split('T')[0];
+    const todayUtc = new Date().toISOString().split('T')[0];
+    const isSameDay = userData.lastAdDate === todayUtc;
+    const currentAds = isSameDay ? (userData.adsWatchedToday || 0) : 0;
+    const nextAdCount = Math.min(10, currentAds + 1);
 
-      transaction.set(userRef, {
-        userId,
-        points: admin.firestore.FieldValue.increment(REWARD_POINTS),
-        adsWatchedToday: admin.firestore.FieldValue.increment(1),
-        lastAdDate: todayUtc,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-    }); // <--- এই ব্র্যাকেটটি ঠিক করে দেওয়া হয়েছে
+    let savedAdDays = userData.savedAdDays || 0;
+    // আজকের ১০টি অ্যাড দেখা সম্পন্ন হলে ১ দিন সেভ হবে
+    if (nextAdCount === 10 && currentAds < 10) {
+      savedAdDays += 1;
+    }
+
+    transaction.set(userRef, {
+      userId,
+      points: admin.firestore.FieldValue.increment(REWARD_POINTS),
+      adsWatchedToday: nextAdCount,
+      savedAdDays: savedAdDays,
+      lastAdDate: todayUtc,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  });
 
     return res.status(200).json({
       success: true,
