@@ -2,10 +2,8 @@
 const { admin, db } = require('./_firebase');
 const { verifyTelegramWebAppData } = require('./_telegram');
 
-// আপনার দেওয়া অফিশিয়াল $GRAM রিসিভার অ্যাড্রেস
 const RECEIVER_ADDRESS = 'UQC_uwp-fGIO5qwRgGKe0ymORn-Cd-pW_HtBVbHD-NPzIVfq';
 
-// ক্যাটাগরি ও আইকন নিখুঁতভাবে ফ্রন্টএন্ডের সাথে মিলানো হলো
 const DEFAULT_TASKS = [
   {
     id: 'tg_channel_join',
@@ -14,7 +12,7 @@ const DEFAULT_TASKS = [
     reward: 200,
     category: 'Social',
     iconType: 'telegram',
-    actionText: 'Join Channel',
+    actionText: 'Start',
     active: true
   },
   {
@@ -24,7 +22,7 @@ const DEFAULT_TASKS = [
     reward: 200,
     category: 'Social',
     iconType: 'twitter',
-    actionText: 'Follow @ToBOOST',
+    actionText: 'Start',
     active: true
   },
   {
@@ -34,7 +32,7 @@ const DEFAULT_TASKS = [
     reward: 200,
     category: 'Partners',
     iconType: 'telegram',
-    actionText: 'Join Station',
+    actionText: 'Start',
     active: true
   },
   {
@@ -44,7 +42,7 @@ const DEFAULT_TASKS = [
     reward: 200,
     category: 'Web3',
     iconType: 'bot',
-    actionText: 'Explore',
+    actionText: 'Start',
     active: true
   }
 ];
@@ -81,13 +79,12 @@ module.exports = async function handler(req, res) {
         tasks.push({
           id: doc.id,
           ...data,
+          actionText: 'Start',
           _time: data.createdAt ? (data.createdAt.toMillis ? data.createdAt.toMillis() : Date.now()) : 0
         });
       });
 
-      // নতুন পোস্ট করা টাস্কগুলো যেন সবার উপরে থাকে
       tasks.sort((a, b) => b._time - a._time);
-
       return res.status(200).json({ tasks });
     } catch (error) {
       console.error('Error fetching tasks:', error);
@@ -95,10 +92,11 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // ২. POST রিকোয়েস্ট: ক্লায়েন্ট নতুন টাস্ক সাবমিট করলে ফায়ারস্টোরে সেভ ও পয়েন্ট কাটা
+  // ২. POST রিকোয়েস্ট: ক্লায়েন্ট নতুন টাস্ক পোস্ট করলে ডাটাবেস থেকে পয়েন্ট কাটা ও সেভ করা
   if (req.method === 'POST') {
     try {
-      const initData = req.headers['x-telegram-init-data'];
+      const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+      const initData = req.headers['x-telegram-init-data'] || body.initData || '';
       const verified = verifyTelegramWebAppData(initData);
       if (!verified || !verified.user) {
         return res.status(401).json({ error: 'Unauthorized Telegram user' });
@@ -107,8 +105,7 @@ module.exports = async function handler(req, res) {
       const userId = String(verified.user.id);
       const userRef = db.collection('users').doc(userId);
 
-      const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
-      const { title, url, reward, category, iconType, actionText, impressions, cost, paidWith } = body;
+      const { title, url, reward, category, iconType, impressions, cost, paidWith } = body;
       
       if (!title || !url) {
         return res.status(400).json({ error: 'Title and URL are required' });
@@ -117,26 +114,24 @@ module.exports = async function handler(req, res) {
       const taskCost = Number(cost) || 0;
       const paymentMethod = String(paidWith || 'PTS');
 
-      // 🔥 PTS দিয়ে টাস্ক পোস্ট করলে ডাটাবেস থেকে পয়েন্ট পার্মানেন্টলি কেটে নেওয়া
+      // 🔥 PTS দিয়ে পোস্ট করলে ফায়ারস্টোর থেকে সরাসরি পয়েন্ট পার্মানেন্টলি কেটে নেওয়া
       if (paymentMethod === 'PTS' && taskCost > 0) {
         const userSnap = await userRef.get();
-        if (!userSnap.exists) {
-          return res.status(404).json({ error: 'User profile not found in database' });
+        if (userSnap.exists) {
+          const currentPoints = userSnap.data().points || 0;
+          if (currentPoints < taskCost) {
+            return res.status(400).json({ error: `Insufficient PTS balance! You need ${taskCost} PTS.` });
+          }
         }
 
-        const currentPts = userSnap.data().points || 0;
-        if (currentPts < taskCost) {
-          return res.status(400).json({ error: `Insufficient PTS balance! You need ${taskCost.toLocaleString()} PTS.` });
-        }
-
-        // ফায়ারস্টোর ডাটাবেস থেকে পয়েন্ট মাইনাস করা
-        await userRef.update({
+        // ডাটাবেস থেকে পয়েন্ট মাইনাস
+        await userRef.set({
+          userId: userId,
           points: admin.firestore.FieldValue.increment(-taskCost),
           updatedAt: admin.firestore.FieldValue.serverTimestamp()
-        });
+        }, { merge: true });
       }
 
-      // অটো আইকন ডিটেকশন ফলব্যাক
       let safeIcon = iconType;
       if (!safeIcon) {
         if (url.includes('t.me')) safeIcon = 'telegram';
@@ -153,12 +148,12 @@ module.exports = async function handler(req, res) {
         reward: Number(reward) || 200,
         category: category || 'Social',
         iconType: safeIcon,
-        actionText: actionText || 'Start',
+        actionText: 'Start',                     // সবসময় 'Start' হিসেবে সেভ হবে
         active: true,
-        targetViews: Number(impressions) || 100, // সঠিক ইমপ্রেশন টার্গেট (যেমন: ১০,০০০)
+        targetViews: Number(impressions) || 100, // সঠিক ইমপ্রেশন সংখ্যা (যেমন: ১০,০০০)
         currentViews: 0,
-        cost: taskCost,                         // আসল কস্ট (যেমন: ২,০০,০০০ PTS)
-        paidWith: paymentMethod,                // পেমেন্ট মাধ্যম
+        cost: taskCost,
+        paidWith: paymentMethod,
         createdBy: userId,
         createdAt: admin.firestore.FieldValue.serverTimestamp()
       };
