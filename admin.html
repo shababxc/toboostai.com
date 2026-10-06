@@ -77,7 +77,6 @@
       const [loginError, setLoginError] = useState('');
       const [isVerifying, setIsVerifying] = useState(false);
 
-      // Accordion Folder States (Expand / Collapse)
       const [folderOpen, setFolderOpen] = useState({
         overview: true,
         withdrawals: true,
@@ -89,7 +88,6 @@
         setFolderOpen(prev => ({ ...prev, [key]: !prev[key] }));
       };
 
-      // Real Data States
       const [stats, setStats] = useState({ pendingWithdrawals: 0, activeTasks: 0 });
       const [withdrawals, setWithdrawals] = useState([]);
       const [tasks, setTasks] = useState([]);
@@ -97,7 +95,6 @@
       const [isLoading, setIsLoading] = useState(false);
       const [copiedId, setCopiedId] = useState(null);
 
-      // User Search States
       const [userSearchQuery, setUserSearchQuery] = useState('');
       const [lookedUpUser, setLookedUpUser] = useState(null);
       const [pointsDelta, setPointsDelta] = useState('');
@@ -109,7 +106,6 @@
         setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
       };
 
-      // Real API Authentication
       const handleLogin = async (e, overrideKey) => {
         if (e) e.preventDefault();
         const key = (overrideKey !== undefined ? overrideKey : adminKey).trim();
@@ -130,7 +126,6 @@
             setLoginError(data.error || 'Invalid Admin Secret Key.');
           }
         } catch (err) {
-          // If offline / local test preview
           localStorage.setItem('tob_admin_key', key);
           setIsAuthenticated(true);
           addToast('Preview Mode Unlocked.');
@@ -144,7 +139,6 @@
         setIsAuthenticated(false);
       };
 
-      // Real API Loaders
       const loadAllData = async () => {
         setIsLoading(true);
         const key = localStorage.getItem('tob_admin_key') || adminKey;
@@ -181,7 +175,6 @@
         }
       }, [isAuthenticated]);
 
-      // Withdraw Action
       const handleWithdrawAction = async (wId, status, shouldRefund = false) => {
         const key = localStorage.getItem('tob_admin_key') || adminKey;
         try {
@@ -202,7 +195,6 @@
         }
       };
 
-      // Task Action
       const handleToggleTask = async (taskId, currentActive) => {
         const key = localStorage.getItem('tob_admin_key') || adminKey;
         try {
@@ -240,7 +232,6 @@
         }
       };
 
-      // User Search & Points
       const handleSearchUser = async (e) => {
         e.preventDefault();
         if (!userSearchQuery.trim()) return;
@@ -286,9 +277,6 @@
         }
       };
 
-      // ========================================================
-      // 1. EXACT PREMIUM LOCK SCREEN VIEW (YOU LOVED)
-      // ========================================================
       if (!isAuthenticated) {
         return (
           <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4 relative overflow-hidden font-sans">
@@ -366,18 +354,13 @@
         );
       }
 
-      // Filtered Withdrawals
       const filteredWithdrawals = withdrawals.filter(w => {
         if (withdrawalFilter === 'all') return true;
         return w.status === withdrawalFilter;
       });
 
-      // ========================================================
-      // 2. DASHBOARD: SERIAL FOLDERS (EXPANDABLE & MOBILE-PERFECT)
-      // ========================================================
       return (
         <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans pb-16">
-          {/* Header */}
           <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="font-extrabold text-white text-base">ToBOOSTAi</span>
@@ -405,9 +388,7 @@
 
           <main className="max-w-4xl w-full mx-auto p-4 space-y-4">
             
-            {/* ======================================================== */}
-            {/* FOLDER 1: SYSTEM OVERVIEW & METRICS */}
-            {/* ======================================================== */}
+            {/* FOLDER 1: OVERVIEW */}
             <div className="rounded-2xl bg-slate-900/90 border border-slate-800 overflow-hidden shadow-lg">
               <div
                 onClick={() => toggleFolder('overview')}
@@ -442,9 +423,54 @@
               )}
             </div>
 
-            {/* ======================================================== */}
-            {/* FOLDER 2: WITHDRAWAL REQUESTS (RESPONSIVE CARDS - NO SLIDER) */}
-            {/* ======================================================== */}
+            {/* FOLDER: DAILY NOTIFICATION BROADCASTER (NEW) */}
+            <div className="rounded-2xl bg-slate-900/90 border border-slate-800 overflow-hidden shadow-lg">
+              <div className="p-4 bg-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3 select-none">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-gradient-to-tr from-amber-500/20 to-orange-500/20 text-amber-400 border border-amber-500/30">
+                    <Icons.Shield />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+                      <span>Daily Broadcast Notification</span>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300">TELEGRAM BOT</span>
+                    </h3>
+                    <p className="text-[11px] text-slate-400">Send custom photo, text & "🌟 TO BOOSTAI NOW" button to all users</p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={async () => {
+                    if (!confirm('Are you sure you want to broadcast daily photo notification to ALL registered Telegram users now?')) return;
+                    setIsLoading(true);
+                    const key = localStorage.getItem('tob_admin_key') || adminKey;
+                    try {
+                      addToast('Broadcasting photo to all users... Please wait.');
+                      const res = await fetch('/api/broadcast', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'x-admin-key': key }
+                      });
+                      const d = await res.json();
+                      if (res.ok && d.success) {
+                        addToast(d.message);
+                      } else {
+                        addToast(d.error || 'Broadcast failed');
+                      }
+                    } catch (e) {
+                      addToast('Network error during broadcast');
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }}
+                  disabled={isLoading}
+                  className="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 active:scale-95 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow-lg shadow-amber-500/20 flex items-center justify-center gap-1.5 disabled:opacity-50"
+                >
+                  <span>🚀 Send Broadcast Now</span>
+                </button>
+              </div>
+            </div>
+
+            {/* FOLDER 2: WITHDRAWAL REQUESTS */}
             <div className="rounded-2xl bg-slate-900/90 border border-slate-800 overflow-hidden shadow-lg">
               <div
                 onClick={() => toggleFolder('withdrawals')}
@@ -471,7 +497,6 @@
 
               {folderOpen.withdrawals && (
                 <div className="p-4 pt-2 border-t border-slate-800/80 space-y-3">
-                  {/* Status Filters */}
                   <div className="flex gap-1.5 overflow-x-auto no-scrollbar py-1">
                     {['pending', 'approved', 'rejected', 'all'].map(f => (
                       <button
@@ -488,7 +513,6 @@
                     ))}
                   </div>
 
-                  {/* Responsive Cards (No Table Slider) */}
                   {filteredWithdrawals.length === 0 ? (
                     <div className="p-6 text-center bg-slate-950 rounded-xl border border-slate-800 text-slate-500 text-xs font-medium">
                       No withdrawal records found under "{withdrawalFilter}".
@@ -519,7 +543,6 @@
                               </span>
                             </div>
 
-                            {/* Wallet Address (Full Wrap & 1-Click Copy) */}
                             <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80 flex items-center justify-between gap-2">
                               <div className="min-w-0 font-mono text-[11px] text-slate-300 break-all select-all">
                                 {w.walletAddress || 'No Wallet Connected'}
@@ -540,7 +563,6 @@
                               )}
                             </div>
 
-                            {/* Payout Amounts */}
                             <div className="flex items-baseline justify-between pt-1">
                               <div className="flex items-baseline gap-1.5">
                                 <span className="text-base font-black font-display text-emerald-400">{w.amountGram || (w.amountPts / 10000)} $GRAM</span>
@@ -551,7 +573,6 @@
                               </span>
                             </div>
 
-                            {/* Actions Buttons */}
                             {isPending && (
                               <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-900">
                                 <button
@@ -580,9 +601,7 @@
               )}
             </div>
 
-            {/* ======================================================== */}
-            {/* FOLDER 3: BOUNTIES & CAMPAIGNS (CARDS) */}
-            {/* ======================================================== */}
+            {/* FOLDER 3: BOUNTIES & CAMPAIGNS */}
             <div className="rounded-2xl bg-slate-900/90 border border-slate-800 overflow-hidden shadow-lg">
               <div
                 onClick={() => toggleFolder('tasks')}
@@ -643,7 +662,6 @@
                             {t.url}
                           </a>
 
-                          {/* Progress */}
                           <div className="space-y-1 pt-1">
                             <div className="flex justify-between text-[11px] text-slate-400 font-semibold font-mono">
                               <span>Views: {current} / {target}</span>
@@ -654,7 +672,6 @@
                             </div>
                           </div>
 
-                          {/* Task Action Buttons */}
                           <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-900">
                             <button
                               onClick={() => handleToggleTask(t.id, t.active)}
@@ -683,9 +700,7 @@
               )}
             </div>
 
-            {/* ======================================================== */}
             {/* FOLDER 4: USER LOOKUP & POINTS CONTROL */}
-            {/* ======================================================== */}
             <div className="rounded-2xl bg-slate-900/90 border border-slate-800 overflow-hidden shadow-lg">
               <div
                 onClick={() => toggleFolder('users')}
@@ -736,7 +751,6 @@
                         </span>
                       </div>
 
-                      {/* Stats Grid */}
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80">
                           <span className="text-slate-400 block text-[10px]">Points Balance</span>
@@ -756,7 +770,6 @@
                         </div>
                       </div>
 
-                      {/* Wallet */}
                       <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80 text-xs">
                         <span className="text-slate-400 block text-[10px] mb-0.5">Wallet Address:</span>
                         <span className="font-mono text-slate-300 break-all select-all text-[11px]">
@@ -764,7 +777,6 @@
                         </span>
                       </div>
 
-                      {/* Point Adjuster */}
                       <form onSubmit={handleAdjustPoints} className="pt-2 border-t border-slate-900 flex gap-2 items-center flex-wrap">
                         <span className="text-xs font-semibold text-slate-300">Quick Adjust:</span>
                         <input
@@ -789,7 +801,6 @@
 
           </main>
 
-          {/* Toast Notification */}
           <div className="fixed bottom-4 right-4 z-50 space-y-2 pointer-events-none">
             {toasts.map(t => (
               <div key={t.id} className="p-3 bg-slate-900 border border-slate-700 text-xs text-slate-100 rounded-xl shadow-2xl pointer-events-auto flex items-center gap-2">
