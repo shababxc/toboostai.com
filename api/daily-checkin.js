@@ -43,13 +43,23 @@ module.exports = async (req, res) => {
       });
     }
 
-    // Determine streak
+    // Determine streak & saved streaks
     let newStreak = 1;
+    let savedStreaks = userData.savedStreaks || 0;
+
     if (userData.lastCheckInDate === yesterdayStr) {
       newStreak = (userData.checkInStreak || 0) + 1;
     }
 
-    const REWARD_POINTS = 100;
+    // ৭ দিন পূর্ণ হলে সংরক্ষিত স্ট্রিকে ১ জমা হবে এবং নতুন স্ট্রিক ০ হবে
+    let displayStreak = newStreak;
+    if (newStreak >= 7) {
+      savedStreaks += 1;
+      newStreak = 0;
+      displayStreak = 7;
+    }
+
+    const REWARD_POINTS = displayStreak === 7 ? 250 : 100;
     const newTotalPoints = (userData.points || 0) + REWARD_POINTS;
 
     await userRef.set({
@@ -59,13 +69,14 @@ module.exports = async (req, res) => {
       lastCheckInDate: todayStr,
       lastCheckInTime: admin.firestore.FieldValue.serverTimestamp(),
       checkInStreak: newStreak,
+      savedStreaks: savedStreaks,
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
     return res.status(200).json({
       success: true,
       reward: REWARD_POINTS,
-      streak: newStreak,
+      streak: displayStreak,
       points: newTotalPoints,
       balance: newTotalPoints,
       message: `Daily check-in successful! +${REWARD_POINTS} PTS awarded.`
