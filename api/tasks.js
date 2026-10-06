@@ -106,7 +106,7 @@ module.exports = async function handler(req, res) {
       }
 
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
-      const { title, url, reward, category, iconType, actionText, impressions } = body;
+      const { title, url, reward, category, iconType, actionText, impressions, cost, paidWith } = body;
       
       if (!title || !url) {
         return res.status(400).json({ error: 'Title and URL are required' });
@@ -131,8 +131,10 @@ module.exports = async function handler(req, res) {
         iconType: safeIcon, // আইকন ফায়ারস্টোরে সেভ হবে
         actionText: actionText || 'Start',
         active: true,
-        targetViews: Number(impressions) || 100, // <--- এই লাইনটি যোগ হয়েছে
-        currentViews: 0,                         // <--- এই লাইনটি যোগ হয়েছে
+        targetViews: Number(impressions) || 100, // সঠিক ইমপ্রেশন সংখ্যা (যেমন: ১০,০০০)
+        currentViews: 0,
+        cost: Number(cost) || 0,                 // পোস্ট করতে কত খরচ হয়েছে (যেমন: ২,০০,০০০ PTS বা Stars বা $GRAM)
+        paidWith: String(paidWith || 'PTS'),     // পেমেন্ট মাধ্যম
         createdBy: String(verified.user.id),
         createdAt: admin.firestore.FieldValue.serverTimestamp()
       };
