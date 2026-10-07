@@ -99,6 +99,32 @@
       const [lookedUpUser, setLookedUpUser] = useState(null);
       const [pointsDelta, setPointsDelta] = useState('');
       const [toasts, setToasts] = useState([]);
+      const [referralList, setReferralList] = useState(null);
+      const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
+      const [isReferralLoading, setIsReferralLoading] = useState(false);
+
+      const handleViewReferrals = async (targetUserId) => {
+        if (!targetUserId) return;
+        setIsReferralLoading(true);
+        setIsReferralModalOpen(true);
+        setReferralList([]);
+        const key = localStorage.getItem('tob_admin_key') || adminKey;
+        try {
+          const res = await fetch(`${API_ENDPOINT}?action=get_referrals&userId=${encodeURIComponent(targetUserId)}`, {
+            headers: { 'x-admin-key': key }
+          });
+          const d = await res.json();
+          if (res.ok && d.success) {
+            setReferralList(d.referrals || []);
+          } else {
+            addToast(d.error || 'Failed to load referrals');
+          }
+        } catch (e) {
+          addToast('Network error loading referrals');
+        } finally {
+          setIsReferralLoading(false);
+        }
+      };
 
       const addToast = (message) => {
         const id = Date.now();
