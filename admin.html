@@ -884,9 +884,16 @@
                           <span className="text-slate-400 block text-[10px]">Points Balance</span>
                           <span className="text-sm font-bold text-amber-400 font-mono">{(lookedUpUser.points || 0).toLocaleString()} PTS</span>
                         </div>
-                        <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80">
-                          <span className="text-slate-400 block text-[10px]">Total Referrals</span>
-                          <span className="text-sm font-bold text-white font-mono">{lookedUpUser.referralsCount || lookedUpUser.referrals || 0} Frens</span>
+                        <div 
+                          onClick={() => handleViewReferrals(lookedUpUser.userId)}
+                          className="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80 hover:border-indigo-500/50 cursor-pointer transition group"
+                          title="Click to view all referral details"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-slate-400 block text-[10px]">Total Referrals</span>
+                            <span className="text-[10px] text-indigo-400 font-bold group-hover:underline">View 👥</span>
+                          </div>
+                          <span className="text-sm font-bold text-white font-mono mt-0.5 block">{lookedUpUser.referralsCount || lookedUpUser.referrals || 0} Frens</span>
                         </div>
                         <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80">
                           <span className="text-slate-400 block text-[10px]">Ads ({lookedUpUser.adsWatchedToday || 0}/10 Today)</span>
