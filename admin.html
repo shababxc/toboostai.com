@@ -334,7 +334,9 @@
                   className="w-full py-3 px-4 bg-gradient-to-r from-teal-500 via-cyan-500 to-sky-500 hover:from-teal-400 hover:to-sky-400 text-slate-950 font-black rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-teal-500/25 active:scale-98 cursor-pointer disabled:opacity-50"
                 >
                   <Icons.Shield />
-                  <span>{isVerifying ? 'Authenticating Gateway...' : 'Authorize & Unlock Console'}</span>
+                  <span className="text-xs font-black uppercase tracking-wider whitespace-nowrap">
+                    {isVerifying ? 'Verifying...' : 'Authorize & Unlock'}
+                  </span>
                 </button>
 
                 {/* সাইবার সিকিউরিটি ফুটার (অটো-ফিল বক্স সম্পূর্ণ মুছে ফেলা হয়েছে) */}
