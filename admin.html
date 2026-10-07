@@ -423,53 +423,156 @@
               )}
             </div>
 
-            {/* FOLDER: DAILY NOTIFICATION BROADCASTER (NEW) */}
+            {/* ======================================================== */}
+            {/* FOLDER: ALL-IN-ONE BROADCAST (1-CLICK FIXED + CUSTOM MEDIA) */}
+            {/* ======================================================== */}
             <div className="rounded-2xl bg-slate-900/90 border border-slate-800 overflow-hidden shadow-lg">
-              <div className="p-4 bg-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3 select-none">
+              <div
+                onClick={() => toggleFolder('broadcast')}
+                className="p-4 bg-slate-900 flex items-center justify-between cursor-pointer hover:bg-slate-850/80 transition select-none"
+              >
                 <div className="flex items-center gap-2.5">
                   <div className="p-2 rounded-xl bg-gradient-to-tr from-amber-500/20 to-orange-500/20 text-amber-400 border border-amber-500/30">
                     <Icons.Shield />
                   </div>
                   <div>
-                    <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
-                      <span>Daily Broadcast Notification</span>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-extrabold text-white">Broadcast System</h3>
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300">TELEGRAM BOT</span>
-                    </h3>
-                    <p className="text-[11px] text-slate-400">Send custom photo, text & "🌟 TO BOOSTAI NOW" button to all users</p>
+                    </div>
+                    <p className="text-[11px] text-slate-400">1-Click daily fixed reminder OR custom manual announcement</p>
                   </div>
                 </div>
-
-                <button
-                  onClick={async () => {
-                    if (!confirm('Are you sure you want to broadcast daily photo notification to ALL registered Telegram users now?')) return;
-                    setIsLoading(true);
-                    const key = localStorage.getItem('tob_admin_key') || adminKey;
-                    try {
-                      addToast('Broadcasting photo to all users... Please wait.');
-                      const res = await fetch('/api/broadcast', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'x-admin-key': key }
-                      });
-                      const d = await res.json();
-                      if (res.ok && d.success) {
-                        addToast(d.message);
-                      } else {
-                        addToast(d.error || 'Broadcast failed');
-                      }
-                    } catch (e) {
-                      addToast('Network error during broadcast');
-                    } finally {
-                      setIsLoading(false);
-                    }
-                  }}
-                  disabled={isLoading}
-                  className="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 active:scale-95 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow-lg shadow-amber-500/20 flex items-center justify-center gap-1.5 disabled:opacity-50"
-                >
-                  <span>🚀 Send Broadcast Now</span>
-                </button>
+                <div className={`text-slate-400 transform transition-transform ${folderOpen.broadcast ? 'rotate-180' : ''}`}>
+                  <Icons.ChevronDown />
+                </div>
               </div>
-            </div>
 
+              {folderOpen.broadcast && (
+                <div className="p-4 pt-2 border-t border-slate-800/80 space-y-4">
+                  
+                  {/* ১-ক্লিক ফিক্সড রিমাইন্ডার বাটন */}
+                  <div className="p-3.5 rounded-xl bg-slate-950 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <h4 className="text-xs font-black text-amber-400 flex items-center gap-1.5">
+                        <span>⚡ Daily Quick Reminder (1-Click)</span>
+                      </h4>
+                      <p className="text-[10.5px] text-slate-400 mt-0.5">
+                        Send yesterday's fixed official photo, text & "🌟 TO BOOSTAI NOW" button instantly.
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={async () => {
+                        if (!confirm('Send yesterday\'s official fixed daily reminder to ALL users now?')) return;
+                        setIsLoading(true);
+                        const key = localStorage.getItem('tob_admin_key') || adminKey;
+                        try {
+                          addToast('Sending daily fixed reminder to all users... Please wait.');
+                          const res = await fetch('/api/broadcast', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'x-admin-key': key },
+                            body: JSON.stringify({ mode: 'default' })
+                          });
+                          const d = await res.json();
+                          if (res.ok && d.success) addToast(d.message);
+                          else addToast(d.error || 'Broadcast failed');
+                        } catch (e) {
+                          addToast('Network error during broadcast');
+                        } finally {
+                          setIsLoading(false);
+                        }
+                      }}
+                      disabled={isLoading}
+                      className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow-md shadow-amber-500/25 shrink-0 disabled:opacity-50"
+                    >
+                      <span>⚡ Send 1-Click Reminder</span>
+                    </button>
+                  </div>
+
+                  {/* কাস্টম ম্যানুয়ালি লেখার সেকশন */}
+                  <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800/90 space-y-2.5">
+                    <h4 className="text-xs font-black text-white flex items-center gap-1.5">
+                      <span>✍️ Custom Announcement (Write New Text or GIF/Video)</span>
+                    </h4>
+
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-400 block mb-1">
+                        Media Link (GIF, MP4 Video, or Photo URL - Optional):
+                      </label>
+                      <input
+                        id="broadcast-media-url"
+                        type="url"
+                        placeholder="https://example.com/animation.mp4 (খালি রাখলে শুধু লেখা যাবে)"
+                        className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-cyan-400 font-mono"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-400 block mb-1">
+                        Button Name:
+                      </label>
+                      <input
+                        id="broadcast-btn-text"
+                        type="text"
+                        placeholder="e.g. ✨ To Do NOW or 👉 WORK NOW 👈"
+                        defaultValue="✨ TO BOOSTAi NOW"
+                        className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-cyan-400 font-semibold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-400 block mb-1">
+                        Custom Message Text:
+                      </label>
+                      <textarea
+                        id="broadcast-caption"
+                        rows="3"
+                        placeholder="এখানে আপনার নতুন নোটিশ বা ঘোষণা নিজের মতো টাইপ করুন..."
+                        className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-cyan-400 leading-relaxed font-sans"
+                      ></textarea>
+                    </div>
+
+                    <button
+                      onClick={async () => {
+                        const mediaUrl = document.getElementById('broadcast-media-url')?.value || '';
+                        const buttonText = document.getElementById('broadcast-btn-text')?.value || '✨ TO BOOSTAi NOW';
+                        const caption = document.getElementById('broadcast-caption')?.value || '';
+
+                        if (!caption.trim()) {
+                          addToast('দয়া করে কিছু মেসেজ টাইপ করুন!');
+                          return;
+                        }
+
+                        if (!confirm('Broadcast this custom message to ALL users now?')) return;
+                        setIsLoading(true);
+                        const key = localStorage.getItem('tob_admin_key') || adminKey;
+                        try {
+                          addToast('Sending custom broadcast to all users... Please wait.');
+                          const res = await fetch('/api/broadcast', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'x-admin-key': key },
+                            body: JSON.stringify({ mode: 'custom', mediaUrl, caption, buttonText })
+                          });
+                          const d = await res.json();
+                          if (res.ok && d.success) addToast(d.message);
+                          else addToast(d.error || 'Broadcast failed');
+                        } catch (e) {
+                          addToast('Network error during broadcast');
+                        } finally {
+                          setIsLoading(false);
+                        }
+                      }}
+                      disabled={isLoading}
+                      className="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl text-xs transition cursor-pointer shadow-md shadow-cyan-600/20 disabled:opacity-50"
+                    >
+                      <span>🚀 Send Custom Announcement</span>
+                    </button>
+                  </div>
+
+                </div>
+              )}
+            </div>
             {/* FOLDER 2: WITHDRAWAL REQUESTS */}
             <div className="rounded-2xl bg-slate-900/90 border border-slate-800 overflow-hidden shadow-lg">
               <div
