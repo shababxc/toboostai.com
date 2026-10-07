@@ -203,6 +203,55 @@ module.exports = async (req, res) => {
       });
     }
 
+    // ========================================================
+    // 🔥 ১০. রেফারেল ইউজারদের বিস্তারিত লিস্ট (Get Referrals Details)
+    // ========================================================
+    if (action === 'get_referrals') {
+      const targetUserId = String(req.query.userId || '').trim();
+      if (!targetUserId) {
+        return res.status(400).json({ success: false, error: 'User ID is required' });
+      }
+
+      // ফায়ারস্টোরে যাদের referredBy == targetUserId (String এবং Number উভয় ফরম্যাটে খোঁজা)
+      const numId = Number(targetUserId);
+      let refSnap = await db.collection('users').where('referredBy', '==', targetUserId).get();
+      if (refSnap.empty && !isNaN(numId)) {
+        refSnap = await db.collection('users').where('referredBy', '==', numId).get();
+      }
+
+      if (refSnap.empty) {
+        return res.status(200).json({ success: true, referrals: [] });
+      }
+
+      const referrals = [];
+      for (const doc of refSnap.docs) {
+        const u = doc.data() || {};
+        const uid = String(u.userId || doc.id);
+
+        // সে কোনো বাউন্টি টাস্ক পোস্ট করেছে কিনা চেক করা
+        const taskCheck = await db.collection('tasks').where('createdBy', '==', uid).limit(1).get();
+        const hasPostedTask = !taskCheck.empty;
+
+        let cleanUsername = 'No @username';
+        if (u.username) {
+          cleanUsername = u.username.startsWith('@') ? u.username : `@${u.username}`;
+        }
+
+        referrals.push({
+          userId: uid,
+          name: u.name || 'Anonymous User',
+          username: cleanUsername,
+          points: Number(u.points ?? u.balance ?? 0),
+          hasPostedTask: hasPostedTask
+        });
+      }
+
+      // বেশি পয়েন্ট পাওয়া ইউজারদের ক্রমানুসারে সাজানো
+      referrals.sort((a, b) => b.points - a.points);
+
+      return res.status(200).json({ success: true, referrals });
+    }
+
     return res.status(400).json({ success: false, error: 'Unknown action' });
   } catch (error) {
     console.error('Admin API error:', error);
