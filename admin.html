@@ -72,7 +72,7 @@
     };
 
     function App() {
-      const [adminKey, setAdminKey] = useState(() => localStorage.getItem('tob_admin_key') || DEFAULT_PIN);
+      const [adminKey, setAdminKey] = useState(() => localStorage.getItem('tob_admin_key') || '');
       const [isAuthenticated, setIsAuthenticated] = useState(false);
       const [loginError, setLoginError] = useState('');
       const [isVerifying, setIsVerifying] = useState(false);
