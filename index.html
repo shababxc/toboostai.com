@@ -563,49 +563,49 @@
         );
       };
 
-      // Slim Dynamic Balance Card ($GRAM Pill Text Smaller)
       const DynamicBalanceCard = ({ starBalance, tokenBalance, dict }) => {
         const formattedStars = starBalance.toLocaleString();
         const displayGram = tokenBalance.toFixed(3);
 
         return (
           <div className="w-full">
-            <div className="relative overflow-hidden rounded-[16px] bg-gradient-to-r from-white via-white to-sky-50/95 border border-white shadow-[0_2px_8px_rgba(56,189,248,0.06)] px-3.5 py-2">
-              <div className="flex items-center justify-between gap-2 mb-1">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 whitespace-nowrap">
+            <div className="relative overflow-hidden rounded-[15px] bg-white border border-sky-100 shadow-[0_2px_8px_rgba(56,189,248,0.06)] px-3.5 py-2">
+              
+              <div className="flex items-center justify-between gap-2 mb-1.5">
+                <span className="text-[9.5px] font-extrabold uppercase tracking-widest text-slate-400">
                   {dict.totalBalance}
                 </span>
                 
-                <div className="inline-flex items-center gap-1 text-[10.5px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/70 shrink-0">
+                <div className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/70 shrink-0">
                   <Icons.ShieldCheck className="w-3.5 h-3.5" />
                   <span>{dict.verified}</span>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between gap-2.5">
+              <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="relative flex items-center justify-center shrink-0">
-                    <Coin3DIcon size={36} idPrefix="balance-main" floating={true} glow={true} />
-                  </div>
-                  <div className="flex items-baseline gap-1 flex-wrap">
-                    <span className="font-display font-extrabold text-[23px] text-slate-900 tracking-tight tabular-nums leading-none">
+                  <Coin3DIcon size={36} idPrefix="balance-main" floating={true} glow={true} />
+                  
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="font-display font-extrabold text-[24px] sm:text-[26px] text-slate-900 tracking-normal tabular-nums leading-none">
                       {formattedStars}
                     </span>
-                    <span className="text-[12px] font-extrabold text-sky-600">PTS</span>
-                    
-                    {/* Small Elegant $GRAM Badge */}
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-sky-100/90 text-sky-800 text-[9.5px] font-extrabold border border-sky-200/70 ml-1">
-                      ≈ {displayGram} $GRAM
-                    </span>
+                    <span className="text-[12px] font-black text-sky-600 tracking-tight">PTS</span>
                   </div>
                 </div>
 
                 <div className="shrink-0 text-right">
-                  <span className="text-[10px] text-slate-400 font-semibold tracking-tight whitespace-nowrap block">
-                    10,000 PTS = 1 $GRAM
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 text-[10.5px] font-black border border-sky-200/80 shadow-2xs">
+                    ≈ {displayGram} $GRAM
                   </span>
                 </div>
               </div>
+
+              <div className="mt-2 pt-1.5 border-t border-slate-100/90 flex items-center justify-between text-[10px] font-bold">
+                <span className="text-slate-400 tracking-tight">Exchange Rate</span>
+                <span className="text-sky-600/90 font-extrabold tracking-tight">10,000 PTS = 1 $GRAM</span>
+              </div>
+
             </div>
           </div>
         );
