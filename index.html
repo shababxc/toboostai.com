@@ -370,75 +370,65 @@
       const Coin3DIcon = ({
         size = 36,
         className = '',
-        floating = false,
-        glow = false,
+        floating = true,
+        glow = true,
         idPrefix = 'toboost-blue',
       }) => {
         const outerRim = `${idPrefix}-outer-rim`;
         const bevelLight = `${idPrefix}-bevel-light`;
         const dishedConcave = `${idPrefix}-dished-concave`;
-        const dishedInnerShadow = `${idPrefix}-dished-inner-shadow`;
         const starFacetLight = `${idPrefix}-star-light`;
         const starFacetMid = `${idPrefix}-star-mid`;
         const starFacetDark = `${idPrefix}-star-dark`;
-        const starFacetDeep = `${idPrefix}-star-deep`;
-        const coinShadow = `${idPrefix}-coin-shadow`;
+        const starGlow = `${idPrefix}-star-glow`;
 
         return (
           <div
             className={`inline-flex items-center justify-center shrink-0 ${floating ? 'animate-coin-float' : ''} ${glow ? 'animate-coin-glow' : ''} ${className}`}
             style={{ width: size, height: size }}
           >
-            <svg viewBox="0 0 100 100" width="100%" height="100%" className="w-full h-full overflow-visible drop-shadow-md">
+            <svg viewBox="0 0 100 100" width="100%" height="100%" className="w-full h-full overflow-visible drop-shadow-[0_2px_8px_rgba(56,189,248,0.35)]">
               <defs>
-                <filter id={coinShadow} x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="0" dy="3.5" stdDeviation="3" floodColor="#0284c7" floodOpacity="0.5" />
-                </filter>
                 <linearGradient id={outerRim} x1="15%" y1="10%" x2="85%" y2="90%">
-                  <stop offset="0%" stopColor="#E0F2FE" /><stop offset="20%" stopColor="#7DD3FC" /><stop offset="50%" stopColor="#0284C7" /><stop offset="78%" stopColor="#0369A1" /><stop offset="100%" stopColor="#075985" />
+                  <stop offset="0%" stopColor="#E0F2FE" /><stop offset="25%" stopColor="#38BDF8" /><stop offset="50%" stopColor="#0284C7" /><stop offset="85%" stopColor="#0369A1" /><stop offset="100%" stopColor="#075985" />
                 </linearGradient>
                 <linearGradient id={bevelLight} x1="10%" y1="10%" x2="90%" y2="90%">
-                  <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.9" /><stop offset="35%" stopColor="#BAE6FD" stopOpacity="0.5" /><stop offset="70%" stopColor="#0369A1" stopOpacity="0.3" /><stop offset="100%" stopColor="#082F49" stopOpacity="0.8" />
+                  <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.95" /><stop offset="40%" stopColor="#BAE6FD" stopOpacity="0.6" /><stop offset="100%" stopColor="#082F49" stopOpacity="0.8" />
                 </linearGradient>
                 <radialGradient id={dishedConcave} cx="46%" cy="38%" r="62%">
-                  <stop offset="0%" stopColor="#082F49" /><stop offset="30%" stopColor="#0C4A6E" /><stop offset="65%" stopColor="#0369A1" /><stop offset="85%" stopColor="#0284C7" /><stop offset="97%" stopColor="#7DD3FC" /><stop offset="100%" stopColor="#E0F2FE" />
+                  <stop offset="0%" stopColor="#0284C7" /><stop offset="45%" stopColor="#0369A1" /><stop offset="85%" stopColor="#075985" /><stop offset="100%" stopColor="#082F49" />
                 </radialGradient>
-                <linearGradient id={dishedInnerShadow} x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#082F49" stopOpacity="0.7" /><stop offset="50%" stopColor="#0C4A6E" stopOpacity="0.2" /><stop offset="100%" stopColor="#F0F9FF" stopOpacity="0.6" />
-                </linearGradient>
                 <linearGradient id={starFacetLight} x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#FFFFFF" /><stop offset="40%" stopColor="#E0F2FE" /><stop offset="100%" stopColor="#BAE6FD" />
+                  <stop offset="0%" stopColor="#FFFFFF" /><stop offset="50%" stopColor="#F0F9FF" /><stop offset="100%" stopColor="#BAE6FD" />
                 </linearGradient>
                 <linearGradient id={starFacetMid} x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#BAE6FD" /><stop offset="100%" stopColor="#38BDF8" />
+                  <stop offset="0%" stopColor="#E0F2FE" /><stop offset="60%" stopColor="#BAE6FD" /><stop offset="100%" stopColor="#7DD3FC" />
                 </linearGradient>
                 <linearGradient id={starFacetDark} x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#0284C7" /><stop offset="100%" stopColor="#0369A1" />
+                  <stop offset="0%" stopColor="#7DD3FC" /><stop offset="60%" stopColor="#38BDF8" /><stop offset="100%" stopColor="#0284C7" />
                 </linearGradient>
-                <linearGradient id={starFacetDeep} x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#075985" /><stop offset="100%" stopColor="#0C4A6E" />
-                </linearGradient>
+                <filter id={starGlow} x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="1.5" result="glow" />
+                  <feComposite in="SourceGraphic" in2="glow" operator="over" />
+                </filter>
               </defs>
-              <circle cx="50" cy="50" r="46" fill={`url(#${outerRim})`} filter={`url(#${coinShadow})`} />
+              <circle cx="50" cy="50" r="46" fill={`url(#${outerRim})`} />
               <circle cx="50" cy="50" r="45.5" fill="none" stroke={`url(#${bevelLight})`} strokeWidth="1.5" />
-              <circle cx="50" cy="50" r="42" fill="none" stroke="#082F49" strokeOpacity="0.4" strokeWidth="1" />
               <circle cx="50" cy="50" r="38.5" fill={`url(#${dishedConcave})`} />
-              <circle cx="50" cy="50" r="38.5" fill="none" stroke={`url(#${dishedInnerShadow})`} strokeWidth="2.5" />
-              <circle cx="50" cy="50" r="34" fill="none" stroke="#F0F9FF" strokeWidth="1.2" strokeDasharray="2 3" strokeOpacity="0.75" />
-              <g id="faceted-star">
+              <circle cx="50" cy="50" r="34" fill="none" stroke="#BAE6FD" strokeWidth="1" strokeDasharray="2 3" strokeOpacity="0.8" />
+              <g id="faceted-star" filter={`url(#${starGlow})`}>
                 <polygon points="50,50 50,26 44.1,41.9" fill={`url(#${starFacetLight})`} />
                 <polygon points="50,50 50,26 55.9,41.9" fill={`url(#${starFacetMid})`} />
                 <polygon points="50,50 72.8,42.6 55.9,41.9" fill={`url(#${starFacetMid})`} />
                 <polygon points="50,50 72.8,42.6 59.5,53.1" fill={`url(#${starFacetDark})`} />
                 <polygon points="50,50 64.1,69.4 59.5,53.1" fill={`url(#${starFacetDark})`} />
-                <polygon points="50,50 64.1,69.4 50,60" fill={`url(#${starFacetDeep})`} />
-                <polygon points="50,50 35.9,69.4 50,60" fill={`url(#${starFacetDeep})`} />
+                <polygon points="50,50 64.1,69.4 50,60" fill={`url(#${starFacetLight})`} />
+                <polygon points="50,50 35.9,69.4 50,60" fill={`url(#${starFacetLight})`} />
                 <polygon points="50,50 35.9,69.4 40.5,53.1" fill={`url(#${starFacetMid})`} />
                 <polygon points="50,50 27.2,42.6 40.5,53.1" fill={`url(#${starFacetLight})`} />
                 <polygon points="50,50 27.2,42.6 44.1,41.9" fill={`url(#${starFacetLight})`} />
               </g>
-              <circle cx="49.5" cy="48.5" r="3" fill="#FFFFFF" fillOpacity="0.9" />
-              <circle cx="47" cy="32" r="1.8" fill="#FFFFFF" fillOpacity="0.95" />
+              <circle cx="50" cy="50" r="2.5" fill="#FFFFFF" />
             </svg>
           </div>
         );
