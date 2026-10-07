@@ -5,7 +5,7 @@ const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const WEB_APP_URL = 'https://toboostaicom-web3.vercel.app';
 
 // 🔥 গতকালের সেই ফিক্সড ছবি, লেখা এবং বাটন
-const DEFAULT_PHOTO = 'https://i.postimg.cc/s2q0bhg9/20261006-192711.jpg';
+const DEFAULT_PHOTO = 'https://i.postimg.cc/1zLcPxN9/In-Shot-20260918-114513620.jpg';
 const DEFAULT_BUTTON = '🌟 TO BOOSTAI NOW';
 const DEFAULT_CAPTION = `⚡️Don’t miss out — fresh sponsors just arrived, and new rewards are already live! 
 💎Your activity keeps the momentum growing.
