@@ -1649,10 +1649,24 @@
 
       const FrensView = ({ currentInvites, dict }) => {
         const [copied, setCopied] = useState(false);
-        const botUsername = 'ToFarmsAi_Bot';
+        const botUsername = 'ToFarmsAi_Bot'; 
+        const appShortName = 'play'; 
         const userId = tg?.initDataUnsafe?.user?.id || '';
-        const inviteUrl = `https://t.me/${botUsername}?startapp=ref_${userId}`;
+        
+        // 🌟 ডিরেক্ট অ্যাপ লিংক (যা ব্যানার ও LAUNCH বাটন দেখাবে)
+        const inviteUrl = `https://t.me/${botUsername}/${appShortName}?startapp=ref_${userId}`;
 
+        const handleCopy = () => {
+          navigator.clipboard.writeText(inviteUrl);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        };
+
+        const handleShare = () => {
+          const shareCaption = `TO BOOSTAi NOW!🌟 Start your online tasks and earn $GRAM rewards together.`;
+          const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(inviteUrl)}&text=${encodeURIComponent(shareCaption)}`;
+          openSafeLink(shareUrl);
+        };
         const handleCopy = () => {
           navigator.clipboard.writeText(inviteUrl);
           setCopied(true);
