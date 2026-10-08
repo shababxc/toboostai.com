@@ -1326,40 +1326,98 @@
 
       const HelpModal = ({ isOpen, onClose }) => {
         if (!isOpen) return null;
+
+        const [openIndex, setOpenIndex] = useState(null);
+
+        const toggleAccordion = (index) => {
+          setOpenIndex((prev) => (prev === index ? null : index));
+        };
+
         const faqs = [
-          { q: 'What is ToBOOSTAi?', a: 'ToBOOSTAi is a Web3 Mini App where users complete social bounties, watch sponsor ads, and convert earned Star PTS to $GRAM tokens.' },
-          { q: 'How to increase Daily Task limits?', a: 'You start with 5 daily tasks. By inviting 5, 10, 15+ friends, you unlock 10, 15, up to 20 high-reward tasks every day.' },
-          { q: 'What are Withdrawal Rules?', a: 'Withdrawals require meeting the minimum PTS threshold for your tier (10,000 PTS for 1st, 20,000 for 2nd, etc.), 7 consecutive daily check-ins, watching at least 10 sponsor ads today, and a connected TON Wallet.' },
+          {
+            q: '1.What is ToBOOSTAi?',
+            a: 'ToBOOSTAi is an app where users can publish and complete tasks. You can earn points by completing tasks or spend money to publish tasks for exposure'
+          },
+          {
+            q: '2.How can I earn points?',
+            a: 'Complete tasks and watch 10 daily ads to earn points, plus invite friends and earn exciting bonuses when they complete tasks!'
+          },
+          {
+            q: '3.How can I use points?',
+            a: 'Points can be exchanged for GRAM or used to publish tasks. 100 points = 0.01GRAM (Minimum: 10,000 points). You can also spend 10,000 points to get 100 task impressions.'
+          },
+          {
+            q: '4.How do I publish a task?',
+            a: "Click 'Post Task'.Enter the task name, task link, and your desired exposure level, make sure your link is correct.Once the fee is paid, your task will be published successfully!"
+          },
+          {
+            q: '5.Can I boost an existing task?',
+            a: 'Yes! You can purchase additional exposure for any task you have already published.'
+          }
         ];
 
         return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
-            <div className="relative w-full max-w-sm rounded-[24px] bg-white border border-sky-100 shadow-2xl p-5 overflow-hidden max-h-[85vh] flex flex-col">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="relative w-full max-w-[340px] sm:max-w-sm rounded-[28px] bg-white border border-slate-100 shadow-2xl p-5 overflow-hidden max-h-[85vh] flex flex-col">
+              
+              {/* Header (No Coin Icon, Clean (?) FAQ and Close Button like Screenshot) */}
+              <div className="flex items-center justify-between pb-3.5 mb-2 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <Coin3DIcon size={30} idPrefix="help-coin" />
-                  <div>
-                    <h3 className="font-display font-black text-slate-900 text-base">ToBOOSTAi Guide</h3>
-                    <p className="text-[12px] text-slate-400">Rules & FAQ</p>
+                  <div className="w-7 h-7 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center">
+                    <Icons.HelpCircle className="w-4 h-4 stroke-[2.2]" />
                   </div>
+                  <h3 className="font-display font-black text-slate-800 text-lg tracking-tight">FAQ</h3>
                 </div>
-                <button onClick={onClose} className="p-1 rounded-full text-slate-400 hover:text-slate-600">
-                  <Icons.X className="w-5 h-5" />
+                <button 
+                  onClick={onClose} 
+                  className="p-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition active:scale-90"
+                >
+                  <Icons.X className="w-5 h-5 stroke-[2.2]" />
                 </button>
               </div>
 
-              <div className="py-3 space-y-3 overflow-y-auto no-scrollbar flex-1">
-                {faqs.map((faq, idx) => (
-                  <div key={idx} className="p-3 rounded-2xl bg-sky-50/50 border border-sky-100">
-                    <div className="font-display font-bold text-xs text-slate-800 mb-1">{faq.q}</div>
-                    <p className="text-[12px] text-slate-600 leading-relaxed">{faq.a}</p>
-                  </div>
-                ))}
+              {/* Accordion Folders List */}
+              <div className="py-1 space-y-2.5 overflow-y-auto no-scrollbar flex-1">
+                {faqs.map((faq, idx) => {
+                  const isOpen = openIndex === idx;
+
+                  return (
+                    <div 
+                      key={idx}
+                      className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
+                        isOpen 
+                          ? 'bg-sky-50/60 border-sky-200 shadow-xs' 
+                          : 'bg-slate-50/90 hover:bg-slate-100/80 border-slate-200/70'
+                      }`}
+                    >
+                      {/* Question Folder Header */}
+                      <div
+                        onClick={() => toggleAccordion(idx)}
+                        className="px-4 py-3.5 flex items-center justify-between cursor-pointer select-none"
+                      >
+                        <span className={`text-[13px] font-bold leading-snug transition-colors pr-2 ${
+                          isOpen ? 'text-sky-700' : 'text-slate-800'
+                        }`}>
+                          {faq.q}
+                        </span>
+                        <div className={`text-slate-400 transform transition-transform duration-200 shrink-0 ${
+                          isOpen ? 'rotate-90 text-sky-600' : ''
+                        }`}>
+                          <Icons.ChevronRight className="w-4 h-4 stroke-[2.5]" />
+                        </div>
+                      </div>
+
+                      {/* Expandable Answer Box */}
+                      {isOpen && (
+                        <div className="px-4 pb-3.5 pt-1 text-[12px] font-medium text-slate-600 leading-relaxed border-t border-sky-100/80">
+                          {faq.a}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
 
-              <button onClick={onClose} className="mt-2 w-full py-2.5 bg-slate-900 text-white font-bold text-xs rounded-xl cursor-pointer">
-                Close Guide
-              </button>
             </div>
           </div>
         );
