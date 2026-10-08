@@ -1667,16 +1667,7 @@
           const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(inviteUrl)}&text=${encodeURIComponent(shareCaption)}`;
           openSafeLink(shareUrl);
         };
-        const handleCopy = () => {
-          navigator.clipboard.writeText(inviteUrl);
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-        };
-
-        const handleShare = () => {
-          const text = encodeURIComponent(`🚀 Join ToBOOSTAi on Telegram! Earn Star PTS and rewards together.\n\nPlay now: ${inviteUrl}`);
-          openSafeLink(`https://t.me/share/url?url=${inviteUrl}&text=${text}`);
-        };
+        
 
         return (
           <div className="w-full px-4 pt-2 pb-20 space-y-3 tab-enter">
