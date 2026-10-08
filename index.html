@@ -1422,133 +1422,196 @@
           </div>
         );
       };
-
-      const SettingsModal = ({ isOpen, onClose, username, onUpdateUsername }) => {
-        const [editingName, setEditingName] = useState(username);
-        const [soundEnabled, setSoundEnabled] = useState(true);
-        const [hapticsEnabled, setHapticsEnabled] = useState(true);
-
+const SettingsModal = ({ isOpen, onClose, username }) => {
         if (!isOpen) return null;
 
-        const handleSave = (e) => {
-          e.preventDefault();
-          if (editingName.trim()) {
-            onUpdateUsername(editingName.trim());
-            onClose();
-          }
+        const [showPrivacy, setShowPrivacy] = useState(false);
+        const [copiedId, setCopiedId] = useState(false);
+
+        const userId = tg?.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : '5569162716';
+        const avatarUrl = tg?.initDataUnsafe?.user?.photo_url || null;
+
+        const handleCopyId = () => {
+          navigator.clipboard.writeText(userId);
+          setCopiedId(true);
+          setTimeout(() => setCopiedId(false), 2000);
         };
 
         return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in">
-            <div className="relative w-full max-w-sm rounded-[24px] bg-white border border-sky-100 shadow-2xl p-5 overflow-hidden">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h3 className="font-display font-black text-slate-900 text-base">Settings</h3>
-                <button onClick={onClose} className="p-1 rounded-full text-slate-400 hover:text-slate-600">
-                  <Icons.X className="w-5 h-5" />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="relative w-full max-w-[340px] sm:max-w-sm rounded-[28px] bg-white border border-slate-100 shadow-2xl p-5 overflow-hidden max-h-[85vh] flex flex-col">
+              
+              {/* Header */}
+              <div className="flex items-center justify-between pb-3.5 mb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  {showPrivacy ? (
+                    <button
+                      onClick={() => setShowPrivacy(false)}
+                      className="p-1 -ml-1 rounded-full text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition flex items-center gap-1 text-xs font-bold cursor-pointer"
+                    >
+                      <span>← Back</span>
+                    </button>
+                  ) : (
+                    <>
+                      <Icons.Settings className="w-5 h-5 text-slate-700" />
+                      <h3 className="font-display font-black text-slate-800 text-lg tracking-tight">Settings</h3>
+                    </>
+                  )}
+                  {showPrivacy && (
+                    <h3 className="font-display font-black text-slate-800 text-base tracking-tight ml-1">Privacy Policy</h3>
+                  )}
+                </div>
+                <button 
+                  onClick={onClose} 
+                  className="p-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition active:scale-90 cursor-pointer"
+                >
+                  <Icons.X className="w-5 h-5 stroke-[2.2]" />
                 </button>
               </div>
 
-              <div className="py-3 space-y-3.5 max-h-[75vh] overflow-y-auto no-scrollbar">
-                <form onSubmit={handleSave} className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                    <Icons.User className="w-4 h-4 text-sky-600" />
-                    <span>Display Name</span>
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={editingName}
-                      onChange={(e) => setEditingName(e.target.value)}
-                      maxLength={25}
-                      className="flex-1 px-3 py-2 text-xs rounded-xl border border-slate-200 text-slate-900 font-semibold"
-                    />
-                    <button type="submit" className="px-3.5 py-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-xl text-xs font-bold cursor-pointer shadow-xs active:scale-95">
-                      Save
-                    </button>
+              {/* Main Content Area */}
+              <div className="overflow-y-auto no-scrollbar flex-1">
+                {showPrivacy ? (
+                  /* ======================================================== */
+                  /* FULL PRIVACY POLICY TEXT VIEW */
+                  /* ======================================================== */
+                  <div className="text-[12px] text-slate-600 space-y-3 leading-relaxed pr-1 pb-2">
+                    <div className="p-2.5 rounded-xl bg-sky-50/70 border border-sky-100 text-[11px] text-sky-800 font-semibold">
+                      Effective Date: September 5, 2025
+                    </div>
+                    <p className="font-medium">
+                      Welcome to our services. We highly value your privacy and are committed to protecting your personal data. This privacy policy details the information we collect, how we use it, and your related rights.
+                    </p>
+
+                    <div>
+                      <h5 className="font-bold text-slate-800 text-[12.5px] mb-1">1. Information We Collect</h5>
+                      <p><strong>1.1 Personal Data:</strong> Your Telegram user ID, username, and user avatar.</p>
+                      <p className="mt-1"><strong>1.2 Usage Data:</strong> Game data (activities, achievements, scores, rankings), device info, and log data.</p>
+                      <p className="mt-1"><strong>1.3 Transaction Data:</strong> Payment information and transaction history.</p>
+                    </div>
+
+                    <div>
+                      <h5 className="font-bold text-slate-800 text-[12.5px] mb-1">2. Cookies and Technologies</h5>
+                      <p>We use local storage and caching technologies to optimize your experience. Disabling these may prevent certain features.</p>
+                    </div>
+
+                    <div>
+                      <h5 className="font-bold text-slate-800 text-[12.5px] mb-1">3. How We Use Your Information</h5>
+                      <p>To provide and maintain services, process token conversions, prevent fraud, personalize user experience, and comply with legal requirements.</p>
+                    </div>
+
+                    <div>
+                      <h5 className="font-bold text-slate-800 text-[12.5px] mb-1">4. Data Sharing & Security</h5>
+                      <p>We do not sell personal data. We apply high-grade encryption, firewalls, and strict access controls to safeguard your information.</p>
+                    </div>
+
+                    <div>
+                      <h5 className="font-bold text-slate-800 text-[12.5px] mb-1">5. Your Rights & Retention</h5>
+                      <p>You have the right to access, rectify, or request deletion of your data according to applicable data protection laws.</p>
+                    </div>
+
+                    <div>
+                      <h5 className="font-bold text-slate-800 text-[12.5px] mb-1">6. Accessibility & Contact</h5>
+                      <p>Accessible via /privacy in bot or Settings in mini app. For support, contact @Toboosthelp.</p>
+                    </div>
                   </div>
-                </form>
-
-                <div className="pt-2 border-t border-slate-100 space-y-2">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                    Community & Support
-                  </span>
-                  
-                  <button
-                    onClick={() => openSafeLink('https://t.me/ToBOOST_Ai')}
-                    className="w-full flex items-center justify-between p-2.5 rounded-xl bg-sky-50/70 hover:bg-sky-100/70 border border-sky-100 text-slate-800 text-xs font-bold transition active:scale-[0.98] cursor-pointer"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-lg bg-[#2AABEE] text-white flex items-center justify-center shadow-xs">
-                        <Icons.Send className="w-3.5 h-3.5 -translate-x-[0.5px] translate-y-[0.5px]" />
+                ) : (
+                  /* ======================================================== */
+                  /* SETTINGS MAIN DASHBOARD (EXACT SCREENSHOT LAYOUT) */
+                  /* ======================================================== */
+                  <div className="space-y-3.5 pb-1">
+                    {/* Profile Header Box with 1-Click Copy ID */}
+                    <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                      <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-xs bg-gradient-to-tr from-sky-400 to-blue-500 shrink-0 flex items-center justify-center text-white font-bold text-base">
+                        {avatarUrl ? (
+                          <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                        ) : (
+                          <span>{(username || 'U')[0].toUpperCase()}</span>
+                        )}
                       </div>
-                      <span className="font-display text-slate-800">Community</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-[12px] text-sky-600 font-semibold">
-                      <span>Join</span>
-                      <Icons.ChevronRight className="w-3.5 h-3.5" />
-                    </div>
-                  </button>
-
-                  <button
-                    onClick={() => openSafeLink('https://x.com/toboostapp')}
-                    className="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 text-xs font-bold transition active:scale-[0.98] cursor-pointer"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-lg bg-black text-white flex items-center justify-center shadow-xs">
-                        <Icons.Twitter className="w-3.5 h-3.5" />
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-display font-extrabold text-slate-900 text-sm leading-tight truncate">
+                          {username || 'User'}
+                        </h4>
+                        <div 
+                          onClick={handleCopyId}
+                          className="flex items-center gap-1.5 text-[11px] text-slate-500 font-mono mt-1 cursor-pointer hover:text-sky-600 transition w-fit select-none"
+                          title="Click to copy ID"
+                        >
+                          <span>ID:{userId}</span>
+                          {copiedId ? (
+                            <span className="text-emerald-600 text-[10px] font-bold">✓ Copied</span>
+                          ) : (
+                            <Icons.Copy className="w-3.5 h-3.5 text-slate-400 hover:text-slate-600" />
+                          )}
+                        </div>
                       </div>
-                      <span className="font-display text-slate-800">X Twitter</span>
                     </div>
-                    <div className="flex items-center gap-1 text-[12px] text-slate-500 font-semibold">
-                      <span>Follow</span>
-                      <Icons.ChevronRight className="w-3.5 h-3.5" />
-                    </div>
-                  </button>
 
-                  <button
-                    onClick={() => openSafeLink('https://t.me/Toboostapp')}
-                    className="w-full flex items-center justify-between p-2.5 rounded-xl bg-emerald-50/70 hover:bg-emerald-100/60 border border-emerald-100 text-slate-800 text-xs font-bold transition active:scale-[0.98] cursor-pointer"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-lg bg-emerald-500 text-white flex items-center justify-center shadow-xs">
-                        <Icons.HelpCircle className="w-3.5 h-3.5" />
+                    {/* Action Items List (Cards like Screenshot) */}
+                    <div className="rounded-2xl border border-slate-200/80 bg-white divide-y divide-slate-100 overflow-hidden shadow-xs">
+                      
+                      {/* Row 1: Channel */}
+                      <div
+                        onClick={() => openSafeLink('https://t.me/ToBOOST_Ai')}
+                        className="p-3.5 flex items-center justify-between hover:bg-slate-50 active:bg-slate-100 transition cursor-pointer select-none"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Icons.Telegram className="w-6 h-6 shrink-0" />
+                          <span className="font-bold text-[13.5px] text-slate-800">Channel</span>
+                        </div>
+                        <Icons.ChevronRight className="w-4 h-4 text-slate-300" />
                       </div>
-                      <span className="font-display text-slate-800">Support</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-[12px] text-emerald-600 font-semibold">
-                      <span>Chat</span>
-                      <Icons.ChevronRight className="w-3.5 h-3.5" />
-                    </div>
-                  </button>
-                </div>
 
-                <div className="space-y-2 pt-2 border-t border-slate-100">
-                  <div className="flex items-center justify-between py-1">
-                    <div className="flex items-center gap-2">
-                      <Icons.Volume2 className="w-4 h-4 text-slate-500" />
-                      <span className="text-xs font-semibold text-slate-700">Sound Effects</span>
+                      {/* Row 2: Go to X */}
+                      <div
+                        onClick={() => openSafeLink('https://x.com/toboostapp')}
+                        className="p-3.5 flex items-center justify-between hover:bg-slate-50 active:bg-slate-100 transition cursor-pointer select-none"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Icons.Twitter className="w-6 h-6 shrink-0" />
+                          <span className="font-bold text-[13.5px] text-slate-800">Go to X</span>
+                        </div>
+                        <Icons.ChevronRight className="w-4 h-4 text-slate-300" />
+                      </div>
+
+                      {/* Row 3: Support */}
+                      <div
+                        onClick={() => openSafeLink('https://t.me/Toboosthelp')}
+                        className="p-3.5 flex items-center justify-between hover:bg-slate-50 active:bg-slate-100 transition cursor-pointer select-none"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-6 h-6 rounded-lg bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                            <Icons.HelpCircle className="w-4 h-4 stroke-[2.2]" />
+                          </div>
+                          <span className="font-bold text-[13.5px] text-slate-800">Support</span>
+                        </div>
+                        <Icons.ChevronRight className="w-4 h-4 text-slate-300" />
+                      </div>
+
+                      {/* Row 4: Privacy policy */}
+                      <div
+                        onClick={() => setShowPrivacy(true)}
+                        className="p-3.5 flex items-center justify-between hover:bg-slate-50 active:bg-slate-100 transition cursor-pointer select-none"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-6 h-6 rounded-full bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                            <Icons.ShieldCheck className="w-4 h-4 stroke-[2.2]" />
+                          </div>
+                          <span className="font-bold text-[13.5px] text-slate-800">Privacy policy</span>
+                        </div>
+                        <Icons.ChevronRight className="w-4 h-4 text-slate-300" />
+                      </div>
+
                     </div>
-                    <button onClick={() => setSoundEnabled(!soundEnabled)} className={`w-10 h-6 flex items-center rounded-full p-1 cursor-pointer ${soundEnabled ? 'bg-sky-500 justify-end' : 'bg-slate-200 justify-start'}`}>
-                      <div className="w-4 h-4 rounded-full bg-white shadow-xs" />
-                    </button>
                   </div>
-
-                  <div className="flex items-center justify-between py-1">
-                    <div className="flex items-center gap-2">
-                      <Icons.Smartphone className="w-4 h-4 text-slate-500" />
-                      <span className="text-xs font-semibold text-slate-700">Haptic Feedback</span>
-                    </div>
-                    <button onClick={() => setHapticsEnabled(!hapticsEnabled)} className={`w-10 h-6 flex items-center rounded-full p-1 cursor-pointer ${hapticsEnabled ? 'bg-sky-500 justify-end' : 'bg-slate-200 justify-start'}`}>
-                      <div className="w-4 h-4 rounded-full bg-white shadow-xs" />
-                    </button>
-                  </div>
-                </div>
+                )}
               </div>
+
             </div>
           </div>
         );
       };
-
       const TaskLimitModal = ({ isOpen, onClose, dailyLimit, invites, onGoToFrens }) => {
         if (!isOpen) return null;
         return (
