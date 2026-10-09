@@ -150,6 +150,13 @@ module.exports = async (req, res) => {
           userData.name = auth.user.first_name;
         }
 
+        // 🌟 ইউজারের টেলিগ্রাম প্রোফাইল ছবি ডাটাবেসে সেভ ও আপডেট করা
+        const currentPhotoUrl = auth.user.photo_url || (req.body && req.body.photoUrl) || null;
+        if (currentPhotoUrl && userData.photo_url !== currentPhotoUrl) {
+          updatesNeeded.photo_url = currentPhotoUrl;
+          userData.photo_url = currentPhotoUrl;
+        }
+
         // ছ) ইউজার ওয়ালেট কানেক্ট করলে ডাটাবেসে সেভ করা
         if (body.walletAddress && userData.walletAddress !== body.walletAddress) {
           updatesNeeded.walletAddress = body.walletAddress;
