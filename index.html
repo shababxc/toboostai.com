@@ -1857,139 +1857,124 @@ const SettingsModal = ({ isOpen, onClose, username }) => {
                 willChange: 'scroll-position' 
               }}
             >
+{/* 👥 মেম্বার কার্ডস (ক্যাপসুলে চাপ দিলে Lv2 ফোল্ডার খুলবে) */}
+            {teamMembers && teamMembers.length > 0 ? (
+              teamMembers.map((m) => {
+                const isLv2Open = openLv2Id === m.userId;
 
-            {/* Members List */}
-            <div className="space-y-3">
-              {teamMembers && teamMembers.length > 0 ? (
-                teamMembers.map((m) => {
-                  const isLv2Open = openLv2Id === m.userId;
-
-                  return (
-                    <div 
-                      key={m.userId}
-                      className="rounded-[22px] bg-white border border-sky-100/90 shadow-[0_2px_10px_rgba(56,189,248,0.05)] p-3.5 space-y-3 transition-all"
-                    >
-                      {/* Top Row: Avatar + Name + Points Capsule + Chat Icon */}
-                      <div className="flex items-center justify-between gap-2">
-                        
-                        {/* Member Info */}
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="w-10 h-10 rounded-full overflow-hidden border border-sky-200 bg-gradient-to-tr from-sky-400 to-blue-500 shrink-0 flex items-center justify-center text-white font-bold text-sm shadow-2xs">
-                            {m.avatarUrl ? (
-                              <img src={m.avatarUrl} alt={m.name} className="w-full h-full object-cover" />
-                            ) : (
-                              <span>{(m.name || 'F')[0].toUpperCase()}</span>
-                            )}
-                          </div>
-                          
-                          <div className="min-w-0">
-                            <h4 className="font-display font-bold text-slate-900 text-[14px] leading-tight truncate">
-                              {m.name || 'Telegram Fren'}
-                            </h4>
-                          </div>
+                return (
+                  <div 
+                    key={m.userId}
+                    className="rounded-[20px] bg-white border border-sky-100/90 shadow-[0_2px_8px_rgba(56,189,248,0.04)] p-3 space-y-2.5 transition-all"
+                    style={{ transform: 'translateZ(0)' }}
+                  >
+                    {/* Top Row: Avatar + Name + Points Capsule + Chat Icon */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-10 h-10 rounded-full overflow-hidden border border-sky-200 bg-gradient-to-tr from-sky-400 to-blue-500 shrink-0 flex items-center justify-center text-white font-bold text-sm shadow-2xs">
+                          {m.avatarUrl ? (
+                            <img src={m.avatarUrl} alt={m.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <span>{(m.name || 'F')[0].toUpperCase()}</span>
+                          )}
                         </div>
-
-                        {/* Right: Cute Capsule & Chat Bubble */}
-                        <div className="flex items-center gap-2 shrink-0">
-                          {/* 🌟 পয়েন্টের সুন্দর ক্যাপসুল (Cute Pill Capsule) */}
-                          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50/90 border border-sky-200/80 shadow-2xs">
-                            <Coin3DIcon size={15} idPrefix={`mem-pts-${m.userId}`} />
-                            <span className="text-[12px] font-extrabold text-sky-800 font-mono tabular-nums">
-                              {(m.points || 0).toLocaleString()}
-                            </span>
-                          </div>
-
-                          {/* 💬 মেসেজ বাটন (সরাসরি চ্যাটে যাওয়ার আইকন) */}
-                          <button
-                            onClick={() => {
-                              if (m.username) {
-                                openSafeLink(`https://t.me/${m.username.replace('@', '')}`);
-                              } else {
-                                openSafeLink(`https://t.me/share/url?url=${encodeURIComponent(inviteUrl)}&text=${encodeURIComponent(`Hey ${m.name}! Come play ToBOOSTAi.`)}`);
-                              }
-                            }}
-                            className="w-7 h-7 rounded-full bg-sky-100/80 hover:bg-sky-200/80 text-sky-600 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-2xs"
-                            title="Message on Telegram"
-                          >
-                            <svg className="w-3.5 h-3.5 fill-sky-600" viewBox="0 0 24 24">
-                              <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
-                            </svg>
-                          </button>
+                        <div className="min-w-0">
+                          <h4 className="font-display font-bold text-slate-900 text-[13.5px] leading-tight truncate">
+                            {m.name || 'Telegram Fren'}
+                          </h4>
                         </div>
-
                       </div>
 
-                      {/* Bottom Box: Lv2 Members Drawer (Click to Toggle Folder) */}
-                      <div 
-                        onClick={() => toggleLv2(m.userId)}
-                        className="p-2.5 rounded-xl bg-slate-50/90 hover:bg-slate-100/80 border border-slate-100 flex items-center justify-between cursor-pointer transition select-none"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="text-[11px] font-bold text-slate-700">Lv2 members</span>
-                          <div className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 bg-white px-2 py-0.5 rounded-full border border-slate-200 shadow-2xs">
-                            <Icons.Users className="w-3 h-3 text-slate-400" />
-                            <span className="font-mono">{m.lv2Count || 0}</span>
+                      {/* Right: Capsule (Click to open Lv2!) + Chat Bubble */}
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {/* 🌟 পয়েন্টের ক্যাপসুল (এটিতে চাপ দিলেই লেভেল-২ ফোল্ডার খুলবে!) */}
+                        <div 
+                          onClick={() => toggleLv2(m.userId)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 hover:bg-sky-100/80 active:scale-95 border border-sky-200/90 cursor-pointer shadow-2xs transition-all select-none"
+                          title="Click to view Lv2 members"
+                        >
+                          <Coin3DIcon size={15} idPrefix={`mem-pts-${m.userId}`} />
+                          <span className="text-[12px] font-extrabold text-sky-800 font-mono tabular-nums">
+                            {(m.points || 0).toLocaleString()}
+                          </span>
+                          <div className={`text-sky-500 transform transition-transform duration-200 ${isLv2Open ? 'rotate-90' : ''}`}>
+                            <Icons.ChevronRight className="w-3 h-3 stroke-[2.5]" />
                           </div>
                         </div>
 
-                        {/* 🌟 Lv2 বোনাস ক্যাপসুল */}
-                        <div className="flex items-center gap-1.5">
-                          <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white border border-sky-100/90 shadow-2xs">
+                        {/* 💬 মেসেজ বাটন */}
+                        <button
+                          onClick={() => {
+                            if (m.username) {
+                              openSafeLink(`https://t.me/${m.username.replace('@', '')}`);
+                            } else {
+                              openSafeLink(`https://t.me/share/url?url=${encodeURIComponent(inviteUrl)}&text=${encodeURIComponent(`Hey ${m.name}! Come play ToBOOSTAi.`)}`);
+                            }
+                          }}
+                          className="w-7 h-7 rounded-full bg-sky-100/80 hover:bg-sky-200/80 text-sky-600 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-2xs shrink-0"
+                          title="Message on Telegram"
+                        >
+                          <svg className="w-3.5 h-3.5 fill-sky-600" viewBox="0 0 24 24">
+                            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* 🌟 লেভেল-২ ফোল্ডার (শুধুমাত্র ক্যাপসুলে চাপ দিলে খুলবে) */}
+                    {isLv2Open && (
+                      <div className="pt-2 border-t border-slate-100 animate-in fade-in duration-200 space-y-2">
+                        <div className="p-2.5 rounded-xl bg-slate-50/90 border border-slate-200/70 flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] font-bold text-slate-700">Lv2 members</span>
+                            <div className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 bg-white px-2 py-0.5 rounded-full border border-slate-200 shadow-2xs">
+                              <Icons.Users className="w-3 h-3 text-slate-400" />
+                              <span className="font-mono">{m.lv2Count || 0}</span>
+                            </div>
+                          </div>
+
+                          <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white border border-sky-100 shadow-2xs">
                             <Coin3DIcon size={13} idPrefix={`lv2-coin-${m.userId}`} />
                             <span className="text-[11px] font-extrabold text-sky-700 font-mono tabular-nums">
                               {(m.lv2Points || 0).toLocaleString()}
                             </span>
                           </div>
-                          <div className={`text-slate-400 transform transition-transform duration-200 ${isLv2Open ? 'rotate-90' : ''}`}>
-                            <Icons.ChevronRight className="w-3.5 h-3.5" />
-                          </div>
                         </div>
+                        <p className="text-[10px] text-slate-400 pl-1 leading-tight">
+                          Earn 100 PTS passive bonus whenever Lv2 members complete tasks!
+                        </p>
                       </div>
-
-                      {/* Expandable Folder Drawer */}
-                      {isLv2Open && (
-                        <div className="p-2.5 rounded-xl bg-sky-50/60 border border-sky-100 text-[11px] text-slate-600 leading-relaxed animate-in fade-in">
-                          <div className="flex justify-between items-center font-semibold">
-                            <span>Sub-network referrals:</span>
-                            <span className="font-bold text-sky-800">{m.lv2Count || 0} Frens</span>
-                          </div>
-                          <p className="text-[10px] text-slate-400 mt-1">
-                            Earn 100 PTS passive bonus whenever Lv2 members complete tasks!
-                          </p>
-                        </div>
-                      )}
-
-                    </div>
-                  );
-                })
-              ) : (
-                /* No Members Fallback Card */
-                <div className="p-6 rounded-[22px] bg-white border border-sky-100 text-center shadow-xs">
-                  <div className="w-12 h-12 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center mx-auto mb-2">
-                    <Icons.Users className="w-6 h-6" />
+                    )}
                   </div>
-                  <h4 className="font-display font-bold text-slate-800 text-[14px]">No team members yet!</h4>
-                  <p className="text-[11px] text-slate-400 mt-0.5 max-w-xs mx-auto">
-                    Invite friends using your link below to build your Lv1 & Lv2 earning network.
-                  </p>
+                );
+              })
+            ) : (
+              <div className="p-6 rounded-[22px] bg-white border border-sky-100 text-center shadow-xs">
+                <div className="w-12 h-12 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center mx-auto mb-2">
+                  <Icons.Users className="w-6 h-6" />
                 </div>
-              )}
-            </div>
-
-            {/* Bottom Floating Action: Invite Members Button */}
-            <div className="pt-2">
-              <button
-                onClick={handleShare}
-                className="w-full py-3 bg-gradient-to-r from-sky-500 via-blue-600 to-sky-600 hover:from-sky-600 hover:to-blue-700 active:scale-[0.98] text-white font-extrabold text-[14px] rounded-2xl shadow-md shadow-sky-500/25 flex items-center justify-center gap-2 cursor-pointer transition-all"
-              >
-                <span>Invite Members</span>
-                <Icons.User className="w-4 h-4 fill-white/20" />
-              </button>
-            </div>
-
+                <h4 className="font-display font-bold text-slate-800 text-[14px]">No team members yet!</h4>
+                <p className="text-[11px] text-slate-400 mt-0.5 max-w-xs mx-auto">
+                  Invite friends using your link below to build your Lv1 & Lv2 earning network.
+                </p>
+              </div>
+            )}
           </div>
-        );
-      };
+
+          {/* 🔒 ৩. নিচে লক থাকা ফিক্সড ইনভাইট বাটন */}
+          <div className="shrink-0 w-full px-4 pt-1.5 pb-20 bg-gradient-to-t from-[#dcf0fb] via-[#dcf0fb] to-transparent z-10">
+            <button
+              onClick={handleShare}
+              className="w-full py-3 bg-gradient-to-r from-sky-500 via-blue-600 to-sky-600 hover:from-sky-600 hover:to-blue-700 active:scale-[0.98] text-white font-extrabold text-[14px] rounded-2xl shadow-lg shadow-sky-500/25 flex items-center justify-center gap-2 cursor-pointer transition-all"
+            >
+              <span>Invite Members</span>
+              <Icons.User className="w-4 h-4 fill-white/20" />
+            </button>
+          </div>
+
+        </div>
+      );
+    };
 const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, savedStreaks, savedAdDays, withdrawCount = 0, onConnectWallet, onDisconnectWallet, onConvertStars, onShowAlert }) => {
         const tier = withdrawCount + 1;
         const minRequiredPts = tier * 10000;
