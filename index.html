@@ -2544,6 +2544,7 @@ const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, s
                 <div className="flex-1 min-h-0 w-full overflow-y-auto no-scrollbar touch-pan-y" style={{ WebkitOverflowScrolling: 'touch' }}>
                   <FrensView
                     currentInvites={stats.currentInvites}
+                    teamMembers={stats.teamMembers || []}
                     dict={dict}
                   />
                 </div>
