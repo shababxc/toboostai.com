@@ -1838,12 +1838,17 @@ const SettingsModal = ({ isOpen, onClose, username }) => {
                   <span className="text-slate-400 font-mono font-bold text-sm">「{teamMembers.length || currentInvites || 0}」</span>
                 </h2>
 
+                {/* 🌟 ২য় স্ক্রিনশটের মতো ভাইব্রেন্ট ব্লু সার্কেল প্রশ্নবোধক বাটন */}
                 <button 
                   onClick={() => openSafeLink('https://t.me/ToBOOST_Ai')}
-                  className="w-6 h-6 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center hover:bg-sky-200 transition cursor-pointer"
-                  title="Rules"
+                  className="w-6 h-6 rounded-full bg-[#24A1DE] hover:bg-[#0284C7] active:scale-90 border-2 border-sky-200/90 shadow-[0_2px_8px_rgba(36,161,222,0.35)] flex items-center justify-center transition-all cursor-pointer shrink-0"
+                  title="Team Rules & Guide"
                 >
-                  <Icons.HelpCircle className="w-3.5 h-3.5 stroke-[2.2]" />
+                  <svg className="w-3 h-3 text-white stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="12" cy="12" r="10" strokeWidth="2.2" />
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" strokeWidth="2.2" strokeLinecap="round" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" strokeWidth="2.5" strokeLinecap="round" />
+                  </svg>
                 </button>
               </div>
             </div>
