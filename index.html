@@ -2198,7 +2198,8 @@ const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, s
                 adsWatchedToday: typeof u.adsWatchedToday === 'number' ? u.adsWatchedToday : prev.adsWatchedToday,
                 walletAddress: u.walletAddress || prev.walletAddress,
                 savedStreaks: u.savedStreaks || 0,
-                savedAdDays: u.savedAdDays || 0
+                savedAdDays: u.savedAdDays || 0,
+                teamMembers: Array.isArray(u.teamMembers) ? u.teamMembers : []
               }));
 
               setCompletedTasksList(mergedCompleted);
