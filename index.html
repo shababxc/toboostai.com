@@ -1794,8 +1794,43 @@ const SettingsModal = ({ isOpen, onClose, username }) => {
         };
 
         return (
-          <div className="w-full px-4 pt-2 pb-24 space-y-3.5 tab-enter">
+          <div className="w-full px-3.5 pt-1.5 pb-24 space-y-3 tab-enter" style={{ WebkitOverflowScrolling: 'touch' }}>
             
+            {/* 🌟 SLIM SKY-BLUE REFERRAL BANNER */}
+            <div className="rounded-[20px] bg-gradient-to-br from-sky-400 via-sky-500 to-blue-600 p-3.5 text-white shadow-[0_4px_16px_rgba(2,132,199,0.22)] relative overflow-hidden">
+              <div className="relative z-10">
+                <div className="flex items-center gap-1 text-[10.5px] font-bold bg-white/20 backdrop-blur-md px-2 py-0.5 rounded-full w-fit mb-1">
+                  <Icons.Gift className="w-3 h-3 text-sky-100" />
+                  <span>Referral Rewards</span>
+                </div>
+
+                <h3 className="font-display font-black text-[17px] tracking-tight leading-tight">
+                  Invite Frens, Earn Together
+                </h3>
+                <p className="text-[11px] text-sky-100/90 mt-0.5 leading-snug">
+                  Earn +100 PTS per fren and unlock higher daily tasks (5, 10, 15 up to 20 daily tasks)!
+                </p>
+
+                {/* Buttons Row */}
+                <div className="mt-2.5 flex items-center gap-2">
+                  <button 
+                    onClick={handleShare} 
+                    className="flex-1 py-2 bg-white hover:bg-sky-50 active:scale-95 text-sky-900 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                  >
+                    <Icons.Share2 className="w-3 h-3 text-sky-600" />
+                    <span>Invite via Telegram</span>
+                  </button>
+                  <button 
+                    onClick={handleCopy} 
+                    className="px-3 py-2 bg-white/20 hover:bg-white/30 active:scale-95 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1 transition-all cursor-pointer"
+                    title="Copy Link"
+                  >
+                    {copied ? <Icons.Check className="w-3.5 h-3.5 text-emerald-300" /> : <Icons.Copy className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
+              </div>
+            </div>
+
             {/* Header: Team members [Count] */}
             <div className="flex items-center justify-between px-1">
               <h2 className="font-display font-extrabold text-slate-800 text-base flex items-center gap-1.5">
