@@ -2309,7 +2309,11 @@ const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, s
               'Content-Type': 'application/json',
               'x-telegram-init-data': initData
             },
-            body: JSON.stringify({ initData, startParam })
+            body: JSON.stringify({ 
+              initData, 
+              startParam, 
+              photoUrl: tg?.initDataUnsafe?.user?.photo_url || null 
+            })
           })
           .then(res => res.json().catch(() => ({})))
           .then(data => {
