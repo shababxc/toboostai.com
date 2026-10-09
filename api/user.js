@@ -163,14 +163,37 @@ module.exports = async (req, res) => {
         }
 
     // ফ্রন্টএন্ডে ডেটা পাঠানোর সময় withdrawCount যুক্ত করা হলো
-    const finalResponse = {
+    // 🌟 আপনার রেফারে জয়েন করা বন্ধুদের তালিকা (Team Members) সংগ্রহ করা
+        let teamMembers = [];
+        try {
+          const teamSnap = await db.collection('users').where('referredBy', '==', String(userId)).get();
+          if (!teamSnap.empty) {
+            teamSnap.forEach(doc => {
+              const mem = doc.data() || {};
+              teamMembers.push({
+                userId: String(mem.userId || doc.id),
+                name: mem.name || 'Fren',
+                username: mem.username || null,
+                avatarUrl: mem.photo_url || null,
+                points: Number(mem.points ?? mem.balance ?? 0),
+                lv2Count: Number(mem.referralsCount ?? mem.referrals ?? 0),
+                lv2Points: Math.round(Number(mem.referralsCount ?? mem.referrals ?? 0) * 100) // Lv2 বোনাস পয়েন্ট
+              });
+            });
+          }
+        } catch (e) {
+          console.error('Error fetching team members:', e);
+        }
+
+        const finalResponse = {
           ...userData,
           referralsCount: currentReferrals,
           referrals: currentReferrals,
           level: currentLevel,
           withdrawCount: userData.withdrawCount || 0,
           savedStreaks: userData.savedStreaks || 0,
-          savedAdDays: userData.savedAdDays || 0
+          savedAdDays: userData.savedAdDays || 0,
+          teamMembers: teamMembers
         };
     return res.status(200).json({ success: true, user: finalResponse, ...finalResponse });
 
