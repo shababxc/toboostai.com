@@ -150,6 +150,12 @@ module.exports = async (req, res) => {
           userData.name = auth.user.first_name;
         }
 
+        // 🌟 ইউজারের টেলিগ্রাম ইউজারনেম (@username) ডাটাবেসে সেভ ও আপডেট করা
+        if (auth.user.username && userData.username !== auth.user.username) {
+          updatesNeeded.username = auth.user.username;
+          userData.username = auth.user.username;
+        }
+
         // 🌟 ইউজারের টেলিগ্রাম প্রোফাইল ছবি ডাটাবেসে সেভ ও আপডেট করা
         const currentPhotoUrl = auth.user.photo_url || (req.body && req.body.photoUrl) || null;
         if (currentPhotoUrl && userData.photo_url !== currentPhotoUrl) {
