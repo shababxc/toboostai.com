@@ -1910,19 +1910,31 @@ const SettingsModal = ({ isOpen, onClose, username }) => {
                         {/* 💬 ২য় স্ক্রিনশটের মতো কয়েন-কালার গ্লোসি মেসেজ বাটন */}
                         <button
                           onClick={() => {
+                            // ১. ইউজারনেম থাকলে সরাসরি https://t.me/ দিয়ে চ্যাট ওপেন
                             if (m.username) {
                               const cleanUser = String(m.username).replace(/^@/, '').trim();
-                              openSafeLink(`https://t.me/${cleanUser}`);
-                            } else {
-                              showToast(`@${m.name} has no public username set.`);
+                              openSafeLink('https://t.me/' + cleanUser);
+                              return;
+                            }
+                            
+                            // ২. ইউজারনেম না থাকলে ও ফোনে সেভ না থাকলেও সরাসরি Telegram ID দিয়ে চ্যাট ওপেন
+                            if (m.userId) {
+                              try {
+                                window.location.href = 'tg://openmessage?user_id=' + m.userId;
+                                setTimeout(() => {
+                                  window.location.href = 'tg://user?id=' + m.userId;
+                                }, 300);
+                              } catch (err) {
+                                window.location.href = 'tg://user?id=' + m.userId;
+                              }
                             }
                           }}
                           className="w-8 h-8 rounded-full bg-gradient-to-b from-white via-sky-50 to-sky-100/80 hover:from-white hover:to-sky-200 border border-sky-200 shadow-[0_2px_8px_rgba(56,189,248,0.22)] flex items-center justify-center transition-all duration-200 active:scale-90 cursor-pointer shrink-0"
-                          title={m.username ? `Message ${m.name} on Telegram` : 'No public username'}
+                          title={'Message ' + (m.name || 'Fren')}
                         >
                           <svg className="w-4 h-4 overflow-visible drop-shadow-[0_1px_3px_rgba(2,132,199,0.3)]" viewBox="0 0 24 24" fill="none">
                             <defs>
-                              <linearGradient id={`chat-grad-${m.userId}`} x1="10%" y1="10%" x2="90%" y2="90%">
+                              <linearGradient id={'chat-grad-' + m.userId} x1="10%" y1="10%" x2="90%" y2="90%">
                                 <stop offset="0%" stopColor="#38BDF8" />
                                 <stop offset="50%" stopColor="#0284C7" />
                                 <stop offset="100%" stopColor="#0369A1" />
@@ -1931,7 +1943,7 @@ const SettingsModal = ({ isOpen, onClose, username }) => {
                             {/* ২য় স্ক্রিনশটের মতো রাউন্ডেড চ্যাট বাবল */}
                             <path
                               d="M12 3C6.48 3 2 6.94 2 11.8c0 2.76 1.44 5.22 3.68 6.84-.25 1.58-.96 3.06-1.92 4.19-.22.26-.06.66.27.69 2.45.2 4.67-.62 6.36-1.77.53.07 1.07.1 1.61.1 5.52 0 10-3.94 10-8.8S17.52 3 12 3z"
-                              fill={`url(#chat-grad-${m.userId})`}
+                              fill={'url(#chat-grad-' + m.userId + ')'}
                             />
                             {/* বাবলের ভেতরের ৩টি সাদা ডট */}
                             <circle cx="8" cy="11.8" r="1.15" fill="#FFFFFF" />
