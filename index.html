@@ -579,101 +579,53 @@
 
         return (
           <div className="w-full">
-            <div className="relative overflow-hidden rounded-[15px] bg-white border border-sky-100 shadow-[0_2px_8px_rgba(56,189,248,0.06)] px-3.5 py-2">
+            {/* 🌟 স্লিম ও ছিমছাম ব্যালেন্স কার্ড (py-1.5) */}
+            <div className="relative overflow-hidden rounded-[15px] bg-white border border-sky-100 shadow-[0_2px_7px_rgba(56,189,248,0.05)] px-3.5 py-1.5">
               
-              <div className="flex items-center justify-between gap-2 mb-1.5">
-                <span className="text-[9.5px] font-extrabold uppercase tracking-widest text-slate-400">
+              {/* Header: Total Balance & Verified */}
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-400">
                   {dict.totalBalance}
                 </span>
                 
-                <div className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/70 shrink-0">
-                  <Icons.ShieldCheck className="w-3.5 h-3.5" />
+                <div className="inline-flex items-center gap-1 text-[9.5px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/70 shrink-0">
+                  <Icons.ShieldCheck className="w-3 h-3" />
                   <span>{dict.verified}</span>
                 </div>
               </div>
 
+              {/* Middle Row: 28px Coin + Balanced Amount (PX) + $GRAM */}
               <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <Coin3DIcon size={36} idPrefix="balance-main" floating={true} glow={true} />
+                <div className="flex items-center gap-2 min-w-0">
+                  {/* 🌟 পারফেক্ট ২৮px কয়েন সাইজ */}
+                  <Coin3DIcon size={28} idPrefix="balance-main" floating={false} glow={false} />
                   
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="font-display font-extrabold text-[24px] sm:text-[26px] text-slate-900 tracking-normal tabular-nums leading-none">
+                  <div className="flex items-baseline gap-1">
+                    <span className="font-display font-extrabold text-[21px] sm:text-[23px] text-slate-900 tracking-normal tabular-nums leading-none">
                       {formattedStars}
                     </span>
-                    <span className="text-[12px] font-black text-sky-600 tracking-tight">PTS</span>
+                    {/* 🌟 PTS এর বদলে PX */}
+                    <span className="text-[11px] font-black text-sky-600 tracking-tight">PX</span>
                   </div>
                 </div>
 
                 <div className="shrink-0 text-right">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 text-[10.5px] font-black border border-sky-200/80 shadow-2xs">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 text-[10px] font-black border border-sky-200/80 shadow-2xs">
                     ≈ {displayGram} $GRAM
                   </span>
                 </div>
               </div>
 
-              <div className="mt-2 pt-1.5 border-t border-slate-100/90 flex items-center justify-between text-[10px] font-bold">
+              {/* Bottom Row: Exchange Rate with PX */}
+              <div className="mt-1 pt-1 border-t border-slate-100/90 flex items-center justify-between text-[9.5px] font-bold">
                 <span className="text-slate-400 tracking-tight">Exchange Rate</span>
-                <span className="text-sky-600/90 font-extrabold tracking-tight">10,000 PTS = 1 $GRAM</span>
+                <span className="text-sky-600/90 font-extrabold tracking-tight">10,000 PX ≈ 1 $GRAM</span>
               </div>
 
             </div>
           </div>
         );
       };
-
-      const BottomNavBar = ({ activeTab, onSelectTab, hasCheckedInToday }) => {
-        const tabs = [
-          { id: 'home', label: 'Home', icon: Icons.Home },
-          { id: 'checkin', label: 'Check-in', icon: Icons.Calendar, isCheckin: true },
-          { id: 'frens', label: 'Frens', icon: Icons.Users },
-          { id: 'wallet', label: 'Wallet', icon: Icons.Wallet },
-        ];
-
-        return (
-          <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-sky-100/90 shadow-[0_-3px_15px_rgba(56,189,248,0.08)] px-4 pb-2 pt-1.5 transition-all">
-            <div className="max-w-md mx-auto grid grid-cols-4 items-center justify-around">
-              {tabs.map((tab) => {
-                const IconComponent = tab.icon;
-                const isActive = activeTab === tab.id;
-
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => onSelectTab(tab.id)}
-                    className={`relative flex flex-col items-center justify-center py-1 px-1 min-h-[46px] rounded-xl transition-all duration-200 cursor-pointer active:scale-90 ${
-                      isActive ? 'text-sky-600' : 'text-slate-400 hover:text-slate-600'
-                    }`}
-                  >
-                    {isActive && (
-                      <span className="absolute -top-1 w-6 h-1 rounded-full bg-gradient-to-r from-sky-400 to-blue-600" />
-                    )}
-
-                    <div className="relative flex items-center justify-center">
-                      <IconComponent className={`w-5 h-5 transition-transform duration-200 ${isActive ? 'scale-110' : ''}`} />
-                      
-                      {tab.isCheckin && (
-                        !hasCheckedInToday ? (
-                          <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-400 border border-white"></span>
-                          </span>
-                        ) : (
-                          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border border-white shadow-xs"></span>
-                        )
-                      )}
-                    </div>
-
-                    <span className={`text-[11px] font-semibold tracking-tight mt-0.5 ${isActive ? 'font-bold text-sky-600' : 'text-slate-500'}`}>
-                      {tab.label}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </nav>
-        );
-      };
-
       const QuickActionsGrid = ({
         adReward,
         checkInReward,
