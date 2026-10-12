@@ -2468,7 +2468,7 @@ const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, s
           if (isAdLoading) return;
 
           if (stats.adsWatchedToday >= 10) {
-            showToast('⚠️ Daily limit of 10 sponsor ads reached! Resets at 00:00 UTC.');
+            setIsAdLimitModalOpen(true);
             return;
           }
 
