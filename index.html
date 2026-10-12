@@ -705,7 +705,7 @@
                     <Icons.PlayCircle className="w-4 h-4 stroke-white" />
                   </div>
                   <div className="inline-flex items-center gap-1.5 pl-1 pr-2 py-0.5 rounded-full bg-gradient-to-r from-sky-50 to-blue-50/90 border border-sky-200/90 text-sky-800 text-[12px] font-black tracking-tight shadow-2xs tabular-nums shrink-0">
-                    <Coin3DIcon size={22} idPrefix="ad-reward" />
+                    <Coin3DIcon size={18} idPrefix="ad-reward" />
                     <span>+{adReward} PX</span>
                   </div>
                 </div>
@@ -727,7 +727,7 @@
                     <Icons.CalendarCheck className="w-4 h-4" />
                   </div>
                   <div className="inline-flex items-center gap-1.5 pl-1 pr-2 py-0.5 rounded-full bg-gradient-to-r from-sky-50 to-blue-50/90 border border-sky-200/90 text-sky-800 text-[12px] font-black tracking-tight shadow-2xs tabular-nums shrink-0">
-                    <Coin3DIcon size={22} idPrefix="checkin-reward" />
+                    <Coin3DIcon size={18} idPrefix="checkin-reward" />
                     <span>+{checkInReward} PX</span>
                   </div>
                 </div>
@@ -887,7 +887,7 @@
 
                           {/* 🌟 ২২px কয়েন + ডানে ফাঁকা ছাড়া PX এর একদম গা ঘেঁষে বর্ডার (pl-0.5 pr-1.5) */}
                           <div className="inline-flex items-center gap-1 pl-0.5 pr-1.5 py-0.5 rounded-full bg-gradient-to-r from-sky-50 to-blue-50/90 border border-sky-200/90 text-sky-800 text-[11px] font-black tracking-tight shadow-2xs tabular-nums leading-none">
-                            <Coin3DIcon size={20} idPrefix={`task-coin-${task.id}`} />
+                            <Coin3DIcon size={18} idPrefix={`task-coin-${task.id}`} />
                             <span>+{task.reward || 200} PX</span>
                           </div>
                         </div>
@@ -1188,7 +1188,7 @@
                             currency === 'STARS' ? 'bg-amber-500 text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-300'
                           }`}
                         >
-                          ⭐️ Stars
+                          ⭐️ STARS
                         </button>
                         <button
                           key="GRAM"
@@ -1203,12 +1203,12 @@
                         <button
                           key="PTS"
                           type="button"
-                          onClick={() => setCurrency('PTS')}
+                          onClick={() => setCurrency('PX')}
                           className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition ${
                             currency === 'PTS' ? 'bg-emerald-500 text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-300'
                           }`}
                         >
-                          Free PTS
+                          FREE PTS
                         </button>
                       </div>
                     </div>
