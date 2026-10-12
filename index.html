@@ -2550,14 +2550,27 @@ const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, s
           }
         };
 
+        const [isAnyTaskVerifying, setIsAnyTaskVerifying] = useState(false);
+
         const handleStartTask = async (taskId, url) => {
+          // ১. দৈনিক লিমিট পূরণ হলে মোডাল দেখানো
           if (stats.completedTasksToday >= dailyTaskLimit) {
             setIsTaskLimitModalOpen(true);
             return;
           }
 
+          // ২. অলরেডি একটি টাস্ক লোডিং থাকলে অন্য টাস্কে ক্লিক সম্পূর্ণ ব্লক করা
+          if (isAnyTaskVerifying) {
+            showToast('⚠️ Please wait! A task is already verifying.');
+            return;
+          }
+
+          // ৩. সিঙ্গেল টাস্ক লক চালু করা
+          setIsAnyTaskVerifying(true);
+
           openSafeLink(url || 'https://t.me/ToBOOST_Ai');
 
+          // শুধুমাত্র এই একটি টাস্ককে চেকিং স্টেটে নেওয়া
           setTasks((prev) =>
             prev.map((t) => (t.id === taskId ? { ...t, status: 'verifying' } : t))
           );
@@ -2586,21 +2599,29 @@ const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, s
                 setStats((p) => ({ ...p, completedTasksToday: newCount }));
                 saveStoredDailyTaskData(currentUserId, newCount, updatedList);
 
-                showToast('🎉 Task completed! +200 PTS');
+                showToast('🎉 Task completed! +200 PX');
                 if (typeof confetti === 'function') {
                   try { confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } }); } catch (e) {}
                 }
+
+                // যদি ৫টি পূর্ণ হয়ে যায় সাথে সাথে লিমিট মোডাল দেখানো
+                if (newCount >= dailyTaskLimit) {
+                  setTimeout(() => setIsTaskLimitModalOpen(true), 1200);
+                }
               } else {
-                const updatedList = completedTasksList.includes(taskId) ? completedTasksList : [...completedTasksList, taskId];
-                setCompletedTasksList(updatedList);
-                saveStoredDailyTaskData(currentUserId, stats.completedTasksToday, updatedList);
-                showToast(data.message || 'Task already completed!');
+                showToast(data.error || data.message || 'Task failed or limit reached!');
+                setTasks((prev) =>
+                  prev.map((t) => (t.id === taskId ? { ...t, status: 'active' } : t))
+                );
               }
             } catch (err) {
               setTasks((prev) =>
                 prev.map((t) => (t.id === taskId ? { ...t, status: 'active' } : t))
               );
               showToast('Network error while completing task.');
+            } finally {
+              // যাচাই শেষ বা এরর হলে লক মুক্ত করা
+              setIsAnyTaskVerifying(false);
             }
           }, 3000);
         };
