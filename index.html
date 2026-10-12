@@ -2897,6 +2897,14 @@ const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, s
               invites={stats.currentInvites}
               onGoToFrens={() => setActiveTab('frens')}
             />
+            <AdLimitModal
+              isOpen={isAdLimitModalOpen}
+              onClose={() => setIsAdLimitModalOpen(false)}
+              onExploreTasks={() => {
+                const el = document.getElementById('bounty-scroll-container');
+                if (el) el.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            />
 
             <WithdrawAlertModal
               isOpen={!!withdrawAlertData}
