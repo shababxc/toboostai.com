@@ -573,9 +573,14 @@
         );
       };
 
-      const DynamicBalanceCard = ({ starBalance, tokenBalance, dict }) => {
-        const formattedStars = starBalance.toLocaleString();
-        const displayGram = tokenBalance.toFixed(3);
+      const DynamicBalanceCard = ({ starBalance = 0, tokenBalance = 0, dict = {} }) => {
+        const safeStars = Number(starBalance) || 0;
+        const safeGram = Number(tokenBalance) || 0;
+        const formattedStars = safeStars.toLocaleString();
+        const displayGram = safeGram.toFixed(3);
+
+        const totalBalanceLabel = (dict && dict.totalBalance) || 'TOTAL BALANCE';
+        const verifiedLabel = (dict && dict.verified) || 'Verified';
 
         return (
           <div className="w-full">
@@ -585,12 +590,12 @@
               {/* Header: Total Balance & Verified */}
               <div className="flex items-center justify-between gap-2 mb-1">
                 <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-400">
-                  {dict.totalBalance}
+                  {totalBalanceLabel}
                 </span>
                 
                 <div className="inline-flex items-center gap-1 text-[9.5px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/70 shrink-0">
                   <Icons.ShieldCheck className="w-3 h-3" />
-                  <span>{dict.verified}</span>
+                  <span>{verifiedLabel}</span>
                 </div>
               </div>
 
@@ -616,7 +621,7 @@
                 </div>
               </div>
 
-              {/* Bottom Row: Exchange Rate with PX */}
+              {/* Bottom Row: Exchange Rate with ≈ symbol */}
               <div className="mt-1 pt-1 border-t border-slate-100/90 flex items-center justify-between text-[9.5px] font-bold">
                 <span className="text-slate-400 tracking-tight">Exchange Rate</span>
                 <span className="text-sky-600/90 font-extrabold tracking-tight">10,000 PX ≈ 1 $GRAM</span>
