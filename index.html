@@ -2152,10 +2152,10 @@ const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, s
       class ErrorBoundary extends Component {
         constructor(props) {
           super(props);
-          this.state = { hasError: false };
+          this.state = { hasError: false, errorInfo: null };
         }
         static getDerivedStateFromError(error) {
-          return { hasError: true };
+          return { hasError: true, errorInfo: error };
         }
         componentDidCatch(error, errorInfo) {
           console.error('Captured React Error:', error, errorInfo);
@@ -2168,10 +2168,18 @@ const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, s
                   <span className="text-2xl">💎</span>
                 </div>
                 <h2 className="text-sm font-extrabold text-slate-900 mb-1">ToBOOSTAi Reconnecting</h2>
-                <p className="text-[11px] text-slate-500 mb-3 max-w-xs">Returning to your mission dashboard...</p>
+                <p className="text-[11px] text-slate-500 mb-2 max-w-xs">Returning to your mission dashboard...</p>
+                
+                {/* 🌟 আসল এরর মেসেজ সরাসরি স্ক্রিনে দেখার লাল বক্স */}
+                {this.state.errorInfo && (
+                  <div className="p-3 bg-red-100 border border-red-300 text-red-700 text-[11px] rounded-xl font-mono mb-3 max-w-xs break-all text-left select-all">
+                    {String(this.state.errorInfo?.message || this.state.errorInfo)}
+                  </div>
+                )}
+
                 <button
                   onClick={() => { this.setState({ hasError: false }); window.location.reload(); }}
-                  className="px-5 py-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold text-xs rounded-full shadow-xs active:scale-95"
+                  className="px-5 py-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold text-xs rounded-full shadow-xs active:scale-95 cursor-pointer"
                 >
                   Refresh Dashboard
                 </button>
