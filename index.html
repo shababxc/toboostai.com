@@ -927,42 +927,86 @@
         );
       };
 
+      /* 🌟 স্ক্রিনশটের মতো হুবহু স্কাই-ব্লু ৩-বাটন ডিসকাউন্ট পোস্ট মোডাল */
       const PostBountyModal = ({ isOpen, onClose, starBalance, walletAddress, onDeductPts, onSubmitBounty, showToast }) => {
         const [title, setTitle] = useState('');
         const [category, setCategory] = useState('Social');
         const [iconType, setIconType] = useState('telegram');
-        const [actionText, setActionText] = useState('Start');
         const [actionUrl, setActionUrl] = useState('');
-        const [currency, setCurrency] = useState('STARS');
-        const [impressions, setImpressions] = useState(100);
+        const [impressions, setImpressions] = useState(10000);
         const [isSubmitting, setIsSubmitting] = useState(false);
 
         if (!isOpen) return null;
 
-        const calcCostValue = () => {
-          const ratio = (impressions - 100) / (10000 - 100);
-          if (currency === 'GRAM') {
-            return Number((1 + ratio * (20 - 1)).toFixed(2));
-          } else if (currency === 'STARS') {
-            return Math.round(300 + ratio * (6000 - 300));
+        // 🌟 আপনার দেওয়া হুবহু ডিসকাউন্ট ও আসল প্রাইস ক্যালকুলেটর
+        const calcPricing = (imp) => {
+          let gramCurrent, gramOld, starsCurrent, starsOld, ptsCost;
+
+          // Points: ১০০ ইমপ্রেশনে ১০,০০০ PTS থেকে শুরু করে ১০,০০০ ইমপ্রেশনে ২,০০,০০০ PTS
+          const ratio = (imp - 100) / (10000 - 100);
+          ptsCost = Math.round(10000 + ratio * (200000 - 10000));
+
+          // আসল রেট (কাটা দাগের জন্য)
+          gramOld = imp >= 10000 ? 100 : Math.round(imp / 100);
+          starsOld = imp >= 10000 ? 30000 : Math.round(imp * 3);
+
+          // আপনার দেওয়া তালিকা অনুযায়ী বর্তমান ডিসকাউন্ট রেট
+          if (imp <= 100) {
+            gramCurrent = 1.00;
+            starsCurrent = 300;
+          } else if (imp <= 200) {
+            gramCurrent = 1.75;
+            starsCurrent = 475;
+          } else if (imp <= 300) {
+            gramCurrent = 2.50;
+            starsCurrent = 585;
+          } else if (imp <= 400) {
+            gramCurrent = 3.25;
+            starsCurrent = 800;
+          } else if (imp <= 500) {
+            gramCurrent = 4.00;
+            starsCurrent = 975;
+          } else if (imp <= 600) {
+            gramCurrent = 4.55;
+            starsCurrent = 1370;
+          } else if (imp <= 700) {
+            gramCurrent = 5.25;
+            starsCurrent = 1425;
+          } else if (imp <= 800) {
+            gramCurrent = 5.75;
+            starsCurrent = 1560;
+          } else if (imp <= 900) {
+            gramCurrent = 6.25;
+            starsCurrent = 1755;
+          } else if (imp <= 1000) {
+            gramCurrent = 6.75;
+            starsCurrent = 1950;
           } else {
-            return Math.round(10000 + ratio * (200000 - 10000));
+            // ১০০০ থেকে ১০০০০ এর মধ্যে ডাইনামিক ডিসকাউন্ট (১০০০০-এ ২০ গ্রাম ও ৬০০০ স্টার)
+            const t = (imp - 1000) / 9000;
+            gramCurrent = Number((6.75 + t * (20 - 6.75)).toFixed(2));
+            starsCurrent = Math.round(1950 + t * (6000 - 1950));
           }
+
+          return {
+            gramCurrent,
+            gramOld: Math.max(gramCurrent, gramOld),
+            starsCurrent,
+            starsOld: Math.max(starsCurrent, starsOld),
+            ptsCost
+          };
         };
 
-        const calcDisplayPrice = () => {
-          const val = calcCostValue();
-          if (currency === 'GRAM') return `${val} $GRAM`;
-          if (currency === 'STARS') return `${val} Stars`;
-          return `${val.toLocaleString()} PTS`;
-        };
+        const pricing = calcPricing(impressions);
 
-        const handleSubmit = async (e) => {
-          e.preventDefault();
-          if (!title.trim() || !actionUrl.trim()) return;
+        // সরাসরি বাটন থেকেই নির্দিষ্ট পেমেন্ট মেথড এক্সিকিউট করা
+        const handleExecutePayment = async (currency) => {
+          if (!title.trim() || !actionUrl.trim()) {
+            showToast('⚠️ Please enter task name and URL!');
+            return;
+          }
 
-          const cost = calcCostValue();
-
+          // ১. $GRAM পেমেন্ট
           if (currency === 'GRAM') {
             if (!walletAddress) {
               showToast('⚠️ Please connect your TON wallet to pay $GRAM!');
@@ -981,7 +1025,7 @@
 
               if (!backendReceiver) throw new Error('Gateway unreachable');
 
-              const nanoAmount = Math.round(cost * 1e9).toString();
+              const nanoAmount = Math.round(pricing.gramCurrent * 1e9).toString();
               const transaction = {
                 validUntil: Math.floor(Date.now() / 1000) + 360,
                 messages: [{ address: backendReceiver, amount: nanoAmount }]
@@ -1000,7 +1044,7 @@
                   actionUrl: actionUrl.trim() || 'https://t.me/ToBOOST_Ai',
                   iconType,
                   paidWith: 'GRAM',
-                  cost: cost,
+                  cost: pricing.gramCurrent,
                   impressions: impressions
                 });
                 onClose();
@@ -1013,39 +1057,8 @@
             return;
           }
 
-          else if (currency === 'PTS') {
-            if (starBalance < cost) {
-              showToast(`❌ Insufficient PTS! You need ${cost.toLocaleString()} PTS.`);
-              return;
-            }
-
-            setIsSubmitting(true);
-            onDeductPts(cost);
-            showToast(`✅ ${cost.toLocaleString()} PTS deducted for Boost!`);
-
-            try {
-              await onSubmitBounty({
-                title: title.trim(),
-                description: `Complete this ${category.toLowerCase()} mission to earn ⭐ stars!`,
-                category,
-                reward: 200,
-                actionText: 'Start',
-                actionUrl: actionUrl.trim() || 'https://t.me/ToBOOST_Ai',
-                iconType,
-                paidWith: 'PTS',
-                cost: cost,
-                impressions: impressions
-              });
-              onClose();
-            } catch (err) {
-              showToast('Error publishing task.');
-            } finally {
-              setIsSubmitting(false);
-            }
-            return;
-          }
-
-          else if (currency === 'STARS') {
+          // ২. Telegram Stars পেমেন্ট
+          if (currency === 'STARS') {
             setIsSubmitting(true);
             showToast('Opening Stars Payment Sheet...');
 
@@ -1058,8 +1071,8 @@
                 },
                 body: JSON.stringify({
                   title: title.trim(),
-                  starsCost: cost,
-                  impressions,
+                  starsCost: pricing.starsCurrent,
+                  impressions: impressions,
                   actionUrl: actionUrl.trim()
                 })
               });
@@ -1079,7 +1092,7 @@
                       actionUrl: actionUrl.trim() || 'https://t.me/ToBOOST_Ai',
                       iconType,
                       paidWith: 'STARS',
-                      cost: cost,
+                      cost: pricing.starsCurrent,
                       impressions: impressions
                     });
                     onClose();
@@ -1102,7 +1115,224 @@
               return;
             }
           }
+
+          // ৩. Points / PX পেমেন্ট
+          if (currency === 'PTS') {
+            if (starBalance < pricing.ptsCost) {
+              showToast(`❌ Insufficient balance! You need ${pricing.ptsCost.toLocaleString()} Pts.`);
+              return;
+            }
+
+            setIsSubmitting(true);
+            onDeductPts(pricing.ptsCost);
+            showToast(`✅ ${pricing.ptsCost.toLocaleString()} Pts deducted!`);
+
+            try {
+              await onSubmitBounty({
+                title: title.trim(),
+                description: `Complete this ${category.toLowerCase()} mission to earn ⭐ stars!`,
+                category,
+                reward: 200,
+                actionText: 'Start',
+                actionUrl: actionUrl.trim() || 'https://t.me/ToBOOST_Ai',
+                iconType,
+                paidWith: 'PTS',
+                cost: pricing.ptsCost,
+                impressions: impressions
+              });
+              onClose();
+            } catch (err) {
+              showToast('Error publishing task.');
+            } finally {
+              setIsSubmitting(false);
+            }
+            return;
+          }
         };
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3.5 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-200">
+            {/* 🌟 স্ক্রিনশটের মতো হুবহু স্কাই-ব্লু ব্যাকগ্রাউন্ড কার্ড */}
+            <div className="relative w-full max-w-sm rounded-[32px] bg-gradient-to-b from-[#00b4f8] via-[#00a2ed] to-[#0091e0] p-5 shadow-2xl overflow-hidden max-h-[92vh] overflow-y-auto no-scrollbar text-white">
+              
+              {/* Header: LIVE Badge + Post Task Title + X Close Button */}
+              <div className="flex items-center justify-between mb-3.5 pb-1">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/25 backdrop-blur-md border border-white/20 text-emerald-300 text-[11px] font-extrabold tracking-wider">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>LIVE</span>
+                  </div>
+                  <h3 className="font-display font-black text-white text-[19px] tracking-tight flex items-center gap-1">
+                    <span>Post Task</span>
+                    <span>⭐</span>
+                  </h3>
+                </div>
+                <button 
+                  onClick={onClose} 
+                  className="p-1 rounded-full text-white/80 hover:text-white hover:bg-white/10 transition active:scale-90"
+                >
+                  <Icons.X className="w-5 h-5 stroke-[2.5]" />
+                </button>
+              </div>
+
+              {/* Form Body */}
+              <div className="space-y-3">
+                
+                {/* 1. Task Name */}
+                <div>
+                  <label className="flex items-center gap-1.5 text-[12.5px] font-bold text-white mb-1.5">
+                    <span>🏷️</span>
+                    <span>Task name</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Enter task name"
+                    className="w-full px-4 py-3 text-[13px] rounded-2xl bg-white text-slate-800 placeholder-slate-400 font-semibold focus:outline-none focus:ring-2 focus:ring-white/80 shadow-inner"
+                    required
+                  />
+                </div>
+
+                {/* 2. Category & Icon (টাস্ক নেমের ঠিক নিচে) */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="flex items-center gap-1 text-[11.5px] font-bold text-white mb-1">
+                      <span>📁</span>
+                      <span>Category</span>
+                    </label>
+                    <select
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      className="w-full px-3 py-2 text-[12.5px] rounded-xl bg-white text-slate-800 font-bold focus:outline-none shadow-xs"
+                    >
+                      <option value="Social">Social</option>
+                      <option value="Partners">Partners</option>
+                      <option value="Web3">Web3</option>
+                      <option value="Daily">Daily</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="flex items-center gap-1 text-[11.5px] font-bold text-white mb-1">
+                      <span>🎨</span>
+                      <span>Icon</span>
+                    </label>
+                    <select
+                      value={iconType}
+                      onChange={(e) => setIconType(e.target.value)}
+                      className="w-full px-3 py-2 text-[12.5px] rounded-xl bg-white text-slate-800 font-bold focus:outline-none shadow-xs"
+                    >
+                      <option value="telegram">Telegram</option>
+                      <option value="twitter">X / Twitter</option>
+                      <option value="youtube">YouTube</option>
+                      <option value="facebook">Facebook</option>
+                      <option value="instagram">Instagram</option>
+                      <option value="others">Others</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* 3. Task Address (URL) */}
+                <div>
+                  <label className="flex items-center gap-1.5 text-[12.5px] font-bold text-white mb-1.5">
+                    <span>💳</span>
+                    <span>Task address</span>
+                  </label>
+                  <textarea
+                    rows="2"
+                    value={actionUrl}
+                    onChange={(e) => setActionUrl(e.target.value)}
+                    placeholder="Please input task url"
+                    className="w-full px-4 py-2.5 text-[13px] rounded-2xl bg-white text-slate-800 placeholder-slate-400 font-medium focus:outline-none focus:ring-2 focus:ring-white/80 shadow-inner resize-none font-mono"
+                    required
+                  ></textarea>
+                </div>
+
+                {/* 4. Impressions Slider */}
+                <div className="pt-1">
+                  <div className="flex justify-between items-center text-[13.5px] font-extrabold mb-1">
+                    <span className="flex items-center gap-1 text-white/95">
+                      <span>⠿</span>
+                      <span>Impressions</span>
+                    </span>
+                    <span className="font-mono text-white text-[15px] tabular-nums">
+                      {impressions.toLocaleString()}
+                    </span>
+                  </div>
+                  
+                  <input
+                    type="range"
+                    min="100"
+                    max="10000"
+                    step="100"
+                    value={impressions}
+                    onChange={(e) => setImpressions(Number(e.target.value))}
+                    className="w-full h-2 bg-white/30 rounded-lg appearance-none cursor-pointer accent-white"
+                  />
+                </div>
+
+                {/* ======================================================== */}
+                {/* 🌟 স্ক্রিনশটের মতো লাল দাগ দেওয়া ৩টি ডিসকাউন্ট বাটন */}
+                {/* ======================================================== */}
+                <div className="pt-2 space-y-2">
+                  
+                  {/* Row 1: GRAM Button & STARS Button */}
+                  <div className="grid grid-cols-2 gap-2.5">
+                    
+                    {/* বাটন ১: Post Task ($GRAM - গাঢ় নীল ব্যাকগ্রাউন্ড) */}
+                    <button
+                      type="button"
+                      onClick={() => handleExecutePayment('GRAM')}
+                      disabled={isSubmitting}
+                      className="py-2.5 px-2 rounded-[20px] bg-[#006bd8] hover:bg-[#005ec0] active:scale-95 text-white font-extrabold flex flex-col items-center justify-center shadow-lg transition-all cursor-pointer border border-white/20 disabled:opacity-50"
+                    >
+                      <span className="font-display text-[13px] tracking-tight leading-tight">Post Task</span>
+                      <div className="flex items-center gap-1 text-[11px] mt-0.5 tabular-nums">
+                        <span className="font-bold">≈ {pricing.gramCurrent} 💎</span>
+                        {pricing.gramOld > pricing.gramCurrent && (
+                          <span className="line-through text-white/50 text-[9.5px]">≈{pricing.gramOld}</span>
+                        )}
+                      </div>
+                    </button>
+
+                    {/* বাটন ২: Post Task (STARS - ঝকঝকে সাদা ব্যাকগ্রাউন্ড) */}
+                    <button
+                      type="button"
+                      onClick={() => handleExecutePayment('STARS')}
+                      disabled={isSubmitting}
+                      className="py-2.5 px-2 rounded-[20px] bg-white hover:bg-slate-50 active:scale-95 text-[#0070d8] font-extrabold flex flex-col items-center justify-center shadow-lg transition-all cursor-pointer border border-white/80 disabled:opacity-50"
+                    >
+                      <span className="font-display text-[13px] tracking-tight leading-tight">Post Task</span>
+                      <div className="flex items-center gap-1 text-[11px] mt-0.5 tabular-nums">
+                        <span className="font-bold text-[#0070d8]">≈ {pricing.starsCurrent.toLocaleString()} ⭐</span>
+                        {pricing.starsOld > pricing.starsCurrent && (
+                          <span className="line-through text-slate-400 text-[9.5px]">≈{pricing.starsOld.toLocaleString()}</span>
+                        )}
+                      </div>
+                    </button>
+
+                  </div>
+
+                  {/* বাটন ৩: Pay with Points (ফুল-উইডথ নীল পিল বাটন) */}
+                  <button
+                    type="button"
+                    onClick={() => handleExecutePayment('PTS')}
+                    disabled={isSubmitting}
+                    className="w-full py-3 px-3 rounded-[20px] bg-[#008fe3] hover:bg-[#0082d0] active:scale-98 text-white font-black text-[13px] border border-white/40 shadow-lg flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    <span>
+                      {isSubmitting ? 'Processing...' : `Pay with Points (≈${pricing.ptsCost.toLocaleString()} Pts)`}
+                    </span>
+                  </button>
+
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        );
+      };
 
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-200">
