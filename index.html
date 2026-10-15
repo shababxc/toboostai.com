@@ -944,7 +944,8 @@
           let gramCurrent, gramOld, starsCurrent, starsOld, ptsCost;
 
           const ratio = (imp - 100) / (10000 - 100);
-          ptsCost = Math.round(10000 + ratio * (200000 - 10000));
+          const rawPts = 10000 + ratio * (200000 - 10000);
+          ptsCost = Math.round(rawPts / 500) * 500;
 
           gramOld = imp >= 10000 ? 100 : (imp <= 100 ? 1 : Math.round(imp / 100));
           starsOld = imp >= 10000 ? 30000 : (imp <= 100 ? 300 : Math.round(imp * 3));
