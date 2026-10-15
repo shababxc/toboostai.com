@@ -1268,9 +1268,10 @@
                 
                   
                   {/* 🌟 রেফারেন্স অ্যাপের কোডের মতো হুবহু স্লিম ও স্ট্যান্ডার্ড ৩টি বাটন */}
-                <div className="pt-2 space-y-2">
+                {/* 🌟 সম্পূর্ণ লকড ও মাখনের মতো মসৃণ ৩টি বাটন (No Jitter / No Shake) */}
+                <div className="pt-2 space-y-2 select-none">
                   
-                  {/* Row 1: GRAM & STARS Buttons */}
+                  {/* Row 1: GRAM & STARS Buttons (ফিক্সড h-[52px] লকড হাইট) */}
                   <div className="grid grid-cols-2 gap-2">
                     
                     {/* বাটন ১: Post Task ($GRAM) */}
@@ -1278,13 +1279,13 @@
                       type="button"
                       onClick={() => handleExecutePayment('GRAM')}
                       disabled={isSubmitting}
-                      className="py-2.5 px-2 rounded-[18px] bg-[#006bd8] hover:bg-[#005ec0] active:scale-95 text-white flex flex-col items-center justify-center shadow-md transition-all cursor-pointer border border-white/25 disabled:opacity-50"
+                      className="h-[52px] px-2 rounded-[18px] bg-[#006bd8] hover:bg-[#005ec0] active:scale-95 text-white flex flex-col items-center justify-center shadow-md transition-all cursor-pointer border border-white/20 disabled:opacity-50"
                     >
-                      <span className="font-display font-bold text-[13.5px] tracking-normal leading-tight">Post Task</span>
-                      <div className="flex items-center gap-1 text-[11.5px] mt-0.5 font-medium tabular-nums">
-                        <span>≈ {pricing.gramCurrent} 💎</span>
+                      <span className="font-display font-bold text-[13.5px] tracking-normal leading-none">Post Task</span>
+                      <div className="flex items-center justify-center gap-1 text-[11.5px] mt-1 font-semibold tabular-nums leading-none">
+                        <span className="font-mono">≈ {pricing.gramCurrent} 💎</span>
                         {pricing.gramOld > pricing.gramCurrent && (
-                          <span className="line-through text-white/50 text-[10px]">≈{pricing.gramOld}</span>
+                          <span className="line-through text-white/50 text-[10px] font-mono">≈{pricing.gramOld}</span>
                         )}
                       </div>
                     </button>
@@ -1294,33 +1295,35 @@
                       type="button"
                       onClick={() => handleExecutePayment('STARS')}
                       disabled={isSubmitting}
-                      className="py-2.5 px-2 rounded-[18px] bg-white hover:bg-slate-50 active:scale-95 text-[#0070d8] flex flex-col items-center justify-center shadow-md transition-all cursor-pointer border border-white/80 disabled:opacity-50"
+                      className="h-[52px] px-2 rounded-[18px] bg-white hover:bg-slate-50 active:scale-95 text-[#0070d8] flex flex-col items-center justify-center shadow-md transition-all cursor-pointer border border-white/80 disabled:opacity-50"
                     >
-                      <span className="font-display font-bold text-[13.5px] tracking-normal leading-tight text-[#0070d8]">Post Task</span>
-                      <div className="flex items-center gap-1 text-[11.5px] mt-0.5 font-medium tabular-nums">
-                        <span className="text-[#0070d8]">≈ {pricing.starsCurrent.toLocaleString()} ⭐</span>
+                      <span className="font-display font-bold text-[13.5px] tracking-normal leading-none text-[#0070d8]">Post Task</span>
+                      <div className="flex items-center justify-center gap-1 text-[11.5px] mt-1 font-semibold tabular-nums leading-none">
+                        <span className="font-mono text-[#0070d8]">≈ {pricing.starsCurrent.toLocaleString()} ⭐</span>
                         {pricing.starsOld > pricing.starsCurrent && (
-                          <span className="line-through text-slate-400 text-[10px]">≈{pricing.starsOld.toLocaleString()}</span>
+                          <span className="line-through text-slate-400 text-[10px] font-mono">≈{pricing.starsOld.toLocaleString()}</span>
                         )}
                       </div>
                     </button>
 
                   </div>
 
-                  {/* বাটন ৩: Pay with Points (রেফারেন্স অ্যাপের মতো স্লিম ও ক্লিন ফ্রস্টেড বাটন) */}
+                  {/* বাটন ৩: Pay with Points (ফিক্সড h-[44px] লকড পিল বাটন) */}
                   <button
                     type="button"
                     onClick={() => handleExecutePayment('PTS')}
                     disabled={isSubmitting}
-                    className="w-full py-2.5 px-4 rounded-full bg-white/15 hover:bg-white/25 active:scale-98 text-white font-bold text-[13px] border border-white/40 shadow-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-50 tracking-normal"
+                    className="w-full h-[44px] px-4 rounded-full bg-white/15 hover:bg-white/25 active:scale-98 text-white font-bold text-[13px] border border-white/40 shadow-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-50 tracking-normal"
                   >
-                    <span>
-                      {isSubmitting ? 'Processing...' : `Pay with Points (≈${pricing.ptsCost.toLocaleString()} Pts)`}
-                    </span>
+                    <span>{isSubmitting ? 'Processing...' : 'Pay with Points'}</span>
+                    {!isSubmitting && (
+                      <span className="font-mono font-black tabular-nums tracking-tight">
+                        (≈{pricing.ptsCost.toLocaleString()} Pts)
+                      </span>
+                    )}
                   </button>
 
                 </div>
-
               </div>
 
             </div>
