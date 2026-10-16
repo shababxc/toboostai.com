@@ -1144,7 +1144,14 @@
           <div className="fixed inset-0 z-50 flex items-center justify-center p-3.5 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-200">
             {/* 🌟 ২য় স্ক্রিনশটের মতো হুবহু স্কাই-ব্লু মোডাল কার্ড */}
             <div className="relative w-full max-w-sm rounded-[32px] bg-gradient-to-b from-[#00b4f8] via-[#00a2ed] to-[#0091e0] p-5 shadow-2xl overflow-hidden max-h-[92vh] overflow-y-auto no-scrollbar text-white">
-              
+              {/* 🌟 মোডালের ঠিক মাঝখানে ডার্ক নোটিফিকেশন বক্স */}
+              {modalError && (
+                <div className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none p-4 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="bg-[#2f3136]/95 backdrop-blur-md border border-white/10 text-white font-semibold text-[13px] px-5 py-3.5 rounded-[18px] shadow-2xl text-center max-w-[240px] leading-snug">
+                    {modalError}
+                  </div>
+                </div>
+              )}
               {/* Header: ২য় স্ক্রিনশটের মতো স্লিম ও ক্লিন হেডার */}
               <div className="flex items-center justify-between mb-3 pb-1">
                 <div className="flex items-center gap-2">
