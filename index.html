@@ -1003,7 +1003,8 @@
 
         const handleExecutePayment = async (currency) => {
           if (!title.trim() || !actionUrl.trim()) {
-            showToast('⚠️ Please enter task name and URL!');
+            setModalError('⚠️ Please enter task name and URL!');
+            setTimeout(() => setModalError(''), 2500);
             return;
           }
 
