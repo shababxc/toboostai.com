@@ -198,15 +198,26 @@ module.exports = async (req, res) => {
           console.error('Error fetching team members:', e);
         }
 
+        // 🌟 সার্ভার থেকে নিখুঁত প্রোগ্রেস পার্সেন্টেজ হিসাব করা
+        const totalInvites = Number(currentReferrals || 0);
+        const requiredInvitesForLevel = currentLevel >= 5 ? 20 : (currentLevel >= 4 ? 15 : (currentLevel >= 3 ? 10 : (currentLevel >= 2 ? 5 : 5)));
+        const invitePct = Math.min(100, Math.round((totalInvites / requiredInvitesForLevel) * 100));
+
+        const tasksDoneToday = Number(userData.dailyTasksCompletedToday || userData.tasksCompletedToday || 0);
+        const currentLimit = currentLevel >= 5 ? 20 : (currentLevel >= 4 ? 20 : (currentLevel >= 3 ? 15 : (currentLevel >= 2 ? 10 : 5)));
+        const taskPct = Math.min(100, Math.round((tasksDoneToday / currentLimit) * 100));
+
         const finalResponse = {
           ...userData,
-          referralsCount: currentReferrals,
-          referrals: currentReferrals,
+          referralsCount: totalInvites,
+          referrals: totalInvites,
           level: currentLevel,
           withdrawCount: userData.withdrawCount || 0,
           savedStreaks: userData.savedStreaks || 0,
           savedAdDays: userData.savedAdDays || 0,
-          teamMembers: teamMembers
+          teamMembers: teamMembers,
+          invitePercentage: invitePct,
+          taskPercentage: taskPct
         };
     return res.status(200).json({ success: true, user: finalResponse, ...finalResponse });
 
