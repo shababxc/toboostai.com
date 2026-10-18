@@ -2720,7 +2720,12 @@ const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, s
                   setTimeout(() => setIsTaskLimitModalOpen(true), 1200);
                 }
               } else {
-                showToast(data.error || data.message || 'Task failed or limit reached!');
+                if (data.limitReached || String(data.error || '').includes('Daily limit')) {
+                  setStats((p) => ({ ...p, completedTasksToday: dailyTaskLimit }));
+                  setIsTaskLimitModalOpen(true);
+                } else {
+                  showToast(data.error || data.message || 'Task already completed!');
+                }
                 setTasks((prev) =>
                   prev.map((t) => (t.id === taskId ? { ...t, status: 'active' } : t))
                 );
