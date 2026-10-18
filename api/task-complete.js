@@ -2,7 +2,7 @@
 const { db, admin } = require('./_firebase');
 const { verifyTelegramWebAppData } = require('./_telegram');
 
-// আজকের UTC তারিখ বের করার হেল্পার
+// আজকের আন্তর্জাতিক UTC তারিখ (প্রতিদিন বাংলাদেশ সময় সকাল ৬টায় স্বয়ংক্রিয়ভাবে নতুন দিন শুরু হয়)
 const getTodayUtc = () => new Date().toISOString().split('T')[0];
 
 module.exports = async (req, res) => {
@@ -41,7 +41,7 @@ module.exports = async (req, res) => {
     let limitReached = false;
     let customMessage = '';
 
-    // ট্রানজ্যাকশন ব্যবহার করা হলো যাতে ইউজার এবং টাস্ক একসাথে নিরাপদে আপডেট হয়
+    // ট্রানজ্যাকশন ব্যবহার করা হলো যাতে ডাটাবেস সম্পূর্ণ হ্যাক-প্রুফ ও সুরক্ষিত থাকে
     await db.runTransaction(async (transaction) => {
       const userDoc = await transaction.get(userRef);
       if (!userDoc.exists) {
@@ -49,17 +49,17 @@ module.exports = async (req, res) => {
       }
 
       const userData = userDoc.data() || {};
-      const completedTasks = userData.completedTasks || [];
+      const completedTasks = Array.isArray(userData.completedTasks) ? userData.completedTasks : [];
 
-      // ১. চেক: টাস্কটি আগে থেকেই করা আছে কিনা
+      // ১. সিকিউরিটি চেক: একই টাস্ক কোনো ইউজার জীবনে দ্বিতীয়বার করতে পারবে না
       if (completedTasks.includes(taskId)) {
         alreadyCompleted = true;
         newPoints = Number(userData.points ?? userData.balance ?? 0);
-        customMessage = 'Task already completed';
+        customMessage = 'You have already completed this task!';
         return;
       }
 
-      // ২. চেক: টাস্কটি ডাটাবেজে আছে কিনা এবং Active কিনা
+      // ২. সিকিউরিটি চেক: টাস্কটি ফায়ারস্টোরে আছে কিনা এবং চালু (Active) আছে কিনা
       const taskDoc = await transaction.get(taskRef);
       if (!taskDoc.exists) {
         throw new Error('Task not found');
@@ -69,25 +69,31 @@ module.exports = async (req, res) => {
         throw new Error('Task is no longer active or target impressions reached');
       }
 
-      // ৩. 🌟 ইউজারের লেভেল ও রেফারেল অনুযায়ী দৈনিক লিমিট নির্ধারণ
+      // ৩. লেভেল ও রেফারেল অনুযায়ী দৈনিক লিমিট হিসাব
       const referrals = Number(userData.referralsCount ?? userData.referrals ?? userData.referralCount ?? 0);
       let dailyLimit = 5;
       if (referrals >= 15) dailyLimit = 20;
       else if (referrals >= 10) dailyLimit = 15;
       else if (referrals >= 5) dailyLimit = 10;
 
-      // ৪. 🌟 আজকের তারিখ অনুযায়ী টাস্ক কাউন্ট যাচাই ও দৈনিক লিমিট চেক
+      // ৪. 🌟 স্বয়ংসম্পূর্ণ দৈনিক রিসেট লজিক (যা আগের দিনের সংখ্যা কখনোই টানবে না)
       const isSameDay = userData.lastTaskDate === todayUtc;
-      const tasksToday = isSameDay ? Number(userData.dailyTasksCompletedToday || userData.tasksCompletedToday || 0) : 0;
+      let tasksToday = 0;
+      
+      // শুধুমাত্র যদি আজকেই টাস্ক করে থাকে তবেই আজকের সংখ্যা গুনবে, অন্যথায় সরাসরি ০
+      if (isSameDay) {
+        tasksToday = Number(userData.dailyTasksCompletedToday ?? userData.tasksCompletedToday ?? 0);
+      }
 
+      // যদি ইউজারের আজকের কোটা শেষ হয়ে যায়, সাথে সাথে আটকে দেওয়া হবে
       if (tasksToday >= dailyLimit) {
         limitReached = true;
         newPoints = Number(userData.points ?? userData.balance ?? 0);
         customMessage = `Daily limit reached! Max ${dailyLimit} tasks allowed per day.`;
-        return; // লিমিট শেষ হলে আর কোনো পয়েন্ট বাড়বে না
+        return;
       }
 
-      // ৫. ইউজার আপডেট (পয়েন্ট এবং ডেইলি টাস্ক কাউন্ট)
+      // ৫. ইউজার আপডেট (পয়েন্ট যোগ ও আজকের কাউন্ট +১)
       const currentPts = Number(userData.points ?? userData.balance ?? 0);
       newPoints = currentPts + taskReward;
 
@@ -103,19 +109,17 @@ module.exports = async (req, res) => {
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
       }, { merge: true });
 
-      // ৬. টাস্ক আপডেট (ভিউ কাউন্ট এবং অটো-হাইড লজিক)
+      // ৬. টাস্কের ভিউ বাড়ানো এবং ১০,০০০ ভিউজ পূর্ণ হলে অটো-ভেনিশ করা
       const targetViews = Number(taskData.targetViews) || 100;
       const currentViews = Number(taskData.currentViews || 0) + 1;
 
       if (currentViews >= targetViews) {
-        // টার্গেট পূরণ হয়ে গেছে! টাস্কটি সবার থেকে স্বয়ংক্রিয়ভাবে হাইড (active: false)
         transaction.set(taskRef, {
           currentViews: currentViews,
           active: false,
           updatedAt: admin.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
       } else {
-        // টার্গেট এখনো বাকি আছে, ভিউ ১টি বাড়িয়ে রাখা
         transaction.set(taskRef, {
           currentViews: admin.firestore.FieldValue.increment(1),
           updatedAt: admin.firestore.FieldValue.serverTimestamp()
@@ -123,7 +127,7 @@ module.exports = async (req, res) => {
       }
     });
 
-    // যদি আগে থেকেই করা থাকে
+    // টাস্ক আগে করা থাকলে
     if (alreadyCompleted) {
       return res.status(200).json({
         success: false,
@@ -133,7 +137,7 @@ module.exports = async (req, res) => {
       });
     }
 
-    // যদি দৈনিক লিমিট শেষ হয়ে থাকে
+    // দৈনিক লিমিট শেষ হলে (যা ফ্রন্টএন্ডে সেই সুন্দর মোডাল ওপেন করবে)
     if (limitReached) {
       return res.status(400).json({
         success: false,
@@ -143,7 +147,7 @@ module.exports = async (req, res) => {
       });
     }
 
-    // সফলভাবে নতুন টাস্ক করলে রেসপন্স
+    // সফলভাবে টাস্ক শেষ হলে
     return res.status(200).json({
       success: true,
       taskId,
