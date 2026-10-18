@@ -2,6 +2,7 @@
 const { admin, db } = require('./_firebase');
 const { verifyTelegramWebAppData } = require('./_telegram');
 
+// আপনার দেওয়া অফিশিয়াল $GRAM রিসিভার অ্যাড্রেস
 const RECEIVER_ADDRESS = 'UQC_uwp-fGIO5qwRgGKe0ymORn-Cd-pW_HtBVbHD-NPzIVfq';
 
 const DEFAULT_TASKS = [
@@ -13,6 +14,8 @@ const DEFAULT_TASKS = [
     category: 'Social',
     iconType: 'telegram',
     actionText: 'Start',
+    targetViews: 9999999,
+    currentViews: 0,
     active: true
   },
   {
@@ -23,6 +26,8 @@ const DEFAULT_TASKS = [
     category: 'Social',
     iconType: 'twitter',
     actionText: 'Start',
+    targetViews: 9999999,
+    currentViews: 0,
     active: true
   },
   {
@@ -33,6 +38,8 @@ const DEFAULT_TASKS = [
     category: 'Partners',
     iconType: 'telegram',
     actionText: 'Start',
+    targetViews: 9999999,
+    currentViews: 0,
     active: true
   },
   {
@@ -43,6 +50,8 @@ const DEFAULT_TASKS = [
     category: 'Web3',
     iconType: 'bot',
     actionText: 'Start',
+    targetViews: 9999999,
+    currentViews: 0,
     active: true
   }
 ];
@@ -92,12 +101,13 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // ২. POST রিকোয়েস্ট: ক্লায়েন্ট নতুন টাস্ক পোস্ট করলে ডাটাবেস থেকে পয়েন্ট কাটা ও সেভ করা
+  // ২. POST রিকোয়েস্ট: ক্লায়েন্ট নতুন টাস্ক সাবমিট করলে ফায়ারস্টোরে সেভ ও পয়েন্ট কাটা
   if (req.method === 'POST') {
     try {
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
       const initData = req.headers['x-telegram-init-data'] || body.initData || '';
       const verified = verifyTelegramWebAppData(initData);
+      
       if (!verified || !verified.user) {
         return res.status(401).json({ error: 'Unauthorized Telegram user' });
       }
@@ -111,23 +121,25 @@ module.exports = async function handler(req, res) {
         return res.status(400).json({ error: 'Title and URL are required' });
       }
 
-      const taskCost = Number(cost) || 0;
-      const paymentMethod = String(paidWith || 'PTS');
+      const taskCost = Math.round(Number(cost) || 0);
+      const paymentMethod = String(paidWith || 'PTS').toUpperCase().trim();
 
-      // 🔥 PTS দিয়ে পোস্ট করলে ফায়ারস্টোর থেকে সরাসরি পয়েন্ট পার্মানেন্টলি কেটে নেওয়া
-      if (paymentMethod === 'PTS' && taskCost > 0) {
+      // 🔥 PTS দিয়ে পোস্ট করলে ফায়ারস্টোরের points এবং balance দুটো থেকেই চিরতরে মাইনাস করা
+      if (paymentMethod.includes('PTS') && taskCost > 0) {
         const userSnap = await userRef.get();
         if (userSnap.exists) {
-          const currentPoints = userSnap.data().points || 0;
-          if (currentPoints < taskCost) {
-            return res.status(400).json({ error: `Insufficient PTS balance! You need ${taskCost} PTS.` });
+          const userData = userSnap.data() || {};
+          const currentPts = Number(userData.points ?? userData.balance ?? 0);
+          if (currentPts < taskCost) {
+            return res.status(400).json({ error: `Insufficient PTS balance! You need ${taskCost.toLocaleString()} PTS.` });
           }
         }
 
-        // ডাটাবেস থেকে পয়েন্ট মাইনাস
+        // ডাটাবেস থেকে পয়েন্ট ও ব্যালেন্স পার্মানেন্টলি মাইনাস
         await userRef.set({
           userId: userId,
           points: admin.firestore.FieldValue.increment(-taskCost),
+          balance: admin.firestore.FieldValue.increment(-taskCost),
           updatedAt: admin.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
       }
@@ -148,12 +160,12 @@ module.exports = async function handler(req, res) {
         reward: Number(reward) || 200,
         category: category || 'Social',
         iconType: safeIcon,
-        actionText: 'Start',                     // সবসময় 'Start' হিসেবে সেভ হবে
+        actionText: 'Start',
         active: true,
-        targetViews: Number(impressions) || 100, // সঠিক ইমপ্রেশন সংখ্যা (যেমন: ১০,০০০)
+        targetViews: Number(impressions) || 100, // সঠিক ইমপ্রেশন টার্গেট (যেমন: ১০,০০০)
         currentViews: 0,
-        cost: taskCost,
-        paidWith: paymentMethod,
+        cost: taskCost,                         // কস্ট (যেমন: ২,০০,০০০ PTS)
+        paidWith: paymentMethod,                // মেথড
         createdBy: userId,
         createdAt: admin.firestore.FieldValue.serverTimestamp()
       };
@@ -162,7 +174,7 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ success: true, task: { id: docRef.id, ...taskData } });
     } catch (error) {
       console.error('Error creating task:', error);
-      return res.status(500).json({ error: 'Failed to create task' });
+      return res.status(500).json({ error: error.message || 'Failed to create task' });
     }
   }
 
