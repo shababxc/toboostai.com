@@ -1,4 +1,4 @@
-// api/withdraw.js
+//api/withdraw.js
 const { db, admin } = require('./_firebase');
 const { verifyTelegramWebAppData } = require('./_telegram');
 
