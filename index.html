@@ -755,23 +755,32 @@
               </div>
 
               {/* Referral & Level */}
-              <div onClick={onInviteClick} role="button" className="group relative flex flex-col justify-between p-2.5 rounded-[16px] bg-white border border-sky-100 shadow-[0_2px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden min-h-[82px]">
-                <div className="flex items-center justify-between">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-xs shrink-0">
-                    <Icons.Users className="w-4 h-4" />
+              {/* 🌟 পারফেক্ট ফ্রেমিং ও স্কাই-ব্লু প্রোগ্রেস বারযুক্ত রেফারেল কার্ড */}
+              <div onClick={onInviteClick} role="button" className="group relative flex flex-col justify-between p-3.5 pt-4 rounded-[20px] bg-white border border-sky-100/90 shadow-[0_2px_10px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden min-h-[92px]">
+                
+                {/* কার্ডের ভেতরে একদম মানানসই সাইজে বসানো ট্রান্সপারেন্ট র‍্যাংক ব্যাজ */}
+                <div className="flex items-center justify-between mb-1">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shrink-0 shadow-2xs overflow-hidden p-0.5">
+                    <img 
+                      src="https://i.postimg.cc/x8mWNtg7/86927-removebg-preview.png" 
+                      alt="Rank Badge" 
+                      className="w-full h-full object-contain scale-110 drop-shadow-xs"
+                    />
                   </div>
-                  <span className="text-[10.5px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200/70 tabular-nums">
+                  <span className="text-[10.5px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200/70 tabular-nums shadow-2xs">
                     Lv.{userLevel}
                   </span>
                 </div>
+
                 <div className="mt-1">
                   <div className="flex items-center justify-between">
                     <h3 className="font-display font-bold text-slate-800 text-[12px] group-hover:text-indigo-600 transition-colors leading-tight">{dict.referralLevel}</h3>
-                    <span className="text-[11px] font-black text-indigo-600">+100 PX</span>
+                    <span className="text-[10.5px] font-black text-sky-600">+100 PX</span>
                   </div>
                   <div className="mt-1 space-y-0.5">
-                    <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full transition-[width] duration-500 ease-out" style={{ width: `${invitePercentage || 0}%` }} />
+                    {/* 🌟 বেগুনি বাদ দিয়ে প্রিমিয়াম স্কাই-ব্লু প্রোগ্রেস বার */}
+                    <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden shadow-inner">
+                      <div className="bg-gradient-to-r from-sky-400 to-blue-600 h-full rounded-full transition-all duration-500" style={{ width: `${stats.invitePercentage || invitePercentage}%` }} />
                     </div>
                     <div className="flex justify-between items-center text-[10px] text-slate-500 font-medium">
                       <span>Perks</span>
