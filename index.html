@@ -715,7 +715,7 @@
                     <Icons.PlayCircle className="w-4 h-4 stroke-white" />
                   </div>
                   <div className="inline-flex items-center gap-1.5 pl-1 pr-2 py-0.5 rounded-full bg-gradient-to-r from-sky-50 to-blue-50/90 border border-sky-200/90 text-sky-800 text-[12px] font-black tracking-tight shadow-2xs tabular-nums shrink-0">
-                    <Coin3DIcon size={18} idPrefix="ad-reward" />
+                    <Coin3DIcon size={22} idPrefix="ad-reward" />
                     <span>+{adReward} PX</span>
                   </div>
                 </div>
@@ -737,7 +737,7 @@
                     <Icons.CalendarCheck className="w-4 h-4" />
                   </div>
                   <div className="inline-flex items-center gap-1.5 pl-1 pr-2 py-0.5 rounded-full bg-gradient-to-r from-sky-50 to-blue-50/90 border border-sky-200/90 text-sky-800 text-[12px] font-black tracking-tight shadow-2xs tabular-nums shrink-0">
-                    <Coin3DIcon size={18} idPrefix="checkin-reward" />
+                    <Coin3DIcon size={22} idPrefix="checkin-reward" />
                     <span>+{checkInReward} PX</span>
                   </div>
                 </div>
@@ -754,36 +754,37 @@
                 </div>
               </div>
 
-              {/* Referral & Level */}
-              {/* 🌟 পারফেক্ট ফ্রেমিং ও স্কাই-ব্লু প্রোগ্রেস বারযুক্ত রেফারেল কার্ড */}
+              {/* 🌟 Referral & Level Card (পারফেক্ট বর্ডার ফিটিং সহ ট্রান্সপারেন্ট ব্যাজ) */}
               <div onClick={onInviteClick} role="button" className="group relative flex flex-col justify-between p-3.5 pt-4 rounded-[20px] bg-white border border-sky-100/90 shadow-[0_2px_10px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden min-h-[92px]">
                 
-                {/* কার্ডের ভেতরে একদম মানানসই সাইজে বসানো ট্রান্সপারেন্ট র‍্যাংক ব্যাজ */}
-                <div className="flex items-center justify-between mb-1">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shrink-0 shadow-2xs overflow-hidden p-0.5">
-                    <img 
-                      src="https://i.postimg.cc/x8mWNtg7/86927-removebg-preview.png" 
-                      alt="Rank Badge" 
-                      className="w-full h-full object-contain scale-110 drop-shadow-xs"
-                    />
-                  </div>
+                {/* কোণায় একদম নিখুঁতভাবে ফিট করা ট্রান্সপারেন্ট ব্যাজ */}
+                <div className="absolute -top-3.5 -left-1.5 z-20 pointer-events-none drop-shadow-xs">
+                  <img 
+                    src="https://i.postimg.cc/x8mWNtg7/86927-removebg-preview.png" 
+                    alt="Rank Badge" 
+                    className="w-9 h-9 object-contain group-hover:scale-110 transition-transform"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between pl-7">
+                  <h3 className="font-display font-bold text-slate-800 text-[12px] group-hover:text-indigo-600 transition-colors leading-tight">{dict.referralLevel}</h3>
                   <span className="text-[10.5px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200/70 tabular-nums shadow-2xs">
                     Lv.{userLevel}
                   </span>
                 </div>
 
-                <div className="mt-1">
+                <div className="mt-1 pl-7">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-display font-bold text-slate-800 text-[12px] group-hover:text-indigo-600 transition-colors leading-tight">{dict.referralLevel}</h3>
-                    <span className="text-[10.5px] font-black text-sky-600">+100 PX</span>
+                    <span className="text-[10.5px] font-extrabold text-indigo-600">+100 PX</span>
+                    <span className="text-[9.5px] text-slate-400 font-bold">Perks</span>
                   </div>
                   <div className="mt-1 space-y-0.5">
-                    {/* 🌟 বেগুনি বাদ দিয়ে প্রিমিয়াম স্কাই-ব্লু প্রোগ্রেস বার */}
+                    {/* প্রিমিয়াম স্কাই-ব্লু প্রোগ্রেস বার */}
                     <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden shadow-inner">
-                      <div className="bg-gradient-to-r from-sky-400 to-blue-600 h-full rounded-full transition-all duration-500" style={{ width: `${invitePercentage || invitePercentage}%` }} />
+                      <div className="bg-gradient-to-r from-sky-400 to-blue-600 h-full rounded-full transition-all duration-500" style={{ width: `${invitePercentage}%` }} />
                     </div>
                     <div className="flex justify-between items-center text-[10px] text-slate-500 font-medium">
-                      <span>Perks</span>
+                      <span>Progress</span>
                       <span className="font-semibold text-slate-700 tabular-nums">{currentInvites}/{requiredInvites} frens</span>
                     </div>
                   </div>
@@ -807,7 +808,7 @@
                   </div>
                   <div className="mt-1 space-y-0.5">
                     <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-gradient-to-r from-teal-400 to-emerald-500 h-full rounded-full" style={{ width: `${taskPercentage || 0}%` }} />
+                      <div className="bg-gradient-to-r from-teal-400 to-emerald-500 h-full rounded-full transition-all duration-500" style={{ width: `${taskPercentage}%` }} />
                     </div>
                     <div className="flex items-center justify-between text-[10px] text-slate-500 font-medium">
                       <span>200 PX/task</span>
