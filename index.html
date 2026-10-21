@@ -700,23 +700,29 @@
         onInviteClick,
         onTasksClick,
         dict,
-        stats = {},
+        stats = {}, // 🌟 সার্ভার স্টেট রিসিভ করার প্রপস
       }) => {
-        const invitePercentage = Math.min(100, Math.round((currentInvites / requiredInvites) * 100));
-        const taskPercentage = Math.min(100, Math.round((completedTasksToday / dailyTaskLimit) * 100));
+        // 🌟 সার্ভার থেকে আসলে সার্ভারের পার্সেন্টেজ, না হলে লোকাল ব্যাকআপ
+        const invitePercentage = stats?.invitePercentage !== undefined 
+          ? stats.invitePercentage 
+          : Math.min(100, Math.round((currentInvites / requiredInvites) * 100));
+          
+        const taskPercentage = stats?.taskPercentage !== undefined 
+          ? stats.taskPercentage 
+          : Math.min(100, Math.round((completedTasksToday / dailyTaskLimit) * 100));
 
         return (
           <div className="w-full">
             <div className="grid grid-cols-2 gap-2">
               
-              {/* Watch Ad */}
+              {/* Card 1: Watch Ad */}
               <div onClick={onWatchAdClick} role="button" className="group relative flex flex-col justify-between p-2.5 rounded-[16px] bg-white border border-sky-100 shadow-[0_2px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden min-h-[82px]">
                 <div className="flex items-center justify-between gap-1.5">
                   <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-400 to-blue-500 flex items-center justify-center text-white shadow-xs shrink-0">
                     <Icons.PlayCircle className="w-4 h-4 stroke-white" />
                   </div>
                   <div className="inline-flex items-center gap-1.5 pl-1 pr-2 py-0.5 rounded-full bg-gradient-to-r from-sky-50 to-blue-50/90 border border-sky-200/90 text-sky-800 text-[12px] font-black tracking-tight shadow-2xs tabular-nums shrink-0">
-                    <Coin3DIcon size={18} idPrefix="ad-reward" />
+                    <Coin3DIcon size={22} idPrefix="ad-reward" />
                     <span>+{adReward} PX</span>
                   </div>
                 </div>
@@ -731,14 +737,14 @@
                 </div>
               </div>
 
-              {/* Daily Check-in */}
+              {/* Card 2: Daily Check-in */}
               <div onClick={onCheckInClick} role="button" className="group relative flex flex-col justify-between p-2.5 rounded-[16px] bg-white border border-sky-100 shadow-[0_2px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden min-h-[82px]">
                 <div className="flex items-center justify-between gap-1.5">
                   <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-xs shrink-0">
                     <Icons.CalendarCheck className="w-4 h-4" />
                   </div>
                   <div className="inline-flex items-center gap-1.5 pl-1 pr-2 py-0.5 rounded-full bg-gradient-to-r from-sky-50 to-blue-50/90 border border-sky-200/90 text-sky-800 text-[12px] font-black tracking-tight shadow-2xs tabular-nums shrink-0">
-                    <Coin3DIcon size={18} idPrefix="checkin-reward" />
+                    <Coin3DIcon size={22} idPrefix="checkin-reward" />
                     <span>+{checkInReward} PX</span>
                   </div>
                 </div>
@@ -755,58 +761,57 @@
                 </div>
               </div>
 
-              {/* 🌟 3. Referral & Level Card (রেফারেন্সের মতো স্লাইডারের ওপর ইনভাইট বাটন এবং বড় লোগো) */}
-              <div onClick={onInviteClick} role="button" className="group relative flex flex-col justify-between p-3.5 rounded-[20px] bg-white border border-sky-100 shadow-[0_2px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer min-h-[82px] overflow-visible mt-2.5 bg-transparent">
+              {/* 🌟 Card 3: Referral & Level (সার্ভার স্টেট + স্লিম সাইজ ও পারফেক্ট লেআউট) */}
+              <div onClick={onInviteClick} role="button" className="group relative flex flex-col justify-between p-3.5 pt-4 rounded-[20px] bg-white border border-sky-100/90 shadow-[0_2px_10px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-visible min-h-[82px]">
                 
-                {/* 🌟 ২px বড় লোগো এবং পেছনের সাদা ব্যাকগ্রাউন্ড রিমুভ (সম্পূর্ণ ট্রান্সপারেন্ট) */}
-                <div className="absolute -top-5 -left-3 z-20 pointer-events-none drop-shadow-md">
+                {/* কোণায় ফিট করা ট্রান্সপারেন্ট ব্যাজ */}
+                <div className="absolute -top-3.5 left-1 z-20 pointer-events-none drop-shadow-xs">
                   <img 
                     src="https://i.postimg.cc/x8mWNtg7/86927-removebg-preview.png" 
                     alt="Rank Badge" 
-                    className="w-[56px] h-[56px] object-contain transition-transform group-hover:scale-105 mix-blend-multiply"
+                    className="w-[42px] h-[42px] object-contain transition-transform group-hover:scale-105"
                   />
                 </div>
 
-                {/* Lv.1 » (বড় অ্যারো সহ) */}
-                <div className="flex justify-end w-full pt-0.5 pr-1">
-                  <h3 className="font-display font-black text-slate-900 text-[19px] tracking-tight flex items-center">
-                    Lv.{userLevel} <span className="text-slate-800 ml-1.5 text-[17px] font-bold">»</span>
-                  </h3>
+                {/* Lv.1 » */}
+                <div className="flex items-center justify-end gap-1 w-full pr-0.5">
+                  <span className="font-display font-black text-slate-900 text-[16px] tracking-tight leading-none">
+                    Lv.{userLevel}
+                  </span>
+                  <span className="font-black text-slate-800 text-[19px] leading-none -mt-0.5">»</span>
                 </div>
 
                 {/* Invitation Progress Text */}
                 <div className="mt-0.5">
-                  <h4 className="font-display font-bold text-slate-800 text-[13px] tracking-tight leading-none">
+                  <h4 className="font-display font-extrabold text-slate-800 text-[11px] tracking-tight leading-tight">
                     Invitation Progress
                   </h4>
-                  <p className="text-[10px] text-slate-400 font-medium mt-1 leading-tight">
-                    invite {Math.max(0, requiredInvites - currentInvites)} users to upgrade to Lv.{userLevel + 1}
+                  <p className="text-[8.5px] text-slate-400 font-medium leading-none mt-0.5">
+                    invite {Math.max(0, requiredInvites - currentInvites)} users to Lv.{userLevel + 1}
                   </p>
                 </div>
 
-                {/* Progress Bar & Invite Button Row (স্লাইডারের ওপর ইনভাইট বাটন) */}
-                <div className="relative mt-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 flex flex-col justify-center">
-                      <div className="w-2/3 bg-slate-200 h-[6px] rounded-full overflow-hidden shadow-inner">
-                        <div className="bg-[#006bd8] h-full rounded-full transition-all duration-300" style={{ width: `${stats?.invitePercentage !== undefined ? stats.invitePercentage : invitePercentage}%` }} />
-                      </div>
-                      <span className="text-[11px] font-bold text-[#006bd8] mt-1.5 tracking-tight tabular-nums">
-                        {currentInvites}/{requiredInvites}
-                      </span>
+                {/* 🌟 সার্ভার স্টেট দিয়ে চালিত প্রোগ্রেস বার ও ইনভাইট বাটন */}
+                <div className="flex items-center justify-between gap-2 mt-1">
+                  <div className="flex-1 flex flex-col justify-center">
+                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden shadow-inner">
+                      <div className="bg-gradient-to-r from-sky-400 to-blue-600 h-full rounded-full transition-all duration-300" style={{ width: `${invitePercentage}%` }} />
                     </div>
-
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); onInviteClick(); }}
-                      className="absolute right-0 bottom-1 px-4 py-1.5 bg-[#006bd8] hover:bg-[#005ec0] active:scale-95 text-white rounded-full text-[12px] font-bold shadow-md transition-all cursor-pointer shrink-0"
-                    >
-                      invite
-                    </button>
+                    <span className="text-[9.5px] font-black text-sky-600 mt-0.5 tracking-tight tabular-nums">
+                      {currentInvites}/{requiredInvites} frens
+                    </span>
                   </div>
+
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); onInviteClick(); }}
+                    className="px-3.5 py-1.5 bg-[#0070d8] hover:bg-[#005ec0] active:scale-95 text-white rounded-full text-[11px] font-extrabold shadow-sm transition-all cursor-pointer shrink-0"
+                  >
+                    invite
+                  </button>
                 </div>
               </div>
 
-              {/* Daily Tasks */}
+              {/* Card 4: Daily Tasks */}
               <div onClick={onTasksClick} role="button" className="group relative flex flex-col justify-between p-2.5 rounded-[16px] bg-white border border-sky-100 shadow-[0_2px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden min-h-[82px]">
                 <div className="flex items-center justify-between">
                   <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-400 to-teal-600 flex items-center justify-center text-white shadow-xs shrink-0">
@@ -823,7 +828,7 @@
                   </div>
                   <div className="mt-1 space-y-0.5">
                     <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-gradient-to-r from-teal-400 to-emerald-500 h-full rounded-full" style={{ width: `${taskPercentage || 0}%` }} />
+                      <div className="bg-gradient-to-r from-teal-400 to-emerald-500 h-full rounded-full transition-all duration-500" style={{ width: `${taskPercentage}%` }} />
                     </div>
                     <div className="flex items-center justify-between text-[10px] text-slate-500 font-medium">
                       <span>200 PX/task</span>
