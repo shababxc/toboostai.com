@@ -700,6 +700,7 @@
         onInviteClick,
         onTasksClick,
         dict,
+        stats = {},
       }) => {
         const invitePercentage = Math.min(100, Math.round((currentInvites / requiredInvites) * 100));
         const taskPercentage = Math.min(100, Math.round((completedTasksToday / dailyTaskLimit) * 100));
@@ -2887,6 +2888,7 @@ const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, s
                         if (el) el.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
                       dict={dict}
+                      stats={stats}
                     />
                   </div>
 
