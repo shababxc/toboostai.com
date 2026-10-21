@@ -754,49 +754,49 @@
                 </div>
               </div>
 
-              {/* 🌟 3. Referral & Level Card (স্লিম সাইজ এবং ডানা ভেতরে ঢোকানো) */}
-              <div onClick={onInviteClick} role="button" className="group relative flex flex-col justify-between p-2.5 rounded-[16px] bg-white border border-sky-100 shadow-[0_2px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-visible min-h-[82px]">
+              {/* 🌟 3. Referral & Level Card (স্ক্রিনশটের মতো কোণা কেটে বসা লোগো এবং ডিজাইন) */}
+              <div onClick={onInviteClick} role="button" className="group relative flex flex-col justify-between p-3 rounded-[20px] bg-white border border-sky-100 shadow-[0_2px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer min-h-[108px] overflow-visible mt-1.5">
                 
-                {/* 🌟 কোণায় নিখুঁতভাবে বসা ট্রান্সপারেন্ট ব্যাজ (ডানা এখন সাদা কার্ডের ভেতরে থাকবে) */}
-                <div className="absolute -top-3 left-0.5 z-20 pointer-events-none drop-shadow-sm">
+                {/* 🌟 কোণায় নিখুঁতভাবে বসা ট্রান্সপারেন্ট ব্যাজ (সাদা বর্ডারের বাইরে বেরিয়ে থাকবে) */}
+                <div className="absolute -top-4 -left-2.5 z-20 pointer-events-none drop-shadow-md">
                   <img 
                     src="https://i.postimg.cc/x8mWNtg7/86927-removebg-preview.png" 
                     alt="Rank Badge" 
-                    className="w-[42px] h-[42px] object-contain transition-transform group-hover:scale-105"
+                    className="w-[54px] h-[54px] object-contain transition-transform group-hover:scale-105"
                   />
                 </div>
 
                 {/* Lv.1 » (উপরে ডানপাশে) */}
-                <div className="flex justify-end w-full pt-0.5 pr-0.5">
-                  <h3 className="font-display font-black text-slate-900 text-[14px] tracking-tight flex items-center">
-                    Lv.{userLevel} <span className="text-slate-400 ml-0.5 text-[13px]">»</span>
+                <div className="flex justify-end w-full pt-0.5 pr-1">
+                  <h3 className="font-display font-black text-slate-900 text-[18px] tracking-tight flex items-center">
+                    Lv.{userLevel} <span className="text-slate-400 ml-0.5 text-[15px]">»</span>
                   </h3>
                 </div>
 
                 {/* Invitation Progress Text */}
                 <div className="mt-0.5">
-                  <h4 className="font-display font-extrabold text-slate-800 text-[11px] tracking-tight leading-none">
+                  <h4 className="font-display font-extrabold text-slate-800 text-[12.5px] tracking-tight leading-none">
                     Invitation Progress
                   </h4>
-                  <p className="text-[8.5px] text-slate-400 font-medium mt-0.5 leading-tight">
-                    invite {Math.max(0, requiredInvites - currentInvites)} users to Lv.{userLevel + 1}
+                  <p className="text-[9px] text-slate-400 font-medium mt-1 leading-tight">
+                    invite {Math.max(0, requiredInvites - currentInvites)} users to upgrade to Lv.{userLevel + 1}
                   </p>
                 </div>
 
                 {/* Progress Bar & Invite Button Row */}
-                <div className="flex items-center gap-2 mt-1">
-                  <div className="flex-1 flex flex-col justify-center mt-0.5">
-                    <div className="w-full bg-slate-100 h-[5px] rounded-full overflow-hidden shadow-inner">
-                      <div className="bg-[#006bd8] h-full rounded-full transition-all duration-300" style={{ width: `${invitePercentage}%` }} />
+                <div className="flex items-center gap-2 mt-2">
+                  <div className="flex-1 flex flex-col justify-center mt-1">
+                    <div className="w-full bg-slate-100 h-[6px] rounded-full overflow-hidden shadow-inner">
+                      <div className="bg-[#006bd8] h-full rounded-full transition-all duration-300" style={{ width: `${stats?.invitePercentage || invitePercentage || 0}%` }} />
                     </div>
-                    <span className="text-[9px] font-black text-[#006bd8] mt-0.5 tracking-tight tabular-nums">
+                    <span className="text-[10px] font-black text-[#006bd8] mt-0.5 tracking-tight tabular-nums">
                       {currentInvites}/{requiredInvites}
                     </span>
                   </div>
 
                   <button 
                     onClick={(e) => { e.stopPropagation(); onInviteClick(); }}
-                    className="px-3 py-1 bg-[#006bd8] hover:bg-[#005ec0] active:scale-95 text-white rounded-full text-[10px] font-bold shadow-md transition-all cursor-pointer shrink-0"
+                    className="px-3.5 py-1.5 bg-[#006bd8] hover:bg-[#005ec0] active:scale-95 text-white rounded-full text-[11px] font-bold shadow-md transition-all cursor-pointer shrink-0"
                   >
                     invite
                   </button>
