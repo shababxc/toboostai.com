@@ -781,33 +781,28 @@
                   <span className="font-black text-slate-800 text-[19px] leading-none -mt-0.5">»</span>
                 </div>
 
-                {/* Invitation Progress Text */}
-                <div className="mt-0">
-                  <h4 className="font-display font-extrabold text-slate-800 text-[11px] tracking-tight leading-tight">
-                    Invitation Progress
-                  </h4>
-                  <p className="text-[8.5px] text-slate-400 font-medium leading-none mt-0.5">
-                    invite {Math.max(0, requiredInvites - currentInvites)} users to upgrade to Lv.{userLevel + 1}
-                  </p>
-                </div>
-
-                {/* 🌟 স্লাইডার এবং ইনভাইট বাটন একদম বাটনের মাঝ বরাবর পারফেক্ট লকড */}
-                <div className="flex items-center justify-between gap-2.5 mt-1.5">
-                  <div className="flex-1 flex flex-col justify-center">
-                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden shadow-inner">
+                {/* 🌟 স্লাইডার এবং ইনভাইট বাটন একদম মাঝ বরাবর পারফেক্ট লকড */}
+                <div className="flex items-center justify-between gap-3 mt-2">
+                  
+                  {/* বামে: প্রোগ্রেস বার এবং ফ্রেন্ডস কাউন্ট */}
+                  <div className="flex-1 flex flex-col justify-center mt-1">
+                    <div className="w-full bg-slate-100 h-[6px] rounded-full overflow-hidden shadow-inner">
+                      {/* আপনার পছন্দের গ্রেডিয়েন্ট প্রোগ্রেস বার */}
                       <div className="bg-gradient-to-r from-sky-400 to-blue-600 h-full rounded-full transition-all duration-300" style={{ width: `${stats?.invitePercentage !== undefined ? stats.invitePercentage : invitePercentage}%` }} />
                     </div>
-                    <span className="text-[9.5px] font-black text-sky-600 mt-1 tracking-tight tabular-nums">
+                    <span className="text-[10px] font-black text-sky-600 mt-1 tracking-tight tabular-nums">
                       {currentInvites}/{requiredInvites} frens
                     </span>
                   </div>
 
+                  {/* ডানে: ইনভাইট বাটন (স্লাইডারের ঠিক সমান্তরালে) */}
                   <button 
                     onClick={(e) => { e.stopPropagation(); onInviteClick(); }}
-                    className="px-4 py-1.5 bg-[#0070d8] hover:bg-[#005ec0] active:scale-95 text-white rounded-full text-[11px] font-extrabold shadow-sm transition-all cursor-pointer shrink-0"
+                    className="px-4 py-1.5 bg-[#006bd8] hover:bg-[#005ec0] active:scale-95 text-white rounded-full text-[11.5px] font-extrabold shadow-md transition-all cursor-pointer shrink-0"
                   >
                     invite
                   </button>
+
                 </div>
               </div>
 
