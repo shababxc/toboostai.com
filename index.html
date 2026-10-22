@@ -761,20 +761,20 @@
                 </div>
               </div>
 
-              {/* 🌟 Card 3: Referral & Level (সার্ভার স্টেট + স্লিম সাইজ ও পারফেক্ট লেআউট) */}
-              <div onClick={onInviteClick} role="button" className="group relative flex flex-col justify-between p-3.5 pt-4 rounded-[20px] bg-white border border-sky-100/90 shadow-[0_2px_10px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-visible min-h-[82px]">
+              {/* 🌟 3: Referral & Level Card (রেফারেন্সের মতো নিখুঁত পিক্সেল অ্যালাইনমেন্ট) */}
+              <div onClick={onInviteClick} role="button" className="group relative flex flex-col justify-between p-3.5 pt-4 rounded-[20px] bg-white border border-sky-100/90 shadow-[0_2px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-visible min-h-[82px]">
                 
                 {/* কোণায় ফিট করা ট্রান্সপারেন্ট ব্যাজ */}
-                <div className="absolute -top-3.5 left-1 z-20 pointer-events-none drop-shadow-sm">
+                <div className="absolute -top-3.5 left-1 z-20 pointer-events-none drop-shadow-xs">
                   <img 
                     src="https://i.postimg.cc/gkd3CHrZ/87243-removebg-preview.png" 
                     alt="Rank Badge" 
-                    className="w-[45px] h-[45px] object-contain"
+                    className="w-[42px] h-[42px] object-contain transition-transform group-hover:scale-105"
                   />
                 </div>
 
-                {/* Lv.1 » */}
-                <div className="flex items-center justify-end gap-1 w-full pr-0.5">
+                {/* 🌟 Lv.1 » (ঠিক ২ পিক্সেল ওপরে শিফট করা) */}
+                <div className="flex items-center justify-end gap-1 w-full pr-0.5 -mt-1.5">
                   <span className="font-display font-black text-slate-900 text-[16px] tracking-tight leading-none">
                     Lv.{userLevel}
                   </span>
@@ -782,29 +782,29 @@
                 </div>
 
                 {/* Invitation Progress Text */}
-                <div className="mt-0.5">
+                <div className="mt-0">
                   <h4 className="font-display font-extrabold text-slate-800 text-[11px] tracking-tight leading-tight">
                     Invitation Progress
                   </h4>
                   <p className="text-[8.5px] text-slate-400 font-medium leading-none mt-0.5">
-                    invite {Math.max(0, requiredInvites - currentInvites)} users to Lv.{userLevel + 1}
+                    invite {Math.max(0, requiredInvites - currentInvites)} users to upgrade to Lv.{userLevel + 1}
                   </p>
                 </div>
 
-                {/* 🌟 সার্ভার স্টেট দিয়ে চালিত প্রোগ্রেস বার ও ইনভাইট বাটন */}
-                <div className="flex items-center justify-between gap-2 mt-1">
+                {/* 🌟 স্লাইডার এবং ইনভাইট বাটন একদম বাটনের মাঝ বরাবর পারফেক্ট লকড */}
+                <div className="flex items-center justify-between gap-2.5 mt-1.5">
                   <div className="flex-1 flex flex-col justify-center">
                     <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden shadow-inner">
                       <div className="bg-gradient-to-r from-sky-400 to-blue-600 h-full rounded-full transition-all duration-300" style={{ width: `${stats?.invitePercentage !== undefined ? stats.invitePercentage : invitePercentage}%` }} />
                     </div>
-                    <span className="text-[9.5px] font-black text-sky-600 mt-0.5 tracking-tight tabular-nums">
+                    <span className="text-[9.5px] font-black text-sky-600 mt-1 tracking-tight tabular-nums">
                       {currentInvites}/{requiredInvites} frens
                     </span>
                   </div>
 
                   <button 
                     onClick={(e) => { e.stopPropagation(); onInviteClick(); }}
-                    className="px-3.5 py-1.5 bg-[#0070d8] hover:bg-[#005ec0] active:scale-95 text-white rounded-full text-[11px] font-extrabold shadow-sm transition-all cursor-pointer shrink-0"
+                    className="px-4 py-1.5 bg-[#0070d8] hover:bg-[#005ec0] active:scale-95 text-white rounded-full text-[11px] font-extrabold shadow-sm transition-all cursor-pointer shrink-0"
                   >
                     invite
                   </button>
