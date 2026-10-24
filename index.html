@@ -761,10 +761,10 @@
                 </div>
               </div>
 
-              {/* 🌟 3. Referral & Level Card (আকাশি কালার, স্লিম বাটন ও স্লাইডারের ওপর কাউন্ট) */}
-              <div onClick={onInviteClick} role="button" className="group relative flex flex-col justify-between p-3.5 pt-4 rounded-[20px] bg-white border border-sky-100/90 shadow-[0_2px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-visible min-h-[82px]">
+              {/* 🌟 3. Referral & Level Card (এক্সাম্পল স্ক্রিনশটের ১০০% হুবহু ডিজাইন) */}
+              <div onClick={onInviteClick} role="button" className="group relative flex flex-col justify-between p-3.5 pt-3 rounded-[20px] bg-white border border-sky-100/90 shadow-[0_2px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-visible min-h-[82px]">
                 
-                {/* কোণায় ফিট করা ট্রান্সপারেন্ট ব্যাজ */}
+                {/* কোণায় ফিট করা ট্রান্সপারেন্ট র্যাংক ব্যাজ */}
                 <div className="absolute -top-3.5 left-1 z-20 pointer-events-none drop-shadow-xs">
                   <img 
                     src="https://i.postimg.cc/gkd3CHrZ/87243-removebg-preview.png" 
@@ -773,45 +773,50 @@
                   />
                 </div>
 
-                {/* Lv.1 » */}
-                <div className="flex items-center justify-end gap-1 w-full pr-0.5 -mt-1">
+                {/* ডানপাশের Lv.X » */}
+                <div className="flex items-center justify-end gap-1 w-full pr-0.5">
                   <span className="font-display font-black text-slate-900 text-[16px] tracking-tight leading-none">
                     Lv.{userLevel}
                   </span>
-                  <span className="font-black text-slate-800 text-[19px] leading-none -mt-0.5">»</span>
+                  <span className="font-black text-slate-800 text-[18px] leading-none -mt-0.5">»</span>
                 </div>
 
-                {/* Invitation Progress Text */}
-                <div className="mt-0">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-display font-extrabold text-slate-800 text-[11px] tracking-wide leading-wide">
-                      Invitation Progress
-                    </h4>
-                    {/* 🌟 স্লাইডারের ওপর কাউন্ট (0/5) */}
-                    <span className="text-[10.5px] font-black text-sky-600 tracking-wide tabular-nums">
-                      {currentInvites}/{requiredInvites}
-                    </span>
-                  </div>
-                  <p className="text-[8.5px] text-slate-400 font-medium leading-none mt-0.5">
-                    invite {Math.max(0, requiredInvites - currentInvites)} users to Lv.{userLevel + 1}
+                {/* Invitation Progress শিরোনাম ও আপগ্রেড সাবটাইটেল */}
+                <div className="mt-0.5">
+                  <h4 className="font-display font-extrabold text-slate-800 text-[11.5px] tracking-wide leading-wide">
+                    Invitation Progress
+                  </h4>
+                  <p className="text-[9.5px] text-slate-400 font-medium leading-none mt-1">
+                    invite {Math.max(0, requiredInvites - currentInvites)} users to upgrade to Lv.{userLevel + 1}
                   </p>
                 </div>
 
-                {/* 🌟 আকাশি স্লাইডার, ইনভাইট বাটনের নিচে লক এবং ১ পিক্সেল ছোট আকাশি বাটন */}
-                <div className="flex items-center justify-between gap-2.5 mt-1">
-                  <div className="flex-1 flex flex-col justify-center">
-                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden shadow-inner">
-                      <div className="bg-gradient-to-r from-sky-400 to-sky-500 h-full rounded-full transition-all duration-300" style={{ width: `${stats?.invitePercentage !== undefined ? stats.invitePercentage : invitePercentage}%` }} />
+                {/* 🌟 স্লাইডার এবং তার ওপর ওভারল্যাপ হওয়া ইনভাইট বাটন (স্লাইডারের ভেতরে 2/3 কাউন্ট) */}
+                <div className="flex items-center mt-1.5 w-full">
+                  {/* স্লাইডার ট্র্যাক (ভেতরে কাউন্ট সহ) */}
+                  <div className="flex-1 h-[10px] bg-[#e1f2fe] rounded-full relative overflow-hidden shadow-inner flex items-center">
+                    {/* নীল কালার ফিল */}
+                    <div 
+                      className="bg-[#1c82f9] h-full rounded-full transition-all duration-300" 
+                      style={{ width: `${stats?.invitePercentage !== undefined ? stats.invitePercentage : invitePercentage}%` }} 
+                    />
+                    {/* স্লাইডারের ভেতরের সেন্টারে থাকা লাইভ কাউন্ট (যেমন 2/3) */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none pr-2">
+                      <span className="font-display font-black text-[10.5px] text-slate-800 drop-shadow-xs tabular-nums">
+                        {currentInvites}/{requiredInvites}
+                      </span>
                     </div>
                   </div>
 
+                  {/* স্লাইডারের ডান প্রান্তে ওভারল্যাপ হওয়া বাটন */}
                   <button 
                     onClick={(e) => { e.stopPropagation(); onInviteClick(); }}
-                    className="px-3.5 py-1 bg-sky-500 hover:bg-sky-600 active:scale-95 text-white rounded-full text-[11px] font-extrabold shadow-sm transition-all cursor-pointer shrink-0"
+                    className="-ml-3.5 z-10 px-3.5 py-1 bg-[#1c82f9] hover:bg-blue-600 active:scale-95 text-white rounded-full text-[11px] font-black shadow-md transition-all cursor-pointer shrink-0"
                   >
                     invite
                   </button>
                 </div>
+
               </div>
 
               {/* Card 4: Daily Tasks */}
