@@ -791,27 +791,27 @@
                   </p>
                 </div>
 
-                {/* 🌟 স্লাইডার এবং তার ওপর ওভারল্যাপ হওয়া ইনভাইট বাটন (স্লাইডারের ভেতরে 2/3 কাউন্ট) */}
-                <div className="flex items-center mt-1.5 w-full">
-                  {/* স্লাইডার ট্র্যাক (ভেতরে কাউন্ট সহ) */}
-                  <div className="flex-1 h-[10px] bg-[#e1f2fe] rounded-full relative overflow-hidden shadow-inner flex items-center">
-                    {/* নীল কালার ফিল */}
+                {/* 🌟 চিকন স্লাইডার এবং শেষ প্রান্তে থাকা ওভারল্যাপ ইনভাইট বাটন */}
+                <div className="flex items-center w-full mt-1.5 pl-0.5">
+                  {/* স্ক্রিনশটের মতো ছিমছাম চিকন স্লাইডার ট্র্যাক (h-[13px]) */}
+                  <div className="flex-1 h-[13px] bg-[#e1f2fe] rounded-full relative overflow-hidden shadow-inner flex items-center">
+                    {/* নীল কালার প্রগ্রেস ফিল */}
                     <div 
                       className="bg-[#1c82f9] h-full rounded-full transition-all duration-300" 
                       style={{ width: `${stats?.invitePercentage !== undefined ? stats.invitePercentage : invitePercentage}%` }} 
                     />
-                    {/* স্লাইডারের ভেতরের সেন্টারে থাকা লাইভ কাউন্ট (যেমন 2/3) */}
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none pr-2">
-                      <span className="font-display font-black text-[10.5px] text-slate-800 drop-shadow-xs tabular-nums">
+                    {/* চিকন ট্র্যাকের ভেতরে পারফেক্ট ফিট হওয়া লাইভ কাউন্ট (যেমন 2/3) */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none pr-3">
+                      <span className="font-display font-black text-[8.5px] text-slate-700 leading-none tabular-nums select-none">
                         {currentInvites}/{requiredInvites}
                       </span>
                     </div>
                   </div>
 
-                  {/* স্লাইডারের ডান প্রান্তে ওভারল্যাপ হওয়া বাটন */}
+                  {/* স্লাইডারের ডানপ্রান্তের উপর বসে থাকা এবং কার্ডের শেষ প্রান্তে থাকা ইনভাইট বাটন */}
                   <button 
                     onClick={(e) => { e.stopPropagation(); onInviteClick(); }}
-                    className="-ml-3.5 z-10 px-3.5 py-1 bg-[#1c82f9] hover:bg-blue-600 active:scale-95 text-white rounded-full text-[11px] font-black shadow-md transition-all cursor-pointer shrink-0"
+                    className="-ml-3 z-10 px-3 py-1 bg-[#1c82f9] hover:bg-blue-600 active:scale-95 text-white rounded-full text-[11px] font-black shadow-sm transition-all cursor-pointer shrink-0 -mr-0.5"
                   >
                     invite
                   </button>
