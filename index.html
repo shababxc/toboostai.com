@@ -684,7 +684,16 @@
           </nav>
         );
       };
-      const QuickActionsGrid = ({
+   const LEVEL_BADGES = {
+  1: 'https://i.postimg.cc/gkd3CHrZ/87243-removebg-preview.png',
+  2: 'https://i.postimg.cc/TPFqsV6r/69605c822a5a.png',
+  3: 'https://i.postimg.cc/4dcbRY4T/69605d188153.png',
+  4: 'https://i.postimg.cc/ZRNFzWY6/69605d3796ed.png'
+};
+
+const getLevelBadge = (lvl) => LEVEL_BADGES[lvl] || LEVEL_BADGES[4] || LEVEL_BADGES[1];
+
+     const QuickActionsGrid = ({
         adReward,
         checkInReward,
         streakDays,
@@ -698,6 +707,7 @@
         onWatchAdClick,
         onCheckInClick,
         onInviteClick,
+        onOpenLevelModal,
         onTasksClick,
         dict,
         stats = {}, // 🌟 সার্ভার স্টেট রিসিভ করার প্রপস
@@ -766,20 +776,22 @@
                 
                 {/* কোণায় ফিট করা ট্রান্সপারেন্ট র্যাংক ব্যাজ */}
                 <div className="absolute -top-3.5 left-1 z-20 pointer-events-none drop-shadow-xs">
-                  <img 
-                    src="https://i.postimg.cc/gkd3CHrZ/87243-removebg-preview.png" 
-                    alt="Rank Badge" 
-                    className="w-[50px] h-[50px] object-contain transition-transform group-hover:scale-105"
-                  />
+                  <img src={getLevelBadge(userLevel)} alt={`Level ${userLevel}`} className="w-[50px] h-[50px] object-contain transition-transform group-hover:scale-105" />
                 </div>
 
                 {/* ডানপাশের Lv.X এবং পরবর্তীতে বাটন হিসেবে ব্যবহারের উপযোগী বড় তীর চিহ্ন (ডান বর্ডার থেকে একদম পারফেক্ট ৮px দূরত্বে) */}
-                <div className="flex items-center justify-end gap-1 w-full">
-                  <span className="font-serif font-black text-slate-950 text-[19px] tracking-tight leading-none [-webkit-text-stroke:0.5px_currentColor]">Lv.{userLevel}</span>
-                  <span className="font-black text-slate-900 text-[20px] leading-none transition-transform group-hover:translate-x-0.5 select-none">
-                    »
-                  </span>
-                </div>
+                <div 
+  onClick={(e) => { e.stopPropagation(); onOpenLevelModal && onOpenLevelModal(); }}
+  className="flex items-center justify-end gap-1 w-full cursor-pointer hover:opacity-80 active:scale-95 transition-all"
+  title="View Level Details"
+>
+  <span className="font-serif font-black text-slate-950 text-[19px] tracking-tight leading-none [-webkit-text-stroke:0.5px_currentColor]">
+    Lv.{userLevel}
+  </span>
+  <span className="font-black text-slate-900 text-[20px] leading-none transition-transform group-hover:translate-x-0.5 select-none">
+    »
+  </span>
+</div>
 
                 {/* Invitation Progress শিরোনাম ও সাবটাইটেল (ডান বর্ডারের কাছাকাছি পারফেক্ট অ্যালাইন) */}
                 <div className="mt-0.5 text-right">
@@ -1237,7 +1249,8 @@
                     </label>
                     <select
                       value={category}
-                      onChange={(e) => setCategory(e.target.value)}
+        level preck
+             onChange={(e) => setCategory(e.target.value)}
                       className="w-full px-3 py-2 text-[12.5px] rounded-xl bg-white text-slate-800 font-bold focus:outline-none shadow-xs cursor-pointer"
                     >
                       <option value="Social">Social</option>
@@ -1391,68 +1404,122 @@
 
         
 
-      const LevelPerksModal = ({ isOpen, onClose, userLevel, currentInvites, requiredInvites, multiplier }) => {
+      const LevelPerksModal = ({ isOpen, onClose }) => {
         if (!isOpen) return null;
 
-        const levels = [
-          { lvl: 1, title: 'Star Hunter', perks: 'Base 5 daily tasks, 1.0x booster multiplier' },
-          { lvl: 2, title: 'Bounty Explorer', perks: '10 daily tasks (5 referrals required), 1.2x boost' },
-          { lvl: 3, title: 'Cosmic Collector', perks: '15 daily tasks (10 referrals required), 1.4x boost' },
-          { lvl: 4, title: 'Galaxy Pioneer', perks: '20 daily tasks (15 referrals required), 1.6x multiplier' },
-          { lvl: 5, title: 'ToBOOST Master', perks: 'Maximum 20 tasks, 2.0x multiplier, priority airdrop' },
+        const levelData = [
+          {
+            lvl: 1,
+            badge: 'https://i.postimg.cc/gkd3CHrZ/87243-removebg-preview.png',
+            invites: 0,
+            dailyLimit: 5,
+          },
+          {
+            lvl: 2,
+            badge: 'https://i.postimg.cc/TPFqsV6r/69605c822a5a.png',
+            invites: 5,
+            dailyLimit: 10,
+          },
+          {
+            lvl: 3,
+            badge: 'https://i.postimg.cc/4dcbRY4T/69605d188153.png',
+            invites: 10,
+            dailyLimit: 15,
+          },
+          {
+            lvl: 4,
+            badge: 'https://i.postimg.cc/ZRNFzWY6/69605d3796ed.png',
+            invites: 20,
+            dailyLimit: 20,
+          },
         ];
 
         return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
-            <div className="relative w-full max-w-sm rounded-[24px] bg-white border border-sky-100 shadow-2xl p-5 overflow-hidden">
-              <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
-                <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center">
-                    <Icons.Trophy className="w-5 h-5 text-sky-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-display font-black text-slate-900 text-base">Level {userLevel} Perks</h3>
-                    <p className="text-[12px] text-slate-400">Current Multiplier: <strong className="text-sky-600">{multiplier}x</strong></p>
-                  </div>
-                </div>
-                <button onClick={onClose} className="p-1 rounded-full text-slate-400 hover:text-slate-600">
-                  <Icons.X className="w-5 h-5" />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-xs animate-in fade-in duration-200">
+            <div className="relative w-full max-w-[345px] sm:max-w-sm rounded-[28px] bg-[#f8fafc] shadow-2xl overflow-hidden border border-white/40">
+              
+              {/* হেডার: স্ক্রিনশটের হুবহু ব্লু-গ্রিন গ্র্যাডিয়েন্ট */}
+              <div className="px-5 py-4 bg-gradient-to-r from-[#00b4f8] via-[#00c8c8] to-[#00e5a3] flex items-center justify-between">
+                <h3 className="font-display font-bold text-white text-[20px] tracking-normal drop-shadow-xs">
+                  Level Details
+                </h3>
+                <button 
+                  onClick={onClose}
+                  className="p-1 rounded-full text-slate-900 hover:bg-black/10 transition active:scale-90 cursor-pointer"
+                >
+                  <Icons.X className="w-5 h-5 stroke-[2.8]" />
                 </button>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-gradient-to-r from-sky-50 to-blue-50/50 border border-sky-200/80 mb-4">
-                <div className="flex justify-between items-center text-xs mb-1.5 font-bold text-sky-900">
-                  <span>Next Level: Lv.{userLevel + 1}</span>
-                  <span className="tabular-nums">{currentInvites}/{requiredInvites} Invites</span>
-                </div>
-                <div className="w-full bg-sky-200/60 h-2 rounded-full overflow-hidden">
-                  <div className="bg-gradient-to-r from-sky-500 to-blue-600 h-full rounded-full" style={{ width: `${Math.min(100, (currentInvites / requiredInvites) * 100)}%` }} />
-                </div>
-                <p className="text-[12px] text-sky-800/80 mt-2 font-medium">
-                  Invite {Math.max(0, requiredInvites - currentInvites)} more friends to unlock higher daily tasks!
-                </p>
-              </div>
+              {/* মোডাল বডি */}
+              <div className="p-4 space-y-2.5">
+                
+                {/* কলাম হেডলাইনস */}
+                <div className="grid grid-cols-3 px-3 py-1 text-[12.5px] font-bold text-slate-600 select-none">
+                  <div className="flex items-center gap-1.5 justify-start">
+                    <span className="w-2 h-2 rounded-full bg-[#c084fc]"></span>
+                    <span>Level</span>
+                  </div>
 
-              <div className="space-y-2 mb-4 max-h-56 overflow-y-auto no-scrollbar">
-                {levels.map((item) => {
-                  const isUnlocked = item.lvl <= userLevel;
-                  return (
-                    <div key={item.lvl} className={`p-2.5 rounded-xl border flex items-start gap-2.5 ${isUnlocked ? 'bg-sky-50/70 border-sky-200' : 'bg-white border-slate-100 opacity-60'}`}>
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${isUnlocked ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-500'}`}>
-                        {isUnlocked ? <Icons.Check className="w-3.5 h-3.5 stroke-[3]" /> : item.lvl}
+                  <div className="flex items-center gap-1.5 justify-center">
+                    <span className="w-2 h-2 rounded-full bg-[#f59e0b]"></span>
+                    <span>Upgrade</span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 justify-end">
+                    <span className="w-2 h-2 rounded-full bg-[#06b6d4]"></span>
+                    <span>Daily Limit</span>
+                  </div>
+                </div>
+
+                {/* লেভেল লিস্ট কার্ডস */}
+                <div className="space-y-2">
+                  {levelData.map((row) => (
+                    <div 
+                      key={row.lvl}
+                      className="bg-white rounded-[18px] px-3.5 py-2.5 flex items-center justify-between shadow-[0_1px_4px_rgba(0,0,0,0.03)] border border-slate-100"
+                    >
+                      {/* ১. লেভেল লোগো ও টেক্সট */}
+                      <div className="flex items-center gap-2 w-1/3">
+                        <img 
+                          src={row.badge} 
+                          alt={`Lv.${row.lvl}`} 
+                          className="w-[30px] h-[30px] object-contain drop-shadow-xs shrink-0" 
+                        />
+                        <span className="font-sans font-extrabold text-slate-900 text-[14px]">
+                          Lv.{row.lvl}
+                        </span>
                       </div>
-                      <div className="min-w-0">
-                        <span className="font-bold text-xs text-slate-900">Lv.{item.lvl} {item.title}</span>
-                        <p className="text-[11px] text-slate-500 mt-0.5">{item.perks}</p>
+
+                      {/* ২. আপগ্রেড (ইনভাইট আইকন ও সংখ্যা) */}
+                      <div className="flex items-center justify-center gap-1.5 w-1/3">
+                        <img 
+                          src="https://i.postimg.cc/W1tZPdXv/invite.png" 
+                          alt="Upgrade" 
+                          className="w-[18px] h-[18px] object-contain shrink-0" 
+                        />
+                        <span className="font-sans font-bold text-slate-900 text-[14px]">
+                          {row.invites}
+                        </span>
+                      </div>
+
+                      {/* ৩. ডেইলি লিমিট (টাস্ক আইকন ও সংখ্যা) */}
+                      <div className="flex items-center justify-end gap-1.5 w-1/3 pr-1">
+                        <img 
+                          src="https://i.postimg.cc/P5cwfdRY/task.png" 
+                          alt="Daily Limit" 
+                          className="w-[18px] h-[18px] object-contain shrink-0" 
+                        />
+                        <span className="font-sans font-bold text-slate-900 text-[14px]">
+                          {row.dailyLimit}
+                        </span>
                       </div>
                     </div>
-                  );
-                })}
+                  ))}
+                </div>
+
               </div>
 
-              <button onClick={onClose} className="w-full py-2.5 bg-slate-900 text-white font-bold text-xs rounded-xl cursor-pointer">
-                Got it
-              </button>
             </div>
           </div>
         );
@@ -2893,7 +2960,7 @@ const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, s
                       adsWatchedToday={stats.adsWatchedToday}
                       onWatchAdClick={handleWatchAd}
                       onCheckInClick={() => setIsCheckInModalOpen(true)}
-                      onInviteClick={() => setActiveTab('frens')}
+                      onOpenLevelModal={() => setIsLevelModalOpen(true)}
                       onTasksClick={() => {
                         const el = document.getElementById('bounty-scroll-container');
                         if (el) el.scrollTo({ top: 0, behavior: 'smooth' });
