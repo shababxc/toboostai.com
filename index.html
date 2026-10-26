@@ -1248,11 +1248,10 @@ const getLevelBadge = (lvl) => LEVEL_BADGES[lvl] || LEVEL_BADGES[4] || LEVEL_BAD
                       <span>Category</span>
                     </label>
                     <select
-                      value={category}
-        level preck
-             onChange={(e) => setCategory(e.target.value)}
-                      className="w-full px-3 py-2 text-[12.5px] rounded-xl bg-white text-slate-800 font-bold focus:outline-none shadow-xs cursor-pointer"
-                    >
+  value={category}
+  onChange={(e) => setCategory(e.target.value)}
+  className="w-full px-3 py-2 text-[12.5px] rounded-xl bg-white text-slate-800 font-bold focus:outline-none shadow-xs cursor-pointer"
+>
                       <option value="Social">Social</option>
                       <option value="Partners">Partners</option>
                       <option value="Web3">Web3</option>
