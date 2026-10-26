@@ -1398,11 +1398,6 @@ const getLevelBadge = (lvl) => LEVEL_BADGES[lvl] || LEVEL_BADGES[4] || LEVEL_BAD
         );
       };
 
-        
-                                      
-
-        
-
       const LevelPerksModal = ({ isOpen, onClose }) => {
         if (!isOpen) return null;
 
@@ -1435,81 +1430,82 @@ const getLevelBadge = (lvl) => LEVEL_BADGES[lvl] || LEVEL_BADGES[4] || LEVEL_BAD
 
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-xs animate-in fade-in duration-200">
-            <div className="relative w-full max-w-[345px] sm:max-w-sm rounded-[28px] bg-[#f8fafc] shadow-2xl overflow-hidden border border-white/40">
+            {/* 🌟 রেফারেন্স স্ক্রিনশটের মতো ছিমছাম ছোট সাইজ (max-w-[315px] ও rounded-[21px]) */}
+            <div className="relative w-full max-w-[315px] rounded-[21px] bg-[#f8fafc] shadow-2xl overflow-hidden border border-white/50">
               
-              {/* হেডার: স্ক্রিনশটের হুবহু ব্লু-গ্রিন গ্র্যাডিয়েন্ট */}
-              <div className="px-5 py-4 bg-gradient-to-r from-[#00b4f8] via-[#00c8c8] to-[#00e5a3] flex items-center justify-between">
-                <h3 className="font-display font-bold text-white text-[20px] tracking-normal drop-shadow-xs">
+              {/* হেডার: স্লিম হাইট এবং Daily Limit এর মতো সেম font-sans ফন্ট */}
+              <div className="px-4 py-3 bg-gradient-to-r from-[#00b4f8] via-[#00c8c8] to-[#00e5a3] flex items-center justify-between">
+                <h3 className="font-sans font-bold text-white text-[18px] tracking-tight drop-shadow-xs">
                   Level Details
                 </h3>
                 <button 
                   onClick={onClose}
                   className="p-1 rounded-full text-slate-900 hover:bg-black/10 transition active:scale-90 cursor-pointer"
                 >
-                  <Icons.X className="w-5 h-5 stroke-[2.8]" />
+                  <Icons.X className="w-4 h-4 stroke-[2.8]" />
                 </button>
               </div>
 
               {/* মোডাল বডি */}
-              <div className="p-4 space-y-2.5">
+              <div className="p-3.5 space-y-2">
                 
-                {/* কলাম হেডলাইনস */}
-                <div className="grid grid-cols-3 px-3 py-1 text-[12.5px] font-bold text-slate-600 select-none">
-                  <div className="flex items-center gap-1.5 justify-start">
-                    <span className="w-2 h-2 rounded-full bg-[#c084fc]"></span>
+                {/* কলাম হেডলাইনস (নিখুঁত গ্রিড) */}
+                <div className="grid grid-cols-[82px_1fr_1.1fr] items-center px-3 py-1 text-[12px] font-bold text-slate-600 select-none">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#c084fc] shrink-0"></span>
                     <span>Level</span>
                   </div>
 
-                  <div className="flex items-center gap-1.5 justify-center">
-                    <span className="w-2 h-2 rounded-full bg-[#f59e0b]"></span>
+                  <div className="flex items-center gap-1.5 pl-3">
+                    <span className="w-2 h-2 rounded-full bg-[#f59e0b] shrink-0"></span>
                     <span>Upgrade</span>
                   </div>
 
-                  <div className="flex items-center gap-1.5 justify-end">
-                    <span className="w-2 h-2 rounded-full bg-[#06b6d4]"></span>
+                  <div className="flex items-center gap-1.5 pl-2">
+                    <span className="w-2 h-2 rounded-full bg-[#06b6d4] shrink-0"></span>
                     <span>Daily Limit</span>
                   </div>
                 </div>
 
-                {/* লেভেল লিস্ট কার্ডস */}
-                <div className="space-y-2">
+                {/* লেভেল লিস্ট কার্ডস (১০০% সোজা খাড়া অ্যালাইনমেন্ট) */}
+                <div className="space-y-1.5">
                   {levelData.map((row) => (
                     <div 
                       key={row.lvl}
-                      className="bg-white rounded-[18px] px-3.5 py-2.5 flex items-center justify-between shadow-[0_1px_4px_rgba(0,0,0,0.03)] border border-slate-100"
+                      className="grid grid-cols-[82px_1fr_1.1fr] items-center bg-white rounded-[16px] px-3 py-2 shadow-[0_1px_3px_rgba(0,0,0,0.03)] border border-slate-100/90"
                     >
                       {/* ১. লেভেল লোগো ও টেক্সট */}
-                      <div className="flex items-center gap-2 w-1/3">
+                      <div className="flex items-center gap-2">
                         <img 
                           src={row.badge} 
                           alt={`Lv.${row.lvl}`} 
-                          className="w-[30px] h-[30px] object-contain drop-shadow-xs shrink-0" 
+                          className="w-[28px] h-[28px] object-contain drop-shadow-xs shrink-0" 
                         />
-                        <span className="font-sans font-extrabold text-slate-900 text-[14px]">
+                        <span className="font-sans font-extrabold text-slate-900 text-[13.5px]">
                           Lv.{row.lvl}
                         </span>
                       </div>
 
-                      {/* ২. আপগ্রেড (ইনভাইট আইকন ও সংখ্যা) */}
-                      <div className="flex items-center justify-center gap-1.5 w-1/3">
+                      {/* ২. আপগ্রেড (আইকন ও সংখ্যা একদম সোজা লাইনে pl-3) */}
+                      <div className="flex items-center gap-1.5 pl-3">
                         <img 
                           src="https://i.postimg.cc/W1tZPdXv/invite.png" 
                           alt="Upgrade" 
-                          className="w-[18px] h-[18px] object-contain shrink-0" 
+                          className="w-[17px] h-[17px] object-contain shrink-0" 
                         />
-                        <span className="font-sans font-bold text-slate-900 text-[14px]">
+                        <span className="font-sans font-bold text-slate-900 text-[13.5px] tabular-nums">
                           {row.invites}
                         </span>
                       </div>
 
-                      {/* ৩. ডেইলি লিমিট (টাস্ক আইকন ও সংখ্যা) */}
-                      <div className="flex items-center justify-end gap-1.5 w-1/3 pr-1">
+                      {/* ৩. ডেইলি লিমিট (আইকন ও সংখ্যা একদম সোজা লাইনে pl-2) */}
+                      <div className="flex items-center gap-1.5 pl-2">
                         <img 
                           src="https://i.postimg.cc/P5cwfdRY/task.png" 
                           alt="Daily Limit" 
-                          className="w-[18px] h-[18px] object-contain shrink-0" 
+                          className="w-[17px] h-[17px] object-contain shrink-0" 
                         />
-                        <span className="font-sans font-bold text-slate-900 text-[14px]">
+                        <span className="font-sans font-bold text-slate-900 text-[13.5px] tabular-nums">
                           {row.dailyLimit}
                         </span>
                       </div>
