@@ -779,31 +779,31 @@ const getLevelBadge = (lvl) => LEVEL_BADGES[lvl] || LEVEL_BADGES[4] || LEVEL_BAD
                   <img src={getLevelBadge(userLevel)} alt={`Level ${userLevel}`} className="w-[50px] h-[50px] object-contain transition-transform group-hover:scale-105" />
                 </div>
 
-                {/* ডানপাশের Lv.X এবং শুধুমাত্র তীর চিহ্নে ক্লিকেবল বাটন */}
-                <div className="flex items-center justify-end gap-1.5 w-full select-none">
+                {/* ডানপাশের Lv.X এবং একদম গা ঘেঁষে থাকা বোল্ড তীর চিহ্ন বাটন */}
+                <div className="flex items-center justify-end gap-0.5 w-full select-none">
                   <span className="font-serif font-black text-slate-950 text-[19px] tracking-tight leading-none [-webkit-text-stroke:0.5px_currentColor]">
                     Lv.{userLevel}
                   </span>
 
-                  {/* 🌟 শুধুমাত্র তীর চিহ্নে ক্লিকযোগ্য বাটন + মাঝে নিখুঁত ফাঁকা বিশিষ্ট ডাবল তীর */}
+                  {/* 🌟 '1'-এর গা ঘেঁষে থাকা নিরেট মোটা ও মাঝখানে স্পষ্ট ফাঁকা বিশিষ্ট বাটন */}
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); onOpenLevelModal && onOpenLevelModal(); }}
-                    className="p-1 -mr-1 rounded-md hover:bg-slate-100 active:scale-85 transition-all cursor-pointer flex items-center justify-center shrink-0"
+                    className="p-0.5 hover:opacity-75 active:scale-90 transition-all cursor-pointer flex items-center justify-center shrink-0 -mt-0.5"
                     title="View Level Details"
                   >
                     <svg 
-                      className="w-[14px] h-[16px] text-slate-950 stroke-[2.7]" 
-                      viewBox="0 0 24 24" 
+                      className="w-[14.6px] h-[16px] text-slate-950 stroke-[3.2]" 
+                      viewBox="0 0 20 16" 
                       fill="none" 
                       stroke="currentColor" 
                       strokeLinecap="round" 
                       strokeLinejoin="round"
                     >
-                      {/* প্রথম তীর */}
-                      <path d="M4 4l7 8-7 8" />
-                      {/* দ্বিতীয় তীর (মাঝখানে স্পষ্ট ফাঁকা রাখা হয়েছে) */}
-                      <path d="M13 4l7 8-7 8" />
+                      {/* প্রথম মোটা তীর */}
+                      <path d="M2 2L8 8L2 14" />
+                      {/* দ্বিতীয় মোটা তীর (পর্যাপ্ত ও সুন্দর স্পেস সহ) */}
+                      <path d="M10.5 2L16.5 8L10.5 14" />
                     </svg>
                   </button>
                 </div>
