@@ -779,19 +779,34 @@ const getLevelBadge = (lvl) => LEVEL_BADGES[lvl] || LEVEL_BADGES[4] || LEVEL_BAD
                   <img src={getLevelBadge(userLevel)} alt={`Level ${userLevel}`} className="w-[50px] h-[50px] object-contain transition-transform group-hover:scale-105" />
                 </div>
 
-                {/* ডানপাশের Lv.X এবং পরবর্তীতে বাটন হিসেবে ব্যবহারের উপযোগী বড় তীর চিহ্ন (ডান বর্ডার থেকে একদম পারফেক্ট ৮px দূরত্বে) */}
-                <div 
-  onClick={(e) => { e.stopPropagation(); onOpenLevelModal && onOpenLevelModal(); }}
-  className="flex items-center justify-end gap-1 w-full cursor-pointer hover:opacity-80 active:scale-95 transition-all"
-  title="View Level Details"
->
-  <span className="font-serif font-black text-slate-950 text-[19px] tracking-tight leading-none [-webkit-text-stroke:0.5px_currentColor]">
-    Lv.{userLevel}
-  </span>
-  <span className="font-black text-slate-900 text-[20px] leading-none transition-transform group-hover:translate-x-0.5 select-none">
-    »
-  </span>
-</div>
+                {/* ডানপাশের Lv.X এবং শুধুমাত্র তীর চিহ্নে ক্লিকেবল বাটন */}
+                <div className="flex items-center justify-end gap-1.5 w-full select-none">
+                  <span className="font-serif font-black text-slate-950 text-[19px] tracking-tight leading-none [-webkit-text-stroke:0.5px_currentColor]">
+                    Lv.{userLevel}
+                  </span>
+
+                  {/* 🌟 শুধুমাত্র তীর চিহ্নে ক্লিকযোগ্য বাটন + মাঝে নিখুঁত ফাঁকা বিশিষ্ট ডাবল তীর */}
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); onOpenLevelModal && onOpenLevelModal(); }}
+                    className="p-1 -mr-1 rounded-md hover:bg-slate-100 active:scale-85 transition-all cursor-pointer flex items-center justify-center shrink-0"
+                    title="View Level Details"
+                  >
+                    <svg 
+                      className="w-[14px] h-[15.5px] text-slate-950 stroke-[2.7]" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                    >
+                      {/* প্রথম তীর */}
+                      <path d="M4 4l7 8-7 8" />
+                      {/* দ্বিতীয় তীর (মাঝখানে স্পষ্ট ফাঁকা রাখা হয়েছে) */}
+                      <path d="M13 4l7 8-7 8" />
+                    </svg>
+                  </button>
+                </div>
 
                 {/* Invitation Progress শিরোনাম ও সাবটাইটেল (ডান বর্ডারের কাছাকাছি পারফেক্ট অ্যালাইন) */}
                 <div className="mt-0.5 text-right">
