@@ -69,13 +69,12 @@ module.exports = async (req, res) => {
         throw new Error('Task is no longer active or target impressions reached');
       }
 
-      // ৩. লেভেল ও রেফারেল অনুযায়ী দৈনিক লিমিট হিসাব
+      // ৩. লেভেল ও রেফারেল অনুযায়ী দৈনিক লিমিট হিসাব (০, ৫, ১০, ২০)
       const referrals = Number(userData.referralsCount ?? userData.referrals ?? userData.referralCount ?? 0);
       let dailyLimit = 5;
-      if (referrals >= 15) dailyLimit = 20;
-      else if (referrals >= 10) dailyLimit = 15;
-      else if (referrals >= 5) dailyLimit = 10;
-
+      if (referrals >= 20) dailyLimit = 20; // Lv.4 (MAX)
+      else if (referrals >= 10) dailyLimit = 15; // Lv.3
+      else if (referrals >= 5) dailyLimit = 10;  // Lv.2
       // ৪. 🌟 স্বয়ংসম্পূর্ণ দৈনিক রিসেট লজিক (যা আগের দিনের সংখ্যা কখনোই টানবে না)
       const isSameDay = userData.lastTaskDate === todayUtc;
       let tasksToday = 0;
