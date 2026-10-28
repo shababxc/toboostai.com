@@ -771,79 +771,122 @@ const getLevelBadge = (lvl) => LEVEL_BADGES[lvl] || LEVEL_BADGES[4] || LEVEL_BAD
                 </div>
               </div>
 
-              {/* 🌟 3. Referral & Level Card (রেফারেন্স স্ক্রিনশটের হুবহু দূরত্ব, ফন্ট ও বড় তীর চিহ্ন) */}
-              <div onClick={onInviteClick} role="button" className="group relative flex flex-col justify-between pl-3 pr-2 pt-2.5 pb-2 rounded-[16px] bg-[radial-gradient(circle_at_28.5px_2.5px,transparent_22px,#ffffff_28px)] border border-sky-100/90 shadow-[0_2px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-visible min-h-[82px]"> 
+              {/* 🌟 3. Referral & Level Card (৪-লেভেল ও ম্যাক্স লেভেল অটো-সুইচ) */}
+              {(() => {
+                const currentInv = Number(currentInvites || stats?.currentInvites || 0);
                 
-                {/* কোণায় ফিট করা ট্রান্সপারেন্ট র্যাংক ব্যাজ */}
-                <div className="absolute -top-3.5 left-1 z-20 pointer-events-none drop-shadow-xs">
-                  <img src={getLevelBadge(userLevel)} alt={`Level ${userLevel}`} className="w-[53px] h-[53px] object-contain transition-transform group-hover:scale-105" />
-                </div>
+                // নতুন ৪-লেভেল ক্যালকুলেশন (০, ৫, ১০, ২০)
+                let calcLevel = 1;
+                let targetInvites = 5;
+                let nextLvl = 2;
+                let isMaxLevel = false;
 
-                {/* ডানপাশের Lv.X এবং একদম গা ঘেঁষে থাকা বোল্ড তীর চিহ্ন বাটন */}
-                <div className="flex items-center justify-end gap-0.5 w-full select-none">
-                  <span className="font-serif font-black text-slate-950 text-[19px] tracking-tight leading-none [-webkit-text-stroke:0.5px_currentColor]">
-                    Lv.{userLevel}
-                  </span>
+                if (currentInv >= 20) {
+                  calcLevel = 4;
+                  targetInvites = 20;
+                  isMaxLevel = true;
+                } else if (currentInv >= 10) {
+                  calcLevel = 3;
+                  targetInvites = 20;
+                  nextLvl = 4;
+                } else if (currentInv >= 5) {
+                  calcLevel = 2;
+                  targetInvites = 10;
+                  nextLvl = 3;
+                } else {
+                  calcLevel = 1;
+                  targetInvites = 5;
+                  nextLvl = 2;
+                }
 
-                  {/* 🌟 '1'-এর গা ঘেঁষে থাকা নিরেট মোটা ও মাঝখানে স্পষ্ট ফাঁকা বিশিষ্ট বাটন */}
-                  <button
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); onOpenLevelModal && onOpenLevelModal(); }}
-                    className="p-0.5 hover:opacity-75 active:scale-90 transition-all cursor-pointer flex items-center justify-center shrink-0 -mt-0.5"
-                    title="View Level Details"
-                  >
-                    <svg 
-                      className="w-[16px] h-[18px] text-slate-950 stroke-[3]" 
-                      viewBox="0 0 20 16" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round"
-                    >
-                      {/* প্রথম মোটা তীর */}
-                      <path d="M2 2L8 8L2 14" />
-                      {/* দ্বিতীয় মোটা তীর (পর্যাপ্ত ও সুন্দর স্পেস সহ) */}
-                      <path d="M10.5 2L16.5 8L10.5 14" />
-                    </svg>
-                  </button>
-                </div>
+                const neededInvites = Math.max(0, targetInvites - currentInv);
+                const invitePercent = isMaxLevel ? 100 : Math.min(100, Math.round((currentInv / targetInvites) * 100));
 
-                {/* Invitation Progress শিরোনাম ও সাবটাইটেল (ডান বর্ডারের কাছাকাছি পারফেক্ট অ্যালাইন) */}
-                <div className="mt-0.5 text-right">
-                  <h4 className="font-sans font-extrabold text-slate-600 text-[14px] tracking-tight leading-tight">Invitation Progress</h4>
-                  <p className="text-[9.5px] text-slate-400 font-medium leading-none mt-1">
-                    invite {Math.max(0, requiredInvites - currentInvites)} users to upgrade to Lv.{userLevel + 1}
-                  </p>
-                </div>
-
-                {/* বামদিকের বর্ডারের একদম কাছাকাছি থেকে শুরু হওয়া স্লাইডার ও ডানপ্রান্তের ইনভাইট বাটন */}
-                <div className="flex items-center w-full mt-auto pt-1">
-                  {/* বাম বর্ডারের কাছে শুরু হওয়া চিকন স্লাইডার ট্র্যাক */}
-                  <div className="-ml-1.5 flex-1 h-[9px] bg-[#e1f2fe] rounded-full relative overflow-hidden shadow-inner flex items-center">
-                    {/* স্লাইডারের নীল প্রগ্রেস ফিল */}
-                    <div 
-                      className="bg-sky-500 h-full rounded-full transition-all duration-300" 
-                      style={{ width: `${stats?.invitePercentage !== undefined ? stats.invitePercentage : invitePercentage}%` }} 
-                    />
-                    {/* 🌟 রেফারেন্স স্ক্রিনশটের হুবহু ফন্টে থাকা কাউন্ট (যেমন 15/5 বা 2/3) */}
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none pr-3">
-                      <span className="font-sans font-extrabold text-[8.5px] text-slate-800 leading-none tabular-nums select-none tracking-tight">
-                        {currentInvites}/{requiredInvites}
-                      </span>
+                return (
+                  <div onClick={onInviteClick} role="button" className="group relative flex flex-col justify-between pl-3 pr-2 pt-2.5 pb-2 rounded-[16px] bg-[radial-gradient(circle_at_28.5px_2.5px,transparent_22px,#ffffff_28px)] border border-sky-100/90 shadow-[0_2px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-visible min-h-[82px]"> 
+                    
+                    {/* কোণায় ফিট করা ট্রান্সপারেন্ট র্যাংক ব্যাজ */}
+                    <div className="absolute -top-3.5 left-1 z-20 pointer-events-none drop-shadow-xs">
+                      <img src={getLevelBadge(calcLevel)} alt={`Level ${calcLevel}`} className="w-[53px] h-[53px] object-contain transition-transform group-hover:scale-105" />
                     </div>
+
+                    {/* ডানপাশের Lv.X এবং একদম গা ঘেঁষে থাকা বোল্ড তীর চিহ্ন বাটন */}
+                    <div className="flex items-center justify-end gap-0.5 w-full select-none">
+                      <span className="font-serif font-black text-slate-950 text-[19px] tracking-tight leading-none [-webkit-text-stroke:0.5px_currentColor]">
+                        Lv.{calcLevel}
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); onOpenLevelModal && onOpenLevelModal(); }}
+                        className="p-0.5 hover:opacity-75 active:scale-90 transition-all cursor-pointer flex items-center justify-center shrink-0 -mt-0.5"
+                        title="View Level Details"
+                      >
+                        <svg 
+                          className="w-[16px] h-[18px] text-slate-950 stroke-[3]" 
+                          viewBox="0 0 20 16" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round"
+                        >
+                          <path d="M2 2L8 8L2 14" />
+                          <path d="M10.5 2L16.5 8L10.5 14" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {isMaxLevel ? (
+                      /* 🌟 ম্যাক্স লেভেলে (Lv.4) পৌঁছালে: স্ক্রিনশটের হুবহু 'Already at the MAX level' ও বড় ইনভাইট বাটন */
+                      <div className="flex flex-col items-center justify-between w-full mt-auto pt-1 pb-0.5 select-none">
+                        <p className="text-[11px] text-slate-400 font-semibold tracking-tight text-center leading-none">
+                          Already at the MAX level
+                        </p>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); onInviteClick(); }}
+                          className="w-full mt-2 py-1.5 bg-[#1c82f9] hover:bg-[#166ed4] active:scale-95 text-white rounded-full text-[12px] font-bold shadow-sm transition-all cursor-pointer leading-tight"
+                        >
+                          invite
+                        </button>
+                      </div>
+                    ) : (
+                      /* 🌟 সাধারণ লেভেলে (Lv.1, Lv.2, Lv.3): প্রগ্রেস টাইটেল ও স্লাইডার */
+                      <React.Fragment>
+                        <div className="mt-0.5 text-right">
+                          <h4 className="font-sans font-extrabold text-slate-600 text-[14px] tracking-tight leading-tight">
+                            Invitation Progress
+                          </h4>
+                          <p className="text-[9.5px] text-slate-400 font-medium leading-none mt-1">
+                            invite {neededInvites} users to upgrade to Lv.{nextLvl}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center w-[calc(100%+6px)] -ml-1.5 mt-auto pt-1">
+                          <div className="flex-1 h-[9px] bg-[#e1f2fe] rounded-full relative overflow-hidden shadow-inner flex items-center">
+                            <div 
+                              className="bg-sky-500 h-full rounded-full transition-all duration-300" 
+                              style={{ width: `${invitePercent}%` }} 
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none pr-3">
+                              <span className="font-sans font-extrabold text-[8.5px] text-slate-800 leading-none tabular-nums select-none tracking-tight">
+                                {currentInv}/{targetInvites}
+                              </span>
+                            </div>
+                          </div>
+
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); onInviteClick(); }}
+                            className="-ml-3 z-10 px-3.5 py-1 bg-sky-500 hover:bg-sky-600 active:scale-95 text-white rounded-full text-[11px] font-black shadow-sm transition-all cursor-pointer shrink-0"
+                          >
+                            invite
+                          </button>
+                        </div>
+                      </React.Fragment>
+                    )}
+
                   </div>
-
-                  {/* স্লাইডারের ডানপ্রান্তে ওভারল্যাপ হওয়া ইনভাইট বাটন (ডান বর্ডারের সীমানায় ফিট) */}
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); onInviteClick(); }}
-                    className="-ml-3 z-10 px-3.5 py-1 bg-sky-500 hover:bg-sky-600 active:scale-95 text-white rounded-full text-[11px] font-black shadow-sm transition-all cursor-pointer shrink-0"
-                  >
-                    invite
-                  </button>
-                </div>
-
-              </div>
-
+                );
+              })()}
               {/* Card 4: Daily Tasks */}
               <div onClick={onTasksClick} role="button" className="group relative flex flex-col justify-between p-2.5 rounded-[16px] bg-white border border-sky-100 shadow-[0_2px_8px_rgba(56,189,248,0.06)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden min-h-[82px]">
                 <div className="flex items-center justify-between">
@@ -2519,10 +2562,10 @@ const WalletView = ({ starBalance, walletAddress, streakDays, adsWatchedToday, s
         };
 
         const getDailyTaskLimit = (invites) => {
-          if (invites >= 15) return 20;
-          if (invites >= 10) return 15;
-          if (invites >= 5) return 10;
-          return 5;
+          if (invites >= 20) return 20; // Lv.4 (MAX)
+          if (invites >= 10) return 15; // Lv.3
+          if (invites >= 5) return 10;  // Lv.2
+          return 5;                     // Lv.1
         };
 
         const dailyTaskLimit = getDailyTaskLimit(stats.currentInvites);
