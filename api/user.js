@@ -5,13 +5,12 @@ const { verifyTelegramWebAppData } = require('./_telegram');
 // আজকের UTC তারিখ বের করার হেল্পার
 const getTodayUtc = () => new Date().toISOString().split('T')[0];
 
-// রেফারেল সংখ্যা অনুযায়ী লেভেল বের করার হেল্পার
+// 🌟 রেফারেল সংখ্যা অনুযায়ী লেভেল বের করার হেল্পার (নতুন ৪-লেভেল সিস্টেম)
 const calculateLevel = (referrals = 0) => {
-  if (referrals >= 20) return 5;
-  if (referrals >= 15) return 4;
-  if (referrals >= 10) return 3;
-  if (referrals >= 5) return 2;
-  return 1;
+  if (referrals >= 20) return 4; // Lv.4 (MAX)
+  if (referrals >= 10) return 3; // Lv.3 (10-19)
+  if (referrals >= 5) return 2;  // Lv.2 (5-9)
+  return 1;                      // Lv.1 (0-4)
 };
 
 module.exports = async (req, res) => {
@@ -98,7 +97,7 @@ module.exports = async (req, res) => {
     let userData = doc.data();
     let updatesNeeded = {};
 
-    // ক) আগের ৮টি রেফারেল যেকোনো ফিল্ড বা নাম থেকে স্বয়ংক্রিয় রিকভার করা
+    // ক) আগের রেফারেল যেকোনো ফিল্ড বা নাম থেকে স্বয়ংক্রিয় রিকভার করা
     let currentReferrals = Number(
       userData.referralsCount ??
       userData.referrals ??
@@ -137,7 +136,7 @@ module.exports = async (req, res) => {
       userData.lastTaskDate = todayUtc;
     }
 
-    // ঙ) রেফারেল সংখ্যা অনুযায়ী অটো লেভেল আপডেট (যেমন: ৫ বা ততোধিক হলে Lv.2)
+    // ঙ) রেফারেল সংখ্যা অনুযায়ী অটো লেভেল আপডেট (যেমন: ৫ হলে Lv.2, ১০ হলে Lv.3, ২০ হলে Lv.4)
     const currentLevel = calculateLevel(currentReferrals);
     if (userData.level !== currentLevel) {
       updatesNeeded.level = currentLevel;
@@ -145,80 +144,80 @@ module.exports = async (req, res) => {
     }
 
     // চ) ইউজারের নাম টেলিগ্রামে পরিবর্তন হলে আপডেট করা
-        if (auth.user.first_name && userData.name !== auth.user.first_name) {
-          updatesNeeded.name = auth.user.first_name;
-          userData.name = auth.user.first_name;
-        }
+    if (auth.user.first_name && userData.name !== auth.user.first_name) {
+      updatesNeeded.name = auth.user.first_name;
+      userData.name = auth.user.first_name;
+    }
 
-        // 🌟 ইউজারের টেলিগ্রাম ইউজারনেম (@username) ডাটাবেসে সেভ ও আপডেট করা
-        if (auth.user.username && userData.username !== auth.user.username) {
-          updatesNeeded.username = auth.user.username;
-          userData.username = auth.user.username;
-        }
+    // 🌟 ইউজারের টেলিগ্রাম ইউজারনেম (@username) ডাটাবেসে সেভ ও আপডেট করা
+    if (auth.user.username && userData.username !== auth.user.username) {
+      updatesNeeded.username = auth.user.username;
+      userData.username = auth.user.username;
+    }
 
-        // 🌟 ইউজারের টেলিগ্রাম প্রোফাইল ছবি ডাটাবেসে সেভ ও আপডেট করা
-        const currentPhotoUrl = auth.user.photo_url || (req.body && req.body.photoUrl) || null;
-        if (currentPhotoUrl && userData.photo_url !== currentPhotoUrl) {
-          updatesNeeded.photo_url = currentPhotoUrl;
-          userData.photo_url = currentPhotoUrl;
-        }
+    // 🌟 ইউজারের টেলিগ্রাম প্রোফাইল ছবি ডাটাবেসে সেভ ও আপডেট করা
+    const currentPhotoUrl = auth.user.photo_url || (req.body && req.body.photoUrl) || null;
+    if (currentPhotoUrl && userData.photo_url !== currentPhotoUrl) {
+      updatesNeeded.photo_url = currentPhotoUrl;
+      userData.photo_url = currentPhotoUrl;
+    }
 
-        // ছ) ইউজার ওয়ালেট কানেক্ট করলে ডাটাবেসে সেভ করা
-        if (body.walletAddress && userData.walletAddress !== body.walletAddress) {
-          updatesNeeded.walletAddress = body.walletAddress;
-          userData.walletAddress = body.walletAddress;
-        }
+    // ছ) ইউজার ওয়ালেট কানেক্ট করলে ডাটাবেসে সেভ করা
+    if (body.walletAddress && userData.walletAddress !== body.walletAddress) {
+      updatesNeeded.walletAddress = body.walletAddress;
+      userData.walletAddress = body.walletAddress;
+    }
 
-        // জ) কোনো আপডেট থাকলে ফায়ারস্টোরে সেভ করা
-        if (Object.keys(updatesNeeded).length > 0) {
-          updatesNeeded.updatedAt = admin.firestore.FieldValue.serverTimestamp();
-          await userRef.set(updatesNeeded, { merge: true });
-        }
+    // জ) কোনো আপডেট থাকলে ফায়ারস্টোরে সেভ করা
+    if (Object.keys(updatesNeeded).length > 0) {
+      updatesNeeded.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+      await userRef.set(updatesNeeded, { merge: true });
+    }
 
-    // ফ্রন্টএন্ডে ডেটা পাঠানোর সময় withdrawCount যুক্ত করা হলো
     // 🌟 আপনার রেফারে জয়েন করা বন্ধুদের তালিকা (Team Members) সংগ্রহ করা
-        let teamMembers = [];
-        try {
-          const teamSnap = await db.collection('users').where('referredBy', '==', String(userId)).get();
-          if (!teamSnap.empty) {
-            teamSnap.forEach(doc => {
-              const mem = doc.data() || {};
-              teamMembers.push({
-                userId: String(mem.userId || doc.id),
-                name: mem.name || 'Fren',
-                username: mem.username || null,
-                avatarUrl: mem.photo_url || null,
-                points: Number(mem.points ?? mem.balance ?? 0),
-                lv2Count: Number(mem.referralsCount ?? mem.referrals ?? 0),
-                lv2Points: Math.round(Number(mem.referralsCount ?? mem.referrals ?? 0) * 100) // Lv2 বোনাস পয়েন্ট
-              });
-            });
-          }
-        } catch (e) {
-          console.error('Error fetching team members:', e);
-        }
+    let teamMembers = [];
+    try {
+      const teamSnap = await db.collection('users').where('referredBy', '==', String(userId)).get();
+      if (!teamSnap.empty) {
+        teamSnap.forEach(doc => {
+          const mem = doc.data() || {};
+          teamMembers.push({
+            userId: String(mem.userId || doc.id),
+            name: mem.name || 'Fren',
+            username: mem.username || null,
+            avatarUrl: mem.photo_url || null,
+            points: Number(mem.points ?? mem.balance ?? 0),
+            lv2Count: Number(mem.referralsCount ?? mem.referrals ?? 0),
+            lv2Points: Math.round(Number(mem.referralsCount ?? mem.referrals ?? 0) * 100) // Lv2 বোনাস পয়েন্ট
+          });
+        });
+      }
+    } catch (e) {
+      console.error('Error fetching team members:', e);
+    }
 
-        // 🌟 সার্ভার থেকে নিখুঁত প্রোগ্রেস পার্সেন্টেজ হিসাব করা
-        const totalInvites = Number(currentReferrals || 0);
-        const requiredInvitesForLevel = currentLevel >= 5 ? 20 : (currentLevel >= 4 ? 15 : (currentLevel >= 3 ? 10 : (currentLevel >= 2 ? 5 : 5)));
-        const invitePct = Math.min(100, Math.round((totalInvites / requiredInvitesForLevel) * 100));
+    // 🌟 নতুন ৪-লেভেলের নিখুঁত প্রোগ্রেস ও লিমিট হিসাব
+    const totalInvites = Number(currentReferrals || 0);
+    const requiredInvitesForLevel = currentLevel >= 4 ? 20 : (currentLevel === 3 ? 20 : (currentLevel === 2 ? 10 : 5));
+    const invitePct = Math.min(100, Math.round((totalInvites / requiredInvitesForLevel) * 100));
 
-        const tasksDoneToday = Number(userData.dailyTasksCompletedToday || userData.tasksCompletedToday || 0);
-        const currentLimit = currentLevel >= 5 ? 20 : (currentLevel >= 4 ? 20 : (currentLevel >= 3 ? 15 : (currentLevel >= 2 ? 10 : 5)));
-        const taskPct = Math.min(100, Math.round((tasksDoneToday / currentLimit) * 100));
+    const tasksDoneToday = Number(userData.dailyTasksCompletedToday || userData.tasksCompletedToday || 0);
+    const currentLimit = currentLevel >= 4 ? 20 : (currentLevel === 3 ? 15 : (currentLevel === 2 ? 10 : 5));
+    const taskPct = Math.min(100, Math.round((tasksDoneToday / currentLimit) * 100));
 
-        const finalResponse = {
-          ...userData,
-          referralsCount: totalInvites,
-          referrals: totalInvites,
-          level: currentLevel,
-          withdrawCount: userData.withdrawCount || 0,
-          savedStreaks: userData.savedStreaks || 0,
-          savedAdDays: userData.savedAdDays || 0,
-          teamMembers: teamMembers,
-          invitePercentage: invitePct,
-          taskPercentage: taskPct
-        };
+    const finalResponse = {
+      ...userData,
+      referralsCount: totalInvites,
+      referrals: totalInvites,
+      level: currentLevel,
+      withdrawCount: userData.withdrawCount || 0,
+      savedStreaks: userData.savedStreaks || 0,
+      savedAdDays: userData.savedAdDays || 0,
+      teamMembers: teamMembers,
+      invitePercentage: invitePct,
+      taskPercentage: taskPct
+    };
+
     return res.status(200).json({ success: true, user: finalResponse, ...finalResponse });
 
   } catch (error) {
