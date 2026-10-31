@@ -114,6 +114,22 @@
         from { opacity: 0; transform: translateY(4px); }
         to { opacity: 1; transform: translateY(0); }
       }
+      /* 🌟 পুরো অ্যাপের সাদা কালারকে ক্রিস্টাল হোয়াইট করার গ্লোবাল রুলস */
+      .bg-white {
+        background-color: #ffffff !important;
+        box-shadow: 0 4px 20px rgba(56, 189, 248, 0.08) !important;
+      }
+
+      /* কার্ডের চারপাশের ধূসর বর্ডার দূর করে সম্পূর্ণ ক্লিন করা */
+      .border-sky-100, .border-sky-100\/90, .border-sky-100\/70 {
+        border-color: rgba(255, 255, 255, 0.85) !important;
+      }
+
+      /* পেছনের ডাল ব্যাকগ্রাউন্ডকে ভাইব্রেন্ট স্কাই-সায়ান লুক দেওয়া */
+      body, #root, .bg-\[\#dcf0fb\] {
+        background: linear-gradient(180deg, #38bdf8 0%, #a5f3fc 22%, #e0f2fe 55%, #f0f9ff 100%) !important;
+        background-attachment: fixed !important;
+      }
     </style>
   </head>
   <body class="bg-[#dcf0fb] text-slate-800 antialiased selection:bg-sky-500/20 selection:text-sky-900">
