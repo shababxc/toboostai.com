@@ -809,7 +809,7 @@ const getLevelBadge = (lvl) => LEVEL_BADGES[lvl] || LEVEL_BADGES[4] || LEVEL_BAD
                 const invitePercent = isMaxLevel ? 100 : Math.min(100, Math.round((currentInv / targetInvites) * 100));
 
                 return (
-                  <div className="group relative flex flex-col justify-between pl-3 pr-2 pt-2.5 pb-2 rounded-[16px] bg-[radial-gradient(circle_at_28.5px_2.5px,transparent_22px,#ffffff_28px)] border border-sky-100/90 shadow-[0_2px_8px_rgba(56,189,248,0.06)] transition-all overflow-visible min-h-[82px] select-none"> 
+                  <div className="group relative flex flex-col justify-between pl-3 pr-2 pt-2.5 pb-2 rounded-[16px] bg-[radial-gradient(circle_at_28.5px_2.5px,rgba(255,255,255,0)_22px,#ffffff_28px)] border border-sky-100/70 shadow-[0_2px_8px_rgba(56,189,248,0.04)] transition-all overflow-visible min-h-[82px] select-none">
                     
                     {/* কোণায় ফিট করা ট্রান্সপারেন্ট র্যাংক ব্যাজ */}
                     <div className="absolute -top-3.5 left-1 z-20 pointer-events-none drop-shadow-xs">
@@ -843,18 +843,20 @@ const getLevelBadge = (lvl) => LEVEL_BADGES[lvl] || LEVEL_BADGES[4] || LEVEL_BAD
                     </div>
 
                     {isMaxLevel ? (
-                      /* 🌟 ম্যাক্স লেভেলে: ইনভাইটে চাপ দিলে সরাসরি টেলিগ্রাম শেয়ার ইনবক্স ওপেন */
-                      <div className="flex flex-col items-center justify-between w-full mt-auto pt-1 pb-0.5">
-                        <p className="text-[11px] text-slate-400 font-semibold tracking-tight text-center leading-none">
+                      /* 🌟 ম্যাক্স লেভেলে: স্ক্রিনশটের হুবহু তীরের মাথা বরাবর ডানপাশে লেখা ও পারফেক্ট স্লিম বাটন */
+                      <div className="flex flex-col items-end w-full mt-auto pt-1 pb-0.5">
+                        <p className="text-[10.5px] text-slate-400 font-semibold tracking-tight text-right leading-none pr-0.5">
                           Already at the MAX level
                         </p>
-                        <button 
-                          type="button"
-                          onClick={handleDirectInvite}
-                          className="w-full mt-2 py-1.5 bg-[#1c82f9] hover:bg-[#166ed4] active:scale-95 text-white rounded-full text-[12px] font-bold shadow-sm transition-all cursor-pointer leading-tight"
-                        >
-                          invite
-                        </button>
+                        <div className="w-full flex justify-end mt-1.5 pr-0.5">
+                          <button 
+                            type="button"
+                            onClick={handleDirectInvite}
+                            className="w-[110px] py-1 bg-[#1c82f9] hover:bg-[#166ed4] active:scale-95 text-white rounded-full text-[11px] font-bold shadow-xs transition-all cursor-pointer leading-tight text-center"
+                          >
+                            invite
+                          </button>
+                        </div>
                       </div>
                     ) : (
                       /* 🌟 সাধারণ লেভেলে: ইনভাইট বাটনে চাপ দিলে সরাসরি টেলিগ্রাম ফ্রেন্ড সিলেক্ট */
