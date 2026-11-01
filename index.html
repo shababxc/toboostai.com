@@ -978,15 +978,21 @@ const getLevelBadge = (lvl) => LEVEL_BADGES[lvl] || LEVEL_BADGES[4] || LEVEL_BAD
                 {dict.activeBounties || 'Bounty Task'}
               </h2>
               
-              {/* 🌟 ১ম স্ট্যান্ডার্ড সাইজ + স্প্রিং বাউন্স ও হ্যাপটিক ফিডব্যাক যুক্ত POST বাটন */}
+              {/* 🌟 মার্জিত ড্রপ খেয়ে মোডাল ওপেন হওয়া ও আটকে না থাকার পারফেক্ট POST বাটন */}
               <button
                 onClick={(e) => {
+                  const btn = e.currentTarget;
                   try {
-                    window.Telegram?.WebApp?.HapticFeedback?.impactOccurred('medium');
+                    window.Telegram?.WebApp?.HapticFeedback?.impactOccurred('light');
                   } catch (err) {}
-                  onPostBountyClick(e);
+
+                  // বাটনটি শান্তভাবে নিচে নেমে (ড্রপ খেয়ে) স্বাভাবিক অবস্থায় ফিরে আসার পর মোডাল ওপেন হবে
+                  setTimeout(() => {
+                    if (btn) btn.blur(); // বাটন ভেতরে আটকে থাকা চিরতরে বন্ধ
+                    onPostBountyClick();
+                  }, 140);
                 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1c82f9] hover:bg-[#166ed4] active:scale-[0.88] text-white rounded-[11px] font-sans font-black text-[12px] tracking-wide shadow-sm shadow-blue-500/20 transition-all duration-150 ease-out cursor-pointer select-none"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1c82f9] hover:bg-[#166ed4] active:scale-[0.90] text-white rounded-[11px] font-sans font-black text-[12px] tracking-wide shadow-sm shadow-blue-500/20 transition-all duration-150 ease-out cursor-pointer select-none touch-manipulation"
               >
                 {/* বামপাশের টাস্ক/ট্রে আইকন */}
                 <img 
