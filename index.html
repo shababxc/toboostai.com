@@ -861,16 +861,16 @@ const getLevelBadge = (lvl) => LEVEL_BADGES[lvl] || LEVEL_BADGES[4] || LEVEL_BAD
                     </div>
 
                     {isMaxLevel ? (
-                      /* 🌟 ম্যাক্স লেভেলে: স্টার্ট/পোস্ট বাটনের আসল সিগনেচার কালার ও বামে প্রসারিত ১৩৮px বাটন */
-                      <div className="flex flex-col items-end w-full mt-auto pt-0.5 select-none">
-                        <p className="text-[10.5px] text-slate-400 font-semibold tracking-tight text-right leading-none pr-1">
+                      /* 🌟 ম্যাক্স লেভেলে: স্ক্রিনশটের আসল ফুল-উইডথ বাটন, ১px উপরে লিফট ও সিগনেচার কালার */
+                      <div className="flex flex-col items-center justify-between w-full mt-auto pb-1 select-none -translate-y-[1px]">
+                        <p className="text-[11px] text-slate-400 font-semibold tracking-tight text-center leading-none">
                           Already at the MAX level
                         </p>
                         
                         <button 
                           type="button"
                           onClick={handleDirectInvite}
-                          className="w-[138px] mt-2 py-1.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 active:scale-95 text-white rounded-full text-[12px] font-bold shadow-xs shadow-sky-500/20 transition-all cursor-pointer leading-tight text-center tracking-wide"
+                          className="w-full mt-1.5 py-1.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 active:scale-95 text-white rounded-full text-[12px] font-bold shadow-xs shadow-sky-500/20 transition-all cursor-pointer leading-tight text-center tracking-wide"
                         >
                           invite
                         </button>
