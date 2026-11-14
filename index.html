@@ -705,8 +705,8 @@
           <div className="fixed bottom-3.5 inset-x-0 z-40 flex items-center justify-center pointer-events-none px-2 select-none">
             <div className="flex items-center justify-center gap-2.5 pointer-events-auto w-auto">
               
-              {/* ১. ছিমছাম ছোট ফ্লোটিং ক্যাপসুল ডক (হোম, ওয়ালেট, ফ্রেন্ডস) */}
-              <nav className="h-[48px] bg-white/95 backdrop-blur-lg rounded-full border border-white/80 shadow-[0_10px_30px_rgba(56,189,248,0.16)] px-1.5 flex items-center gap-1 shrink-0">
+              {/* 🌟 ১. ফ্রস্টেড গ্লাস ক্যাপসুল ডক + উজ্জ্বল গ্লোয়িং সাদা বর্ডার */}
+              <nav className="h-[54px] bg-white/80 backdrop-blur-xl rounded-full border-[1.5px] border-white shadow-[0_10px_28px_rgba(15,23,42,0.12),0_0_18px_rgba(255,255,255,0.95),inset_0_1.5px_2px_rgba(255,255,255,1)] px-1.5 flex items-center gap-1 shrink-0">
                 {tabs.map((tab) => {
                   const IconComponent = tab.icon;
                   const isActive = activeTab === tab.id;
@@ -721,11 +721,11 @@
                       }}
                       className={`flex items-center justify-center transition-all duration-200 cursor-pointer active:scale-95 touch-manipulation shrink-0 ${
                         isActive
-                          ? 'bg-[#1c82f9] text-white px-4 py-2 rounded-full gap-1.5 shadow-md shadow-blue-500/25'
-                          : 'px-3 py-2 text-slate-400 hover:text-slate-600 rounded-full'
+                          ? 'bg-gradient-to-b from-[#2489f0] to-[#1262c2] text-white px-4 py-2 rounded-full gap-1.5 shadow-[0_4px_12px_rgba(18,98,194,0.32),inset_0_1px_1.5px_rgba(255,255,255,0.45)]'
+                          : 'px-3 py-2 text-slate-700 hover:text-slate-900 rounded-full'
                       }`}
                     >
-                      <IconComponent className={`w-[20px] h-[20px] shrink-0 ${isActive ? 'stroke-[2.5]' : 'stroke-[1.9]'}`} />
+                      <IconComponent className={`w-[20px] h-[20px] shrink-0 ${isActive ? 'stroke-[2.4]' : 'stroke-[1.9]'}`} />
                       
                       {isActive && (
                         <span className="font-sans font-extrabold text-[12.5px] tracking-tight leading-none">
@@ -737,14 +737,16 @@
                 })}
               </nav>
 
-              {/* ২. ডানপাশের গোল কুইক-ইনভাইট বাটন (FAB) */}
+              {/* 🌟 ক্যাপসুল ডকের সাথে হুবহু মিলানো ফ্রস্টেড গ্লাস রিং + উজ্জ্বল সাদা বর্ডার যুক্ত ৪৮px সিঙ্গেল বাটন */}
               <button
                 type="button"
                 onClick={handleFloatingInvite}
-                className="w-[48px] h-[48px] rounded-full bg-[#1c82f9] hover:bg-[#166ed4] active:scale-[0.88] text-white shadow-[0_10px_25px_rgba(28,130,249,0.38)] flex items-center justify-center transition-all duration-150 cursor-pointer shrink-0 touch-manipulation"
+                className="group w-[54px] h-[54px] rounded-full bg-white/80 backdrop-blur-xl border-[1.5px] border-white shadow-[0_10px_28px_rgba(15,23,42,0.12),0_0_18px_rgba(255,255,255,0.95),inset_0_1.5px_2px_rgba(255,255,255,1)] p-[0.5px] flex items-center justify-center shrink-0 cursor-pointer touch-manipulation select-none"
                 title="Quick Invite Fren"
               >
-                <Icons.UserPlus className="w-[21px] h-[21px] stroke-[2.4]" />
+                <span className="w-full h-full rounded-full bg-gradient-to-b from-[#2489f0] to-[#1262c2] group-hover:brightness-105 group-active:scale-[0.88] text-white shadow-[0_4px_12px_rgba(18,98,194,0.32),inset_0_1px_1.5px_rgba(255,255,255,0.45)] flex items-center justify-center transition-all duration-150 pointer-events-none">
+                  <Icons.UserPlus className="w-[21px] h-[21px] stroke-[2.3]" />
+                </span>
               </button>
 
             </div>
