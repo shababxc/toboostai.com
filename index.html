@@ -352,6 +352,21 @@
             <path d="M10 16.5h4" stroke="#10B981" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
         ),
+        TikTok: ({ className = "w-6 h-6 shrink-0" }) => (
+          <svg className={className} viewBox="0 0 24 24" fill="none">
+            <rect width="24" height="24" rx="6" fill="#010101" />
+            {/* Cyan layer */}
+            <path d="M16.6 8.3c-.9-.6-1.4-1.5-1.5-2.6V5h-2.1v10.2c0 1.2-1 2.2-2.2 2.2s-2.2-1-2.2-2.2 1-2.2 2.2-2.2c.2 0 .5 0 .7.1v-2.2c-.2 0-.5-.1-.7-.1-2.4 0-4.4 2-4.4 4.4s2 4.4 4.4 4.4c2.4 0 4.4-2 4.4-4.4v-5.2c1.1.8 2.5 1.3 4 1.3V8.8c-.9 0-1.9-.2-2.6-.5z" fill="#25F4EE" />
+            {/* White top layer */}
+            <path d="M16.3 8c-.9-.6-1.4-1.5-1.5-2.5V5h-2.1v10.2c0 1.2-1 2.2-2.2 2.2s-2.2-1-2.2-2.2 1-2.2 2.2-2.2c.2 0 .5 0 .7.1v-2.2c-.2 0-.5-.1-.7-.1-2.4 0-4.4 2-4.4 4.4s2 4.4 4.4 4.4c2.4 0 4.4-2 4.4-4.4v-5.2c1.1.8 2.5 1.3 4 1.3V8.5c-.9 0-1.9-.2-2.6-.5z" fill="#FFFFFF" />
+          </svg>
+        ),
+        BinanceSquare: ({ className = "w-6 h-6 shrink-0" }) => (
+          <svg className={className} viewBox="0 0 24 24" fill="none">
+            <rect width="24" height="24" rx="6" fill="#181A20" />
+            <path d="M12 9.9l2.1 2.1-2.1 2.1-2.1-2.1 2.1-2.1zm0-5.4l2.6 2.6-1.3 1.3-1.3-1.3-1.3 1.3-1.3-1.3L12 4.5zm0 15l-2.6-2.6 1.3-1.3 1.3 1.3 1.3-1.3 1.3 1.3L12 19.5zM4.5 12l2.6-2.6 1.3 1.3-1.3 1.3 1.3 1.3-1.3 1.3L4.5 12zm15 0l-2.6 2.6-1.3-1.3 1.3-1.3-1.3-1.3 1.3-1.3L19.5 12z" fill="#F0B90B"/>
+          </svg>
+        ),
         Globe: ({ className = "w-6 h-6" }) => (
           <svg className={className} viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="12" fill="#0284C7" />
@@ -965,6 +980,9 @@ const getLevelBadge = (lvl) => LEVEL_BADGES[lvl] || LEVEL_BADGES[4] || LEVEL_BAD
             case 'facebook': return <Icons.Facebook className="w-6 h-6 shrink-0 drop-shadow-xs" />;
             case 'instagram': return <Icons.Instagram className="w-6 h-6 shrink-0 drop-shadow-xs" />;
             case 'bot': return <Icons.Bot className="w-6 h-6 shrink-0 drop-shadow-xs" />;
+            case 'tiktok': return <Icons.TikTok className="w-6 h-6 shrink-0 drop-shadow-xs" />;
+            case 'binance':
+            case 'binancesquare': return <Icons.BinanceSquare className="w-6 h-6 shrink-0 drop-shadow-xs" />;
             case 'others':
             default: return <Icons.Globe className="w-6 h-6 shrink-0 drop-shadow-xs" />;
           }
@@ -1382,7 +1400,9 @@ const getLevelBadge = (lvl) => LEVEL_BADGES[lvl] || LEVEL_BADGES[4] || LEVEL_BAD
                       <option value="youtube">YouTube</option>
                       <option value="facebook">Facebook</option>
                       <option value="instagram">Instagram</option>
-                      <option value="others">Others</option>
+                      <option value="tiktok">TikTok</option>
+                      <option value="binance">Binance Square</option>
+                     <option value="others">Others</option>
                     </select>
                   </div>
                 </div>
